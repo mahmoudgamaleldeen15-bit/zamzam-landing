@@ -469,6 +469,76 @@ a{text-decoration:none;color:inherit}
 .btn-save-edit:hover{filter:brightness(1.1);transform:translateY(-1px)}
 .edit-note{font-size:11px;color:rgba(255,255,255,.35);text-align:center;margin-top:10px}
 
+/* ══════════════════════════════════
+   ADMIN PANEL TABS SYSTEM
+══════════════════════════════════ */
+.admin-nav-tabs{display:flex;gap:6px;margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.08);flex-wrap:wrap}
+.ant{flex:1;min-width:80px;padding:9px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.45);font-size:12px;font-weight:700;cursor:pointer;transition:all .25s;font-family:'Cairo',sans-serif;text-align:center}
+.ant:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.7)}
+.ant.on{background:rgba(244,63,94,.15);border-color:rgba(244,63,94,.4);color:#f43f5e}
+.admin-panel-sec{display:none}.admin-panel-sec.on{display:block}
+
+/* ══════════════════════════════════
+   MENU SECTION (MAIN PAGE)
+══════════════════════════════════ */
+#menus-section{background:linear-gradient(160deg,#080305 0%,#0d0308 100%);padding:72px 0 80px;position:relative;overflow:hidden}
+#menus-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 30% 30%,rgba(244,63,94,.07),transparent),radial-gradient(ellipse 60% 50% at 70% 70%,rgba(249,115,22,.05),transparent);pointer-events:none}
+.menus-inner{max-width:1100px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.menus-header{text-align:center;margin-bottom:36px}
+.menus-main-title{font-weight:900;font-size:clamp(1.6rem,5vw,2.8rem);color:#fff;letter-spacing:-.02em;margin-bottom:6px}
+.menus-main-title span{color:#f43f5e}
+.menus-sub{color:rgba(255,255,255,.4);font-size:.9rem;margin-bottom:24px}
+.menu-type-tabs{display:inline-flex;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:5px;gap:4px}
+.mtype{padding:10px 28px;border-radius:10px;border:none;background:transparent;color:rgba(255,255,255,.5);font-size:14px;font-weight:700;cursor:pointer;transition:all .3s;font-family:'Cairo',sans-serif;direction:rtl}
+.mtype.on{background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;box-shadow:0 4px 20px rgba(244,63,94,.4)}
+.mtype:not(.on):hover{color:#fff;background:rgba(255,255,255,.08)}
+
+/* ══════════════════════════════════
+   PRODUCT CARDS
+══════════════════════════════════ */
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;direction:rtl}
+.prod-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:20px;overflow:hidden;transition:all .35s;display:flex;flex-direction:column;position:relative}
+.prod-card:hover{transform:translateY(-6px);border-color:rgba(244,63,94,.25);box-shadow:0 24px 60px rgba(0,0,0,.5),0 0 0 1px rgba(244,63,94,.15)}
+.prod-card.unavailable{opacity:.55}
+.prod-img{width:100%;aspect-ratio:4/3;background:#1a1020;background-size:cover;background-position:center;position:relative;overflow:hidden}
+.prod-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.6) 0%,transparent 60%)}
+.prod-badges{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:5px;z-index:2}
+.pbadge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;border-radius:9999px;padding:4px 10px;letter-spacing:.04em;backdrop-filter:blur(8px)}
+.pbadge-avail{background:rgba(34,197,94,.9);color:#fff}
+.pbadge-unavail{background:rgba(100,100,100,.85);color:rgba(255,255,255,.7)}
+.pbadge-delivery{background:rgba(59,130,246,.85);color:#fff}
+.pbadge-pickup{background:rgba(168,85,247,.85);color:#fff}
+.prod-body{padding:16px 18px 18px;flex:1;display:flex;flex-direction:column}
+.prod-name{font-weight:900;font-size:1rem;color:#fff;margin-bottom:5px;line-height:1.3}
+.prod-desc{color:rgba(255,255,255,.45);font-size:.82rem;line-height:1.65;flex:1;margin-bottom:12px}
+.prod-price{font-weight:900;font-size:1.15rem;color:#f43f5e;margin-bottom:14px;letter-spacing:-.01em}
+.btn-prod-order{display:flex;align-items:center;justify-content:center;gap:7px;background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;font-weight:900;font-size:13px;border-radius:12px;padding:11px 18px;text-decoration:none;transition:all .3s;font-family:'Cairo',sans-serif;border:none;cursor:pointer;width:100%}
+.btn-prod-order:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-prod-order.resto{background:linear-gradient(135deg,#f97316,#ef4444)}
+.no-menu-msg{text-align:center;padding:60px 24px;color:rgba(255,255,255,.3)}
+.no-menu-msg .ni{font-size:52px;margin-bottom:12px}
+.no-menu-msg p{font-size:15px;font-weight:600}
+
+/* ══════════════════════════════════
+   ADMIN MENU MANAGEMENT
+══════════════════════════════════ */
+.menu-admin-item{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:11px 13px;transition:all .2s;margin-bottom:8px}
+.menu-admin-item:hover{border-color:rgba(244,63,94,.18)}
+.mai-thumb{width:52px;height:40px;border-radius:8px;background-size:cover;background-position:center;background-color:rgba(255,255,255,.06);flex-shrink:0}
+.mai-info{flex:1;min-width:0}
+.mai-name{font-weight:700;font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mai-price{font-size:11px;color:rgba(244,63,94,.8);font-weight:700}
+.mai-actions{display:flex;gap:5px;flex-shrink:0}
+.mai-btn{width:30px;height:30px;border-radius:7px;border:1px solid;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;background:transparent}
+.mai-btn-edit{border-color:rgba(59,130,246,.3);color:#60a5fa}.mai-btn-edit:hover{background:rgba(59,130,246,.2)}
+.mai-btn-del{border-color:rgba(239,68,68,.3);color:#f87171}.mai-btn-del:hover{background:rgba(239,68,68,.2)}
+.mai-btn-tog.on{border-color:rgba(34,197,94,.35);color:#4ade80}.mai-btn-tog.on:hover{background:rgba(34,197,94,.15)}
+.mai-btn-tog.off{border-color:rgba(100,100,100,.3);color:#6b7280}.mai-btn-tog.off:hover{background:rgba(100,100,100,.15)}
+.delivery-opts{display:flex;gap:8px;margin-top:8px}
+.dopt{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:8px 14px;cursor:pointer;transition:all .2s;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,.55);flex:1;justify-content:center}
+.dopt.on{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.4);color:#93c5fd}
+.dopt input{display:none}
+
 /* ══ AUTH MODAL ══ */
 #modal-auth{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.95);backdrop-filter:blur(28px);display:none;align-items:center;justify-content:center;font-family:'Cairo',sans-serif;direction:rtl}
 #modal-auth.open{display:flex}
@@ -487,7 +557,10 @@ a{text-decoration:none;color:inherit}
 .auth-btn-no{width:100%;padding:11px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.45);font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif;transition:all .2s}
 .auth-btn-no:hover{background:rgba(255,255,255,.1);color:#fff}
 /* ══ OFFERS HERO BUTTON ══ */
-.btn-offers-hero{display:inline-flex;align-items:center;gap:8px;background:transparent;border:2px solid #dc2626;color:#fff;border-radius:9999px;padding:12px 28px;font-size:clamp(13px,2.2vw,15px);font-weight:800;cursor:pointer;font-family:'Cairo',sans-serif;transition:all .3s;animation:offerBeat 2s ease-in-out infinite}
+.btn-offers-hero{display:inline-flex;align-items:center;gap:8px;background:transparent;border:2px solid rgba(255,255,255,.22);color:rgba(255,255,255,.85);border-radius:9999px;padding:11px 22px;font-size:clamp(12px,2vw,14px);font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;transition:all .3s}
+.btn-offers-hero:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.5);color:#fff;transform:translateY(-2px)}
+.btn-menu-nav{display:inline-flex;align-items:center;gap:8px;background:transparent;border:2px solid rgba(255,255,255,.22);color:rgba(255,255,255,.85);border-radius:9999px;padding:11px 22px;font-size:clamp(12px,2vw,14px);font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;transition:all .3s}
+.btn-menu-nav:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.5);color:#fff;transform:translateY(-2px)}
 @keyframes offerBeat{0%,100%{border-color:#dc2626;box-shadow:0 0 0 0 rgba(220,38,38,.55)}50%{border-color:#f87171;box-shadow:0 0 0 10px rgba(220,38,38,0)}}
 .btn-offers-hero:hover{background:#dc2626;transform:translateY(-3px);box-shadow:0 0 30px rgba(220,38,38,.5)}
 
@@ -596,6 +669,40 @@ a{text-decoration:none;color:inherit}
   </div>
 </div>
 
+
+<!-- ══ EDIT MENU ITEM MODAL ══ -->
+<div id="modal-edit-menu" style="position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,.92);backdrop-filter:blur(22px);display:none;align-items:center;justify-content:center;font-family:'Cairo',sans-serif;direction:rtl">
+  <div style="width:100%;max-width:500px;margin:20px;background:#0e0608;border:1px solid rgba(244,63,94,.22);border-radius:24px;overflow:hidden;max-height:90vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(244,63,94,.06);position:sticky;top:0">
+      <div style="font-weight:900;font-size:17px;color:#fff">✏️ تعديل المنتج</div>
+      <button onclick="ZZ.closeEditMenu()" style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:none;color:rgba(255,255,255,.65);font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:22px 24px 26px">
+      <input type="hidden" id="em-type">
+      <input type="hidden" id="em-id">
+      <div class="admin-form-grid">
+        <div><label class="admin-lbl">اسم المنتج *</label><input id="em-name" class="admin-inp" type="text"></div>
+        <div><label class="admin-lbl">الوصف</label><textarea id="em-desc" class="admin-inp" rows="3"></textarea></div>
+        <div><label class="admin-lbl">السعر</label><input id="em-price" class="admin-inp" type="text"></div>
+        <div id="em-delivery-row" style="display:none">
+          <label class="admin-lbl">طريقة الاستلام</label>
+          <div class="delivery-opts">
+            <label class="dopt" id="em-delivery-lbl" onclick="ZZ.toggleEditDelivery('delivery')"><input type="checkbox" id="em-delivery"> 🛵 ديليفري</label>
+            <label class="dopt" id="em-pickup-lbl" onclick="ZZ.toggleEditDelivery('pickup')"><input type="checkbox" id="em-pickup"> 🏃 استلام</label>
+          </div>
+        </div>
+        <div>
+          <label class="admin-lbl">صورة جديدة (اختياري)</label>
+          <input id="em-imgurl" class="admin-inp" placeholder="رابط صورة جديدة أو اتركه فاضي" type="url">
+          <div style="margin-top:6px"><input id="em-imgfile" class="admin-inp" type="file" accept="image/*" style="padding:8px;cursor:pointer"></div>
+        </div>
+      </div>
+      <div id="em-preview" style="width:100%;aspect-ratio:4/3;background:#1a1020;background-size:cover;background-position:center;border-radius:14px;margin:12px 0;border:1px solid rgba(255,255,255,.08)"></div>
+      <button onclick="ZZ.saveEditMenu()" style="width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;font-weight:900;font-size:15px;border:none;cursor:pointer;font-family:'Cairo',sans-serif;transition:all .25s">💾 حفظ التعديلات</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ AUTH MODAL ══ -->
 <div id="modal-auth">
   <div class="auth-box">
@@ -622,10 +729,20 @@ a{text-decoration:none;color:inherit}
 <div id="modal-admin">
   <div class="admin-box">
     <div class="admin-top">
-      <div class="admin-title">🔧 لوحة التحكم — العروض</div>
+      <div class="admin-title">🔧 لوحة التحكم</div>
       <button class="admin-close" onclick="ZZ.closeAdmin()">✕</button>
     </div>
     <div class="admin-body">
+      <!-- ══ NAV TABS ══ -->
+      <div class="admin-nav-tabs">
+        <button class="ant on" onclick="ZZ.adminTab('offers')">🏷️ العروض</button>
+        <button class="ant" onclick="ZZ.adminTab('cake-menu')">🎂 منيو الحلويات</button>
+        <button class="ant" onclick="ZZ.adminTab('resto-menu')">🍔 منيو المطعم</button>
+        <button class="ant" onclick="ZZ.adminTab('security')">🔐 الأمان</button>
+      </div>
+
+      <!-- ══ TAB: OFFERS ══ -->
+      <div id="admin-tab-offers" class="admin-panel-sec on">
       <!-- Add form -->
       <div class="admin-sec-title">إضافة عرض جديد</div>
       <div class="admin-form-grid">
@@ -667,6 +784,89 @@ a{text-decoration:none;color:inherit}
       </div>
 
       <!-- Security -->
+      </div><!-- end tab-offers -->
+
+      <!-- ══ TAB: CAKE MENU ══ -->
+      <div id="admin-tab-cake-menu" class="admin-panel-sec">
+        <div class="admin-sec-title">🎂 إضافة تورتة / حلوى جديدة</div>
+        <div class="admin-form-grid">
+          <div>
+            <label class="admin-lbl">اسم المنتج *</label>
+            <input id="cm-name" class="admin-inp" placeholder="مثال: تورتة شوكولاتة فاخرة" type="text">
+          </div>
+          <div>
+            <label class="admin-lbl">وصف / مواصفات</label>
+            <textarea id="cm-desc" class="admin-inp" placeholder="مثال: تورتة بكريمة الشوكولاتة الداكنة والفراولة الطازجة..." rows="3"></textarea>
+          </div>
+          <div>
+            <label class="admin-lbl">السعر / نطاق السعر</label>
+            <input id="cm-price" class="admin-inp" placeholder="مثال: 150 جنيه — 350 جنيه" type="text">
+          </div>
+          <div>
+            <label class="admin-lbl">صورة المنتج</label>
+            <div class="img-tabs">
+              <button class="img-tab on" id="cm-imgbtn-url" onclick="ZZ.setCakeImgMode('url')">🔗 رابط</button>
+              <button class="img-tab" id="cm-imgbtn-file" onclick="ZZ.setCakeImgMode('file')">📁 رفع</button>
+            </div>
+            <div id="cm-url-row"><input id="cm-imgurl" class="admin-inp" placeholder="https://..." type="url"></div>
+            <div id="cm-file-row" style="display:none"><input id="cm-imgfile" class="admin-inp" type="file" accept="image/*" style="padding:10px;cursor:pointer"></div>
+          </div>
+        </div>
+        <button class="btn-admin-add" style="background:linear-gradient(135deg,#f43f5e,#e11d48)" onclick="ZZ.addMenuItem('cake')">➕ إضافة للمنيو</button>
+        <div class="admin-note" id="cake-menu-note">✅ تم الحفظ</div>
+        <div style="margin-top:24px">
+          <div class="admin-sec-title">منيو الحلويات الحالي</div>
+          <div id="admin-cake-menu-list"><div style="text-align:center;color:rgba(255,255,255,.3);padding:20px;font-size:13px">لا توجد منتجات بعد</div></div>
+        </div>
+      </div><!-- end tab-cake-menu -->
+
+      <!-- ══ TAB: RESTAURANT MENU ══ -->
+      <div id="admin-tab-resto-menu" class="admin-panel-sec">
+        <div class="admin-sec-title">🍔 إضافة صنف جديد للمطعم</div>
+        <div class="admin-form-grid">
+          <div>
+            <label class="admin-lbl">اسم الصنف *</label>
+            <input id="rm-name" class="admin-inp" placeholder="مثال: برجر كلاسيك" type="text">
+          </div>
+          <div>
+            <label class="admin-lbl">وصف الصنف</label>
+            <textarea id="rm-desc" class="admin-inp" placeholder="مثال: برجر لحم مع جبن شيدر وخضروات طازجة..." rows="3"></textarea>
+          </div>
+          <div>
+            <label class="admin-lbl">السعر</label>
+            <input id="rm-price" class="admin-inp" placeholder="مثال: 85 جنيه" type="text">
+          </div>
+          <div>
+            <label class="admin-lbl">طريقة الاستلام</label>
+            <div class="delivery-opts">
+              <label class="dopt on" id="rm-delivery-lbl" onclick="ZZ.toggleDeliveryOpt('delivery')">
+                <input type="checkbox" id="rm-delivery" checked> 🛵 ديليفري
+              </label>
+              <label class="dopt on" id="rm-pickup-lbl" onclick="ZZ.toggleDeliveryOpt('pickup')">
+                <input type="checkbox" id="rm-pickup" checked> 🏃 استلام
+              </label>
+            </div>
+          </div>
+          <div>
+            <label class="admin-lbl">صورة الصنف</label>
+            <div class="img-tabs">
+              <button class="img-tab on" id="rm-imgbtn-url" onclick="ZZ.setRestoImgMode('url')">🔗 رابط</button>
+              <button class="img-tab" id="rm-imgbtn-file" onclick="ZZ.setRestoImgMode('file')">📁 رفع</button>
+            </div>
+            <div id="rm-url-row"><input id="rm-imgurl" class="admin-inp" placeholder="https://..." type="url"></div>
+            <div id="rm-file-row" style="display:none"><input id="rm-imgfile" class="admin-inp" type="file" accept="image/*" style="padding:10px;cursor:pointer"></div>
+          </div>
+        </div>
+        <button class="btn-admin-add" style="background:linear-gradient(135deg,#f97316,#ef4444)" onclick="ZZ.addMenuItem('restaurant')">➕ إضافة للمنيو</button>
+        <div class="admin-note" id="resto-menu-note">✅ تم الحفظ</div>
+        <div style="margin-top:24px">
+          <div class="admin-sec-title">منيو المطعم الحالي</div>
+          <div id="admin-resto-menu-list"><div style="text-align:center;color:rgba(255,255,255,.3);padding:20px;font-size:13px">لا توجد أصناف بعد</div></div>
+        </div>
+      </div><!-- end tab-resto-menu -->
+
+      <!-- ══ TAB: SECURITY ══ -->
+      <div id="admin-tab-security" class="admin-panel-sec">
       <div class="admin-sec-divider"></div>
       <div class="admin-sec-title">🔐 تغيير كلمة السر</div>
       <div class="admin-form-grid" style="margin-bottom:10px">
@@ -696,7 +896,7 @@ a{text-decoration:none;color:inherit}
         <button class="btn-admin-add" style="background:linear-gradient(135deg,#0369a1,#0284c7)" onclick="ZZ.changePin()">حفظ PIN في الفايربيز</button>
       </div>
       <div class="pin-status" id="pin-status"></div>
-
+      </div><!-- end tab-security -->
     </div>
   </div>
 </div>
@@ -786,6 +986,7 @@ a{text-decoration:none;color:inherit}
     <a href="#hero"        onclick="toggleMenu()">الحلويات</a>
     <a href="#restaurant"  onclick="toggleMenu()">مطعم زمزم</a>
     <a href="#about"       onclick="toggleMenu()">من نحن</a>
+    <a href="#menus-section" onclick="toggleMenu();setTimeout(function(){document.getElementById('menus-section').scrollIntoView({behavior:'smooth'})},300);return false">قوائمنا</a>
     <a href="#" onclick="toggleMenu();ZZ.openContact();return false">تواصل معنا</a>
     <div class="mob-cta-wrap">
       <a href="https://mahmoudgamaleldeen15-bit.github.io/zamzam-cake/" target="_blank" class="btn-cake" onclick="toggleMenu()" style="font-size:15px;padding:14px 32px">
@@ -827,18 +1028,22 @@ a{text-decoration:none;color:inherit}
       <br/><strong>نحن لا نصنع حلوى فقط — بل نصنع لحظات لا تُنسى.</strong>
     </div>
 
-    <div class="cta-row reveal" data-delay="420">
-      <a href="https://mahmoudgamaleldeen15-bit.github.io/zamzam-cake/" target="_blank" class="btn-cake">
-        ✨ صمم تورتتك بنفسك 🎂
+    <!-- Row 1: Primary Actions -->
+    <div class="reveal" data-delay="420" style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+      <a href="https://mahmoudgamaleldeen15-bit.github.io/zamzam-cake/" target="_blank" class="btn-cake" style="flex:1;min-width:160px;justify-content:center">
+        🎂 صمم تورتتك
       </a>
-      <a href="#restaurant" class="btn-fire2">
-        <span class="fire2-icon">🔥</span>
-        اطلب من المطعم
+      <a href="#restaurant" class="btn-fire2" style="flex:1;min-width:160px;justify-content:center;padding:14px 20px">
+        <span class="fire2-icon">🔥</span> اطلب من المطعم
       </a>
     </div>
-    <div class="reveal" data-delay="500" style="text-align:center;margin-top:4px">
-      <button class="btn-offers-hero" onclick="ZZ.showOffers()">
-        🏷️ عروضنا الحصرية &nbsp;&nbsp;→
+    <!-- Row 2: Secondary Actions -->
+    <div class="reveal" data-delay="500" style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn-offers-hero" onclick="ZZ.showOffers()" style="flex:1;min-width:140px;justify-content:center;animation:none">
+        🏷️ عروضنا
+      </button>
+      <button class="btn-menu-nav" onclick="document.getElementById('menus-section').scrollIntoView({behavior:'smooth'})" style="flex:1;min-width:140px;justify-content:center">
+        🍽️ تصفح القوائم
       </button>
     </div>
 
@@ -1008,6 +1213,39 @@ a{text-decoration:none;color:inherit}
 <!-- ═══════════════════════════════════════
      FOOTER
 ═══════════════════════════════════════ -->
+
+<!-- ══════════════════════════════════════════════════════
+     SECTION: OUR MENUS
+══════════════════════════════════════════════════════ -->
+<section id="menus-section">
+  <div class="menus-inner">
+    <div class="menus-header">
+      <h2 class="menus-main-title">قوائم<span>نا</span></h2>
+      <p class="menus-sub">اختر ما يناسبك واطلبه بسهولة</p>
+      <div class="menu-type-tabs">
+        <button class="mtype on" onclick="ZZ.switchMenuDisplay('cake')">🎂 الحلويات والتورتات</button>
+        <button class="mtype" onclick="ZZ.switchMenuDisplay('restaurant')">🍔 المطعم</button>
+      </div>
+    </div>
+
+    <!-- Cake Menu Grid -->
+    <div id="cake-menu-display">
+      <div class="no-menu-msg">
+        <div class="ni">🎂</div>
+        <p>جاري تحميل القائمة...</p>
+      </div>
+    </div>
+
+    <!-- Restaurant Menu Grid -->
+    <div id="resto-menu-display" style="display:none">
+      <div class="no-menu-msg">
+        <div class="ni">🍔</div>
+        <p>جاري تحميل القائمة...</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer id="footer">
   <div class="footer-inner">
       <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:18px;flex-wrap:wrap">
@@ -1758,6 +1996,306 @@ var ZZ_PROMO = (function(){
 
 /* تشغيل النظام */
 ZZ_PROMO.start();
+
+/* ════════════════════════════════════════════════════════
+   ZAMZAM MENU SYSTEM — منيو الحلويات والمطعم
+════════════════════════════════════════════════════════ */
+const CAKE_APP_URL = 'https://mahmoudgamaleldeen15-bit.github.io/zamzam-cake/';
+const RESTO_APP_URL = 'https://mahmoudgamaleldeen15-bit.github.io/Zamzam-Restaurant-Cafe/';
+
+/* ── Admin Tabs ── */
+ZZ.adminTab = function(tab) {
+  document.querySelectorAll('.admin-panel-sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.ant').forEach(b=>b.classList.remove('on'));
+  document.getElementById('admin-tab-'+tab).classList.add('on');
+  event.target.classList.add('on');
+  if(tab==='cake-menu') ZZ.loadAdminMenuList('cake');
+  if(tab==='resto-menu') ZZ.loadAdminMenuList('restaurant');
+};
+
+/* ── Image Mode Helpers ── */
+ZZ._cakeImgMode='url'; ZZ._restoImgMode='url';
+ZZ.setCakeImgMode=function(m){
+  ZZ._cakeImgMode=m;
+  document.getElementById('cm-url-row').style.display=m==='url'?'block':'none';
+  document.getElementById('cm-file-row').style.display=m==='file'?'block':'none';
+  document.getElementById('cm-imgbtn-url').classList.toggle('on',m==='url');
+  document.getElementById('cm-imgbtn-file').classList.toggle('on',m==='file');
+};
+ZZ.setRestoImgMode=function(m){
+  ZZ._restoImgMode=m;
+  document.getElementById('rm-url-row').style.display=m==='url'?'block':'none';
+  document.getElementById('rm-file-row').style.display=m==='file'?'block':'none';
+  document.getElementById('rm-imgbtn-url').classList.toggle('on',m==='url');
+  document.getElementById('rm-imgbtn-file').classList.toggle('on',m==='file');
+};
+
+/* ── Delivery Opts ── */
+ZZ._deliveryOpts={delivery:true,pickup:true};
+ZZ.toggleDeliveryOpt=function(opt){
+  ZZ._deliveryOpts[opt]=!ZZ._deliveryOpts[opt];
+  var lbl=document.getElementById('rm-'+opt+'-lbl');
+  if(lbl) lbl.classList.toggle('on',ZZ._deliveryOpts[opt]);
+  var chk=document.getElementById('rm-'+opt);
+  if(chk) chk.checked=ZZ._deliveryOpts[opt];
+};
+ZZ._editDeliveryOpts={delivery:true,pickup:true};
+ZZ.toggleEditDelivery=function(opt){
+  ZZ._editDeliveryOpts[opt]=!ZZ._editDeliveryOpts[opt];
+  var lbl=document.getElementById('em-'+opt+'-lbl');
+  if(lbl) lbl.classList.toggle('on',ZZ._editDeliveryOpts[opt]);
+  var chk=document.getElementById('em-'+opt);
+  if(chk) chk.checked=ZZ._editDeliveryOpts[opt];
+};
+
+/* ── Compress Image ── */
+async function _compressMenuImg(src,maxW,q){
+  return new Promise(function(res){
+    try{
+      var im=new Image(); im.crossOrigin='anonymous';
+      im.onload=function(){
+        try{
+          var w=Math.min(im.width,maxW||800),h=Math.round(im.height*w/im.width);
+          var cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+          cv.getContext('2d').drawImage(im,0,0,w,h);
+          res(cv.toDataURL('image/jpeg',q||0.65));
+        }catch(e){res(src);}
+      };
+      im.onerror=function(){res(src);};
+      im.src=src;
+    }catch(e){res(src);}
+  });
+}
+
+async function _getMenuImg(file,urlEl,fileEl,maxW,q){
+  if(file){
+    var raw=await new Promise(function(res,rej){
+      var fr=new FileReader(); fr.onload=function(e){res(e.target.result);};
+      fr.onerror=function(){rej(new Error('فشل قراءة الملف'));}; fr.readAsDataURL(file);
+    });
+    return await _compressMenuImg(raw,maxW||800,q||0.65);
+  }
+  if(urlEl && urlEl.value.trim()) return urlEl.value.trim();
+  return '';
+}
+
+/* ── Firebase CRUD ── */
+ZZ.addMenuItem = async function(type) {
+  try{
+    var nameEl=document.getElementById(type==='cake'?'cm-name':'rm-name');
+    var descEl=document.getElementById(type==='cake'?'cm-desc':'rm-desc');
+    var priceEl=document.getElementById(type==='cake'?'cm-price':'rm-price');
+    var name=(nameEl&&nameEl.value||'').trim();
+    if(!name){alert('من فضلك أدخل اسم المنتج');return;}
+    if(!window.zzdb){alert('الفايربيز مش متصل — تأكد من الإعدادات');return;}
+
+    var imgFile=null, imgUrl=null;
+    if(type==='cake'){
+      if(ZZ._cakeImgMode==='file'){var f=document.getElementById('cm-imgfile'); imgFile=f&&f.files&&f.files[0];}
+      else imgUrl=document.getElementById('cm-imgurl');
+    }else{
+      if(ZZ._restoImgMode==='file'){var f=document.getElementById('rm-imgfile'); imgFile=f&&f.files&&f.files[0];}
+      else imgUrl=document.getElementById('rm-imgurl');
+    }
+
+    var img=await _getMenuImg(imgFile,imgUrl,null,800,0.65);
+    var item={
+      name:name,
+      desc:(descEl&&descEl.value||'').trim(),
+      price:(priceEl&&priceEl.value||'').trim(),
+      img:img,
+      available:true,
+      createdAt:Date.now()
+    };
+    if(type==='restaurant'){
+      item.delivery=ZZ._deliveryOpts.delivery;
+      item.pickup=ZZ._deliveryOpts.pickup;
+    }
+
+    await zzdb.ref('landing/menus/'+type).push(item);
+
+    var noteId=type==='cake'?'cake-menu-note':'resto-menu-note';
+    var n=document.getElementById(noteId); if(n){n.classList.add('show');setTimeout(function(){n.classList.remove('show');},2500);}
+    ['cm-name','cm-desc','cm-price','cm-imgurl','rm-name','rm-desc','rm-price','rm-imgurl'].forEach(function(id){
+      var el=document.getElementById(id); if(el) el.value='';
+    });
+    ZZ.loadAdminMenuList(type);
+    ZZ.loadMenuDisplay(type);
+  }catch(err){
+    console.error('[ZZ Menu] addMenuItem:',err);
+    alert('❌ خطأ: '+(err.message||err));
+  }
+};
+
+ZZ.loadAdminMenuList = async function(type){
+  var listId=type==='cake'?'admin-cake-menu-list':'admin-resto-menu-list';
+  var el=document.getElementById(listId); if(!el) return;
+  if(!window.zzdb){el.innerHTML='<div style="color:rgba(255,255,255,.3);text-align:center;padding:16px;font-size:13px">الفايربيز غير متصل</div>';return;}
+  var snap=await zzdb.ref('landing/menus/'+type).orderByChild('createdAt').once('value');
+  var items=[]; snap.forEach(function(ch){items.unshift({id:ch.key,...ch.val()});});
+  if(!items.length){el.innerHTML='<div style="text-align:center;color:rgba(255,255,255,.3);padding:20px;font-size:13px">لا توجد منتجات بعد</div>';return;}
+  el.innerHTML=items.map(function(it){
+    return '<div class="menu-admin-item">'
+      +'<div class="mai-thumb" id="mat_'+it.id+'" style="background-color:#1a1020"></div>'
+      +'<div class="mai-info">'
+      +'<div class="mai-name">'+(it.name||'')+'</div>'
+      +'<div class="mai-price">'+(it.price||'—')+'</div>'
+      +'</div>'
+      +'<div class="mai-actions">'
+      +'<button class="mai-btn mai-btn-tog '+(it.available?'on':'off')+'" onclick="ZZ.toggleMenuAvail(\''+type+'\',\''+it.id+'\','+(it.available?'false':'true')+')" title="'+(it.available?'إخفاء':'إظهار')+'">'+(it.available?'✅':'🔴')+'</button>'
+      +'<button class="mai-btn mai-btn-edit" onclick="ZZ.openEditMenu(\''+type+'\',\''+it.id+'\')" title="تعديل">✏️</button>'
+      +'<button class="mai-btn mai-btn-del" onclick="ZZ.deleteMenuItem(\''+type+'\',\''+it.id+'\')" title="حذف">🗑</button>'
+      +'</div></div>';
+  }).join('');
+  /* Set thumbnails */
+  items.forEach(function(it){
+    var t=document.getElementById('mat_'+it.id);
+    if(t&&it.img) t.style.backgroundImage='url("'+it.img+'")';
+  });
+};
+
+ZZ.toggleMenuAvail = async function(type,id,avail){
+  if(!window.zzdb) return;
+  await zzdb.ref('landing/menus/'+type+'/'+id+'/available').set(avail);
+  ZZ.loadAdminMenuList(type);
+  ZZ.loadMenuDisplay(type);
+};
+
+ZZ.deleteMenuItem = async function(type,id){
+  if(!confirm('حذف هذا المنتج نهائياً؟')) return;
+  if(!window.zzdb) return;
+  await zzdb.ref('landing/menus/'+type+'/'+id).remove();
+  ZZ.loadAdminMenuList(type);
+  ZZ.loadMenuDisplay(type);
+};
+
+/* ── Edit Item ── */
+ZZ._editMenuData={};
+ZZ.openEditMenu = async function(type,id){
+  if(!window.zzdb) return;
+  var snap=await zzdb.ref('landing/menus/'+type+'/'+id).once('value');
+  var it=snap.val(); if(!it) return;
+  ZZ._editMenuData={type:type,id:id,img:it.img};
+  document.getElementById('em-type').value=type;
+  document.getElementById('em-id').value=id;
+  document.getElementById('em-name').value=it.name||'';
+  document.getElementById('em-desc').value=it.desc||'';
+  document.getElementById('em-price').value=it.price||'';
+  document.getElementById('em-imgurl').value='';
+  var fe=document.getElementById('em-imgfile'); if(fe) fe.value='';
+  var prev=document.getElementById('em-preview');
+  if(prev&&it.img) prev.style.backgroundImage='url("'+it.img+'")';
+  /* delivery opts for restaurant */
+  var drow=document.getElementById('em-delivery-row');
+  if(drow) drow.style.display=type==='restaurant'?'block':'none';
+  if(type==='restaurant'){
+    ZZ._editDeliveryOpts={delivery:!!it.delivery,pickup:!!it.pickup};
+    ['delivery','pickup'].forEach(function(opt){
+      var lbl=document.getElementById('em-'+opt+'-lbl');
+      var chk=document.getElementById('em-'+opt);
+      if(lbl) lbl.classList.toggle('on',!!it[opt]);
+      if(chk) chk.checked=!!it[opt];
+    });
+  }
+  document.getElementById('modal-edit-menu').style.display='flex';
+};
+
+ZZ.closeEditMenu=function(){document.getElementById('modal-edit-menu').style.display='none';};
+
+ZZ.saveEditMenu = async function(){
+  try{
+    var type=document.getElementById('em-type').value;
+    var id=document.getElementById('em-id').value;
+    var name=(document.getElementById('em-name').value||'').trim();
+    if(!name){alert('أدخل اسم المنتج');return;}
+    if(!window.zzdb) return;
+    var updates={};
+    updates.name=name;
+    updates.desc=(document.getElementById('em-desc').value||'').trim();
+    updates.price=(document.getElementById('em-price').value||'').trim();
+    if(type==='restaurant'){
+      updates.delivery=ZZ._editDeliveryOpts.delivery;
+      updates.pickup=ZZ._editDeliveryOpts.pickup;
+    }
+    /* Handle image */
+    var fileEl=document.getElementById('em-imgfile');
+    var urlEl=document.getElementById('em-imgurl');
+    var newFile=fileEl&&fileEl.files&&fileEl.files[0];
+    var newUrl=urlEl&&urlEl.value.trim();
+    if(newFile||newUrl){
+      updates.img=await _getMenuImg(newFile,urlEl,null,800,0.65);
+    } else {
+      updates.img=ZZ._editMenuData.img;
+    }
+    await zzdb.ref('landing/menus/'+type+'/'+id).update(updates);
+    ZZ.closeEditMenu();
+    ZZ.loadAdminMenuList(type);
+    ZZ.loadMenuDisplay(type);
+  }catch(err){alert('❌ '+err.message);}
+};
+document.getElementById('modal-edit-menu').addEventListener('click',function(e){if(e.target===this)ZZ.closeEditMenu();});
+
+/* ── Display Menu (Main Page) ── */
+ZZ.switchMenuDisplay=function(type){
+  document.getElementById('cake-menu-display').style.display=type==='cake'?'block':'none';
+  document.getElementById('resto-menu-display').style.display=type==='restaurant'?'block':'none';
+  document.querySelectorAll('.mtype').forEach(function(b){b.classList.remove('on');});
+  event.target.classList.add('on');
+};
+
+ZZ.loadMenuDisplay = async function(type){
+  var el=document.getElementById(type==='cake'?'cake-menu-display':'resto-menu-display');
+  if(!el) return;
+  if(!window.zzdb){return;}
+  var snap=await zzdb.ref('landing/menus/'+type).orderByChild('createdAt').once('value');
+  var items=[]; snap.forEach(function(ch){var v=ch.val(); if(v&&v.available!==false) items.unshift({id:ch.key,...v});});
+  if(!items.length){
+    el.innerHTML='<div class="no-menu-msg"><div class="ni">'+(type==='cake'?'🎂':'🍔')+'</div><p>لا توجد منتجات حالياً</p></div>';
+    return;
+  }
+  var grid='<div class="menu-grid">'+items.map(function(it){
+    var badges='';
+    if(it.available!==false) badges+='<span class="pbadge pbadge-avail">✅ متاح</span>';
+    if(type==='restaurant'){
+      if(it.delivery) badges+='<span class="pbadge pbadge-delivery">🛵 ديليفري</span>';
+      if(it.pickup)   badges+='<span class="pbadge pbadge-pickup">🏃 استلام</span>';
+    }
+    var targetUrl=type==='cake'?CAKE_APP_URL:RESTO_APP_URL;
+    var btnClass=type==='restaurant'?'btn-prod-order resto':'btn-prod-order';
+    return '<div class="prod-card">'
+      +'<div class="prod-img" id="pimg_'+it.id+'">'
+      +'<div class="prod-badges">'+badges+'</div>'
+      +'</div>'
+      +'<div class="prod-body">'
+      +'<div class="prod-name">'+(it.name||'')+'</div>'
+      +(it.desc?'<div class="prod-desc">'+(it.desc||'')+'</div>':'')
+      +(it.price?'<div class="prod-price">'+(it.price||'')+'</div>':'')
+      +'<a href="'+targetUrl+'" target="_blank" class="'+btnClass+'">اطلب الآن <span style="display:inline-block;transform:scaleX(-1)">→</span></a>'
+      +'</div></div>';
+  }).join('')+'</div>';
+  el.innerHTML=grid;
+  /* Set images after innerHTML */
+  items.forEach(function(it){
+    var div=document.getElementById('pimg_'+it.id);
+    if(div&&it.img) div.style.backgroundImage='url("'+it.img+'")';
+  });
+};
+
+/* ── Load All Menus on Page Load ── */
+setTimeout(function(){
+  if(window.zzdb){
+    ZZ.loadMenuDisplay('cake');
+    ZZ.loadMenuDisplay('restaurant');
+  } else {
+    setTimeout(function(){
+      if(window.zzdb){
+        ZZ.loadMenuDisplay('cake');
+        ZZ.loadMenuDisplay('restaurant');
+      }
+    },2500);
+  }
+},1500);
+
 </script>
 
 </body>
