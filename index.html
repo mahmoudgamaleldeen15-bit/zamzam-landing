@@ -730,7 +730,7 @@ a{text-decoration:none;color:inherit}
       <div id="auth-err" class="auth-err">❌ بيانات خاطئة</div>
       <input type="password" id="auth-pass" class="auth-inp" placeholder="🔑 كلمة السر" autocomplete="off">
       <div id="auth-pin-wrap" style="display:none">
-        <input type="text" id="auth-pin" class="auth-inp" placeholder="🔢 PIN الفايربيز" maxlength="8" inputmode="numeric" autocomplete="off">
+        <input type="password" id="auth-pin" class="auth-inp" placeholder="🔢 PIN الفايربيز" maxlength="8" inputmode="numeric" autocomplete="off">
       </div>
       <button class="auth-btn-go" onclick="ZZ.checkAuth()">دخول ←</button>
       <button class="auth-btn-no" onclick="ZZ.closeAuth()">إلغاء</button>
@@ -921,7 +921,7 @@ a{text-decoration:none;color:inherit}
       <div class="admin-form-grid" style="margin-bottom:10px">
         <div>
           <label class="admin-lbl">PIN جديد (أرقام فقط — 4-8 خانات)</label>
-          <input id="new-pin" type="text" class="admin-inp" placeholder="مثال: 4829" maxlength="8" inputmode="numeric">
+          <input id="new-pin" type="password" class="admin-inp" placeholder="••••" maxlength="8" inputmode="numeric">
         </div>
         <button class="btn-admin-add" style="background:linear-gradient(135deg,#0369a1,#0284c7)" onclick="ZZ.changePin()">حفظ PIN في الفايربيز</button>
       </div>
@@ -1752,16 +1752,25 @@ try {
   if(typeof firebase !== 'undefined') {
     if(!firebase.apps.length) firebase.initializeApp(ZZ_FB_CONFIG);
     window.zzdb = firebase.database();
-    /* Sign in anonymously to get Firebase write permission */
+    window.ZZ_AUTH_READY = false;
+    /* Sign in anonymously FIRST, then start everything */
     firebase.auth().signInAnonymously()
-      .then(function() { console.log('[ZAMZAM] Firebase Auth ✅ — connected'); })
+      .then(function(cred) {
+        window.ZZ_AUTH_READY = true;
+        window.ZZ_USER = cred.user;
+        console.log('[ZAMZAM] ✅ Auth ready — uid:', cred.user.uid);
+        /* Start real-time listeners AFTER auth */
+        if(typeof _zzInit==='function') _zzInit();
+      })
       .catch(function(e) {
-        console.warn('[ZAMZAM] Auth failed (normal on file://):', e.code);
-        /* Still try to use zzdb for reads */
+        console.warn('[ZAMZAM] Auth failed:', e.code, '— check Anonymous Auth in Firebase Console');
+        window.ZZ_AUTH_READY = false;
+        /* Try listeners anyway (for read-only) */
+        if(typeof _zzInit==='function') _zzInit();
       });
     console.log('[ZAMZAM] Firebase connected ✅');
   }
-} catch(e) { window.zzdb = null; console.warn('[ZAMZAM] Firebase not configured'); }
+} catch(e) { window.zzdb = null; console.warn('[ZAMZAM] Firebase not configured:', e.message); }
 
 /* ════════════════════════════════════════
    AUTH SYSTEM
@@ -2159,6 +2168,35 @@ ZZ.toggleEditDelivery = function(opt) {
 ZZ._offersCache  = [];
 ZZ._offersSubbed = false;
 
+/* Force re-read from Firebase and update UI immediately */
+ZZ._forceRefreshOffers = function() {
+  if (!window.zzdb) return;
+  zzdb.ref('landing/offers').orderByChild('createdAt').once('value')
+    .then(function(snap) {
+      ZZ._offersCache = [];
+      snap.forEach(function(ch) {
+        ZZ._offersCache.unshift(Object.assign({ id: ch.key }, ch.val()));
+      });
+      ZZ._updatePromoCache();
+      ZZ.renderAdminList();
+    })
+    .catch(function(e) { console.warn('Refresh offers error:', e.message); });
+};
+
+ZZ._forceRefreshMenu = function(type) {
+  if (!window.zzdb) return;
+  zzdb.ref('landing/menus/' + type).orderByChild('createdAt').once('value')
+    .then(function(snap) {
+      ZZ._menuCache[type] = [];
+      snap.forEach(function(ch) {
+        ZZ._menuCache[type].unshift(Object.assign({ id: ch.key }, ch.val()));
+      });
+      ZZ.renderMenuDisplay(type);
+      ZZ._renderAdminMenuList(type);
+    })
+    .catch(function(e) { console.warn('Refresh menu error:', e.message); });
+};
+
 ZZ.subscribeOffers = function() {
   if (ZZ._offersSubbed || !window.zzdb) return;
   ZZ._offersSubbed = true;
@@ -2183,7 +2221,11 @@ ZZ.addOffer = function() {
   var linkEl    = document.getElementById('ai-link');
   var title = titleEl ? titleEl.value.trim() : '';
   if (!title) { alert('من فضلك أدخل عنوان العرض'); return; }
-  if (!window.zzdb) { alert('⚠️ الفايربيز مش متصل\nتأكد إنك فاتح الملف من GitHub Pages:\nhttps://mahmoudgamaleldeen15-bit.github.io/zamzam-landing/\nمش من الكمبيوتر مباشرة'); return; }
+  if (!window.zzdb) { alert('⚠️ الفايربيز مش متصل'); return; }
+  if (!window.ZZ_AUTH_READY) {
+    alert('⏳ جاري تسجيل الدخول تلقائياً...\nانتظر ثانيتين وأعد المحاولة');
+    return;
+  }
 
   var offer = {
     title:     title,
@@ -2205,16 +2247,19 @@ ZZ.addOffer = function() {
 
   /* Get image then save */
   function _doSave(img) {
-    offer.img = img;
-    if (!img) { alert('من فضلك أضف صورة للعرض'); return; }
+    offer.img = img || '';
     zzdb.ref('landing/offers').push(offer)
       .then(function() {
+        /* Clear form */
         ['ai-title','ai-caption','ai-link','ai-imgurl','ai-orig-price','ai-sale-price','ai-bogo-desc'].forEach(function(id) {
           var el = document.getElementById(id); if (el) el.value = '';
         });
         var fe = document.getElementById('ai-imgfile'); if (fe) try { fe.value = ''; } catch(e) {}
+        /* Show toast */
         var n = document.getElementById('admin-save-note');
         if (n) { n.classList.add('show'); setTimeout(function() { n.classList.remove('show'); }, 2500); }
+        /* Force refresh — don't wait for listener */
+        ZZ._forceRefreshOffers();
       })
       .catch(function(err) { alert('❌ Firebase error: ' + err.message); });
   }
@@ -2372,7 +2417,11 @@ ZZ.addMenuItem = function(type) {
   var price = priceEl ? priceEl.value.trim() : '';
 
   if (!name) { alert('من فضلك أدخل اسم المنتج'); return; }
-  if (!window.zzdb) { alert('⚠️ الفايربيز مش متصل\nافتح الملف من GitHub Pages وليس من الكمبيوتر'); return; }
+  if (!window.zzdb) { alert('⚠️ الفايربيز مش متصل'); return; }
+  if (!window.ZZ_AUTH_READY) {
+    alert('⏳ جاري تسجيل الدخول تلقائياً...\nانتظر ثانيتين وأعد المحاولة');
+    return;
+  }
 
   var item = { name: name, desc: desc, price: price, available: true, createdAt: Date.now() };
   if (type === 'restaurant') {
@@ -2389,6 +2438,8 @@ ZZ.addMenuItem = function(type) {
         var noteId = type==='cake' ? 'cake-menu-note' : 'resto-menu-note';
         var n = document.getElementById(noteId);
         if (n) { n.classList.add('show'); setTimeout(function() { n.classList.remove('show'); }, 2500); }
+        /* Force refresh */
+        ZZ._forceRefreshMenu(type);
       })
       .catch(function(err) { alert('❌ ' + err.message); });
   }
@@ -2562,17 +2613,20 @@ function _zzInit() {
   ZZ.subscribeMenu('cake');
   ZZ.subscribeMenu('restaurant');
 }
-if (window.zzdb) {
+/* _zzInit will be called by auth callback — no polling needed */
+/* But keep as fallback for when auth completes before this block runs */
+if (window.ZZ_AUTH_READY && window.zzdb) {
   _zzInit();
-} else {
-  var _zzT = setInterval(function() {
-    if (window.zzdb) { clearInterval(_zzT); _zzInit(); }
-  }, 400);
-  setTimeout(function() { clearInterval(_zzT); }, 10000);
 }
 
 /* Failsafe: ensure window.ZZ is always available */
 if (typeof ZZ !== 'undefined') window.ZZ = ZZ;
+
+/* Note: _zzInit() is called by Firebase auth callback above.
+   Fallback in case auth was already done when this runs. */
+if (window.ZZ_AUTH_READY && typeof _zzInit === 'function') {
+  _zzInit();
+}
 </script>
 
 </body>
