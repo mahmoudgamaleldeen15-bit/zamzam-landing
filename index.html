@@ -2286,6 +2286,105 @@ ZZ.deleteOffer = function(id) {
   if (!window.zzdb) return;
   zzdb.ref('landing/offers/' + id).remove().catch(function(e) { alert('❌ ' + e.message); });
 };
+
+/* ── Edit Offer ── */
+ZZ._editOfferData = {};
+
+ZZ.openEditOffer = function(id) {
+  if (!window.zzdb) return;
+  zzdb.ref('landing/offers/' + id).once('value').then(function(snap) {
+    var o = snap.val(); if (!o) return;
+    ZZ._editOfferData = { id: id, img: o.img, offerType: o.offerType || 'standard' };
+    /* Populate modal fields */
+    var f = function(elId, val) { var el=document.getElementById(elId); if(el) el.value=val||''; };
+    f('eo-title',      o.title);
+    f('eo-caption',    o.caption);
+    f('eo-link',       o.link);
+    f('eo-orig-price', o.origPrice);
+    f('eo-sale-price', o.salePrice);
+    f('eo-bogo-desc',  o.bogoDesc);
+    f('eo-imgurl',     '');
+    var fe = document.getElementById('eo-imgfile'); if(fe) fe.value='';
+    /* Offer type tabs */
+    document.querySelectorAll('.eo-type-btn').forEach(function(b) { b.classList.remove('on'); });
+    var tb = document.getElementById('eo-type-' + (o.offerType||'standard'));
+    if (tb) tb.classList.add('on');
+    var dr = document.getElementById('eo-discount-row');
+    var br = document.getElementById('eo-bogo-row');
+    if(dr) dr.style.display = (o.offerType==='discount') ? 'block' : 'none';
+    if(br) br.style.display = (o.offerType==='bogo')     ? 'block' : 'none';
+    /* Preview current image */
+    var prev = document.getElementById('eo-img-preview');
+    if(prev) { prev.style.backgroundImage = o.img ? 'url("'+o.img+'")' : 'none'; prev.style.display = o.img ? 'block' : 'none'; }
+    /* Show modal */
+    document.getElementById('modal-edit-offer').style.display = 'flex';
+  });
+};
+
+ZZ.closeEditOffer = function() {
+  document.getElementById('modal-edit-offer').style.display = 'none';
+};
+
+ZZ.setEditOfferType = function(type, btn) {
+  ZZ._editOfferData.offerType = type;
+  document.querySelectorAll('.eo-type-btn').forEach(function(b) { b.classList.remove('on'); });
+  btn.classList.add('on');
+  var dr = document.getElementById('eo-discount-row');
+  var br = document.getElementById('eo-bogo-row');
+  if(dr) dr.style.display = (type==='discount') ? 'block' : 'none';
+  if(br) br.style.display = (type==='bogo')     ? 'block' : 'none';
+};
+
+ZZ.setEditOfferImgMode = function(m, btn) {
+  document.querySelectorAll('.eo-img-tab').forEach(function(b) { b.classList.remove('on'); });
+  btn.classList.add('on');
+  document.getElementById('eo-url-row').style.display  = m==='url'  ? 'block':'none';
+  document.getElementById('eo-file-row').style.display = m==='file' ? 'block':'none';
+  ZZ._editOfferData._imgMode = m;
+};
+
+ZZ.saveEditOffer = function() {
+  var id = ZZ._editOfferData.id;
+  if (!id || !window.zzdb) return;
+  var title = (document.getElementById('eo-title')||{}).value||'';
+  if (!title.trim()) { alert('من فضلك أدخل عنوان العرض'); return; }
+  var updates = {
+    title:     title.trim(),
+    caption:   ((document.getElementById('eo-caption')||{}).value||'').trim(),
+    link:      ((document.getElementById('eo-link')||{}).value||'').trim(),
+    offerType: ZZ._editOfferData.offerType || 'standard'
+  };
+  if (updates.offerType === 'discount') {
+    updates.origPrice = ((document.getElementById('eo-orig-price')||{}).value||'').trim();
+    updates.salePrice = ((document.getElementById('eo-sale-price')||{}).value||'').trim();
+  }
+  if (updates.offerType === 'bogo') {
+    updates.bogoDesc = ((document.getElementById('eo-bogo-desc')||{}).value||'').trim();
+  }
+
+  function _doUpdate(img) {
+    updates.img = img || ZZ._editOfferData.img || '';
+    zzdb.ref('landing/offers/' + id).update(updates)
+      .then(function() {
+        ZZ.closeEditOffer();
+        ZZ._forceRefreshOffers();
+      })
+      .catch(function(e) { alert('❌ ' + e.message); });
+  }
+
+  var mode = ZZ._editOfferData._imgMode || 'url';
+  if (mode === 'file') {
+    var fe = document.getElementById('eo-imgfile');
+    var f  = fe && fe.files && fe.files[0];
+    if (f) {
+      _zzReadFile(f).then(function(r) { return _zzCompress(r,900,0.7); }).then(_doUpdate);
+    } else { _doUpdate(null); }
+  } else {
+    var urlEl = document.getElementById('eo-imgurl');
+    var newUrl = urlEl ? urlEl.value.trim() : '';
+    _doUpdate(newUrl || null);
+  }
+};
 ZZ.clearAllOffers = function() {
   if (!confirm('مسح كل العروض نهائياً؟')) return;
   if (!window.zzdb) return;
@@ -2307,7 +2406,10 @@ ZZ.renderAdminList = function() {
       + '<div class="admin-info-name">' + icon + ' ' + (o.title||'') + '</div>'
       + '<div class="admin-info-link">' + (o.link||'بدون رابط') + '</div>'
       + '</div>'
-      + '<button class="btn-del" onclick="ZZ.deleteOffer(\'' + o.id + '\')" title="حذف">🗑</button>'
+      + '<div style="display:flex;gap:5px">'
+      + '<button class="mai-btn mai-btn-edit" onclick="ZZ.openEditOffer(\'' + o.id + '\')" title="تعديل">✏️</button>'
+      + '<button class="mai-btn mai-btn-del"  onclick="ZZ.deleteOffer(\''  + o.id + '\')" title="حذف">🗑</button>'
+      + '</div>'
       + '</div>';
   }).join('');
   h += '<div style="margin-top:14px;text-align:center"><button onclick="ZZ.clearAllOffers()" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:9999px;padding:8px 22px;font-size:12px;font-weight:700;cursor:pointer;font-family:Cairo,sans-serif">🗑 مسح كل العروض</button></div>';
@@ -2629,4 +2731,48 @@ if (window.ZZ_AUTH_READY && typeof _zzInit === 'function') {
 }
 </script>
 
+
+<!-- ══ EDIT OFFER MODAL ══ -->
+<div id="modal-edit-offer" style="position:fixed;inset:0;z-index:1300;background:rgba(0,0,0,.92);backdrop-filter:blur(22px);display:none;align-items:center;justify-content:center;font-family:'Cairo',sans-serif;direction:rtl">
+  <div style="width:100%;max-width:520px;margin:16px;background:#0e0608;border:1px solid rgba(244,63,94,.22);border-radius:24px;overflow:hidden;max-height:92vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(244,63,94,.06);position:sticky;top:0;z-index:1">
+      <div style="font-weight:900;font-size:16px;color:#fff">✏️ تعديل العرض</div>
+      <button onclick="ZZ.closeEditOffer()" style="width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:none;color:rgba(255,255,255,.6);font-size:15px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:20px 22px 26px">
+      <label class="admin-lbl">نوع العرض</label>
+      <div class="offer-type-tabs" style="margin-bottom:16px">
+        <button class="otype-btn eo-type-btn on" id="eo-type-standard" onclick="ZZ.setEditOfferType('standard',this)">🏷️ عرض عادي</button>
+        <button class="otype-btn eo-type-btn"    id="eo-type-bogo"     onclick="ZZ.setEditOfferType('bogo',this)">🎁 اشتري وخذ هدية</button>
+        <button class="otype-btn eo-type-btn"    id="eo-type-discount" onclick="ZZ.setEditOfferType('discount',this)">🔥 خصم / تخفيض</button>
+      </div>
+      <div class="admin-form-grid">
+        <div><label class="admin-lbl">عنوان العرض *</label><input id="eo-title" class="admin-inp" type="text" placeholder="عنوان العرض"></div>
+        <div><label class="admin-lbl">الوصف / التفاصيل</label><textarea id="eo-caption" class="admin-inp" rows="3"></textarea></div>
+        <div id="eo-discount-row" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div><label class="admin-lbl">السعر الأصلي</label><input id="eo-orig-price" class="admin-inp" type="text"></div>
+            <div><label class="admin-lbl">بعد الخصم</label><input id="eo-sale-price" class="admin-inp" type="text"></div>
+          </div>
+        </div>
+        <div id="eo-bogo-row" style="display:none">
+          <label class="admin-lbl">تفاصيل الهدية</label>
+          <input id="eo-bogo-desc" class="admin-inp" type="text">
+        </div>
+        <div><label class="admin-lbl">رابط العرض</label><input id="eo-link" class="admin-inp" type="url" placeholder="https://..."></div>
+        <div>
+          <label class="admin-lbl">الصورة (فاضية = الإبقاء على الحالية)</label>
+          <div id="eo-img-preview" style="display:none;width:100%;aspect-ratio:16/9;background-size:cover;background-position:center;border-radius:12px;margin-bottom:10px;border:1px solid rgba(255,255,255,.1)"></div>
+          <div class="img-tabs">
+            <button class="img-tab eo-img-tab on" onclick="ZZ.setEditOfferImgMode('url',this)">🔗 رابط جديد</button>
+            <button class="img-tab eo-img-tab"    onclick="ZZ.setEditOfferImgMode('file',this)">📁 رفع جديدة</button>
+          </div>
+          <div id="eo-url-row"><input id="eo-imgurl" class="admin-inp" placeholder="رابط صورة جديدة (اختياري)" type="url"></div>
+          <div id="eo-file-row" style="display:none"><input id="eo-imgfile" class="admin-inp" type="file" accept="image/*" style="padding:8px;cursor:pointer"></div>
+        </div>
+      </div>
+      <button onclick="ZZ.saveEditOffer()" style="width:100%;margin-top:10px;padding:13px;border-radius:12px;background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;font-weight:900;font-size:15px;border:none;cursor:pointer;font-family:'Cairo',sans-serif">💾 حفظ التعديلات</button>
+    </div>
+  </div>
+</div>
 </body>
