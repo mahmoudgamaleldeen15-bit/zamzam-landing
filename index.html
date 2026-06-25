@@ -553,6 +553,114 @@ a{text-decoration:none;color:inherit}
 .bogo-badge{background:rgba(124,58,237,.9)}
 .disc-badge{background:rgba(220,38,38,.9)}
 
+/* ══ OFFERS CAROUSEL (Main Page) ══ */
+#offers-carousel-section{background:linear-gradient(180deg,#080204 0%,#0a0206 100%);padding:56px 0 60px;position:relative;overflow:hidden}
+#offers-carousel-section::before{content:'أحدث عروضنا';position:absolute;top:20px;right:28px;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:rgba(255,255,255,.2);font-weight:700;font-family:'Cairo',sans-serif}
+.carousel-header{max-width:1100px;margin:0 auto 24px;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+.carousel-title{font-weight:900;font-size:clamp(1.3rem,3.5vw,2rem);color:#fff}
+.carousel-title span{color:#f43f5e}
+.carousel-track-wrap{overflow:hidden;position:relative;cursor:grab;user-select:none}
+.carousel-track-wrap:active{cursor:grabbing}
+.carousel-track{display:flex;gap:16px;padding:0 28px 20px;transition:transform .5s cubic-bezier(.25,.46,.45,.94);will-change:transform}
+.c-card{flex:0 0 260px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden;transition:all .3s;position:relative}
+.c-card:hover{transform:translateY(-6px);border-color:rgba(244,63,94,.3);box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.c-card-img{width:100%;aspect-ratio:16/10;background-size:cover;background-position:center;position:relative}
+.c-card-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7),transparent 60%)}
+.c-badge{position:absolute;top:10px;right:10px;font-size:10px;font-weight:800;border-radius:9999px;padding:4px 10px;color:#fff;backdrop-filter:blur(6px);z-index:1}
+.c-badge.standard{background:rgba(220,38,38,.85)}
+.c-badge.bogo{background:rgba(124,58,237,.85)}
+.c-badge.discount{background:rgba(220,38,38,.85)}
+.c-body{padding:14px 16px 16px}
+.c-title{font-weight:800;font-size:.95rem;color:#fff;margin-bottom:6px}
+.c-prices{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.c-orig{font-size:12px;color:rgba(255,255,255,.4);text-decoration:line-through}
+.c-sale{font-size:1.2rem;font-weight:900;color:#fbbf24}
+.c-desc{font-size:.82rem;color:rgba(255,255,255,.45);margin-bottom:12px;line-height:1.5}
+.c-btn{display:block;text-align:center;background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;font-weight:800;font-size:13px;border-radius:10px;padding:10px;text-decoration:none;transition:all .25s;font-family:'Cairo',sans-serif}
+.c-btn:hover{filter:brightness(1.1)}
+.carousel-nav{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:18px}
+.c-nav-btn{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);font-size:16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.c-nav-btn:hover{background:rgba(244,63,94,.2);border-color:rgba(244,63,94,.4);color:#f43f5e}
+.c-dots{display:flex;gap:6px}
+.c-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;transition:all .25s}
+.c-dot.on{background:#f43f5e;width:18px;border-radius:3px}
+
+/* ══ BUTTON CONTROLS (Admin) ══ */
+.btn-toggle-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px 18px;margin-bottom:10px}
+.btn-toggle-info{font-size:13px;color:rgba(255,255,255,.7);font-weight:600}
+.btn-toggle-info small{display:block;color:rgba(255,255,255,.35);font-size:11px;font-weight:400;margin-top:3px}
+.toggle-sw{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle-sw input{opacity:0;width:0;height:0}
+.toggle-sw .slider{position:absolute;inset:0;background:rgba(255,255,255,.15);border-radius:9999px;cursor:pointer;transition:.3s}
+.toggle-sw .slider:before{content:'';position:absolute;width:18px;height:18px;bottom:3px;right:3px;background:#fff;border-radius:50%;transition:.3s}
+.toggle-sw input:checked + .slider{background:#f43f5e}
+.toggle-sw input:checked + .slider:before{transform:translateX(-20px)}
+
+/* ══ JOBS SECTION ══ */
+#jobs-section{background:linear-gradient(160deg,#06030a 0%,#080210 100%);padding:72px 0 80px;position:relative;overflow:hidden;display:none}
+#jobs-section.active{display:block}
+.jobs-inner{max-width:1100px;margin:0 auto;padding:0 24px}
+.jobs-header{text-align:center;margin-bottom:40px}
+.jobs-title{font-weight:900;font-size:clamp(1.6rem,4vw,2.5rem);color:#fff}
+.jobs-title span{color:#f43f5e}
+.jobs-sub{color:rgba(255,255,255,.4);font-size:.9rem;margin-top:6px}
+.jobs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;direction:rtl}
+.job-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:22px;transition:all .3s;cursor:pointer;position:relative;overflow:hidden}
+.job-card::before{content:'';position:absolute;top:0;right:0;width:3px;height:100%;background:linear-gradient(135deg,#f43f5e,#a855f7);border-radius:0 18px 18px 0}
+.job-card:hover{transform:translateY(-4px);border-color:rgba(244,63,94,.25);box-shadow:0 16px 40px rgba(0,0,0,.4)}
+.job-dept{font-size:10px;font-weight:800;letter-spacing:.15em;color:#f43f5e;text-transform:uppercase;margin-bottom:8px}
+.job-title{font-weight:900;font-size:1.05rem;color:#fff;margin-bottom:8px}
+.job-meta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.job-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:rgba(255,255,255,.5);background:rgba(255,255,255,.06);border-radius:9999px;padding:4px 10px;font-weight:600}
+.job-desc-preview{font-size:.83rem;color:rgba(255,255,255,.45);line-height:1.6;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.btn-job-apply{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;font-weight:800;font-size:13px;border-radius:10px;padding:10px 20px;border:none;cursor:pointer;font-family:'Cairo',sans-serif;transition:all .25s}
+.btn-job-apply:hover{filter:brightness(1.1);transform:translateY(-1px)}
+
+/* ══ JOB DETAIL + APPLICATION MODAL ══ */
+.modal-job{position:fixed;inset:0;z-index:1400;background:rgba(0,0,0,.92);backdrop-filter:blur(20px);display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;font-family:'Cairo',sans-serif;direction:rtl}
+.modal-job.open{display:flex}
+.job-modal-box{width:100%;max-width:600px;background:#09050d;border:1px solid rgba(244,63,94,.2);border-radius:24px;overflow:hidden;margin:auto}
+.job-modal-hdr{padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(244,63,94,.06);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:1}
+.job-modal-hdr-title{font-weight:900;font-size:17px;color:#fff}
+.job-modal-body{padding:22px 24px 28px}
+.job-modal-dept{font-size:11px;font-weight:800;letter-spacing:.15em;color:#f43f5e;text-transform:uppercase;margin-bottom:8px}
+.job-modal-title{font-size:1.4rem;font-weight:900;color:#fff;margin-bottom:16px}
+.job-section-lbl{font-size:11px;font-weight:800;letter-spacing:.1em;color:rgba(255,255,255,.35);text-transform:uppercase;margin:18px 0 8px}
+.job-modal-text{font-size:.9rem;color:rgba(255,255,255,.65);line-height:1.75;white-space:pre-wrap}
+.btn-open-apply{width:100%;margin-top:20px;padding:14px;border-radius:14px;background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;font-weight:900;font-size:16px;border:none;cursor:pointer;font-family:'Cairo',sans-serif;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:8px}
+
+/* Application Form */
+.apply-form-section{border-top:1px solid rgba(255,255,255,.07);margin-top:24px;padding-top:22px;display:none}
+.apply-form-section.open{display:block}
+.form-row{margin-bottom:14px}
+.form-lbl{font-size:12px;font-weight:700;color:rgba(255,255,255,.6);margin-bottom:6px;display:block}
+.form-lbl span{color:#f43f5e}
+.form-inp{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;font-family:'Cairo',sans-serif;outline:none;transition:all .25s;direction:rtl;box-sizing:border-box}
+.form-inp:focus{border-color:rgba(244,63,94,.4);background:rgba(255,255,255,.08)}
+.form-inp.err{border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.06)}
+.form-err{font-size:11px;color:#f87171;margin-top:4px;display:none}
+.form-err.show{display:block}
+.cv-upload-area{border:2px dashed rgba(255,255,255,.12);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all .25s;position:relative}
+.cv-upload-area:hover{border-color:rgba(244,63,94,.3);background:rgba(244,63,94,.04)}
+.cv-upload-area input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.cv-icon{font-size:28px;margin-bottom:8px}
+.cv-text{font-size:13px;color:rgba(255,255,255,.5);font-weight:600}
+.cv-text span{color:#f43f5e}
+.cv-selected{font-size:12px;color:#4ade80;margin-top:6px;font-weight:600}
+.btn-submit-apply{width:100%;margin-top:18px;padding:14px;border-radius:12px;background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;font-weight:900;font-size:15px;border:none;cursor:pointer;font-family:'Cairo',sans-serif;transition:all .25s}
+.btn-submit-apply:disabled{opacity:.5;cursor:not-allowed}
+.apply-success{display:none;text-align:center;padding:20px}
+.apply-success.show{display:block}
+.apply-success .s-icon{font-size:48px;margin-bottom:10px}
+.apply-success p{color:rgba(255,255,255,.7);font-size:14px;line-height:1.7}
+
+/* Admin Jobs */
+.job-admin-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.jac-info{flex:1;min-width:0}
+.jac-title{font-weight:700;font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jac-dept{font-size:11px;color:rgba(244,63,94,.7);font-weight:600}
+.jac-actions{display:flex;gap:5px;flex-shrink:0}
+
 /* ══ AUTH MODAL ══ */
 #modal-auth{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.95);backdrop-filter:blur(28px);display:none;align-items:center;justify-content:center;font-family:'Cairo',sans-serif;direction:rtl}
 #modal-auth.open{display:flex}
@@ -730,7 +838,7 @@ a{text-decoration:none;color:inherit}
       <div id="auth-err" class="auth-err">❌ بيانات خاطئة</div>
       <input type="password" id="auth-pass" class="auth-inp" placeholder="🔑 كلمة السر" autocomplete="off">
       <div id="auth-pin-wrap" style="display:none">
-        <input type="password" id="auth-pin" class="auth-inp" placeholder="🔢 PIN " maxlength="8" inputmode="numeric" autocomplete="off">
+        <input type="password" id="auth-pin" class="auth-inp" placeholder="🔢 PIN الفايربيز" maxlength="8" inputmode="numeric" autocomplete="off">
       </div>
       <button class="auth-btn-go" onclick="ZZ.checkAuth()">دخول ←</button>
       <button class="auth-btn-no" onclick="ZZ.closeAuth()">إلغاء</button>
@@ -753,6 +861,8 @@ a{text-decoration:none;color:inherit}
         <button class="ant on" onclick="ZZ.adminTab('offers')">🏷️ العروض</button>
         <button class="ant" onclick="ZZ.adminTab('cake-menu')">🎂 منيو الحلويات</button>
         <button class="ant" onclick="ZZ.adminTab('resto-menu')">🍔 منيو المطعم</button>
+        <button class="ant" onclick="ZZ.adminTab('jobs')">💼 التوظيف</button>
+        <button class="ant" onclick="ZZ.adminTab('btns')">🎛️ الأزرار</button>
         <button class="ant" onclick="ZZ.adminTab('security')">🔐 الأمان</button>
       </div>
 
@@ -895,6 +1005,75 @@ a{text-decoration:none;color:inherit}
         </div>
       </div><!-- end tab-resto-menu -->
 
+
+      <!-- ══ TAB: BUTTON CONTROLS ══ -->
+      <div id="admin-tab-btns" class="admin-panel-sec">
+        <div class="admin-sec-title">🎛️ التحكم في أزرار الصفحة الرئيسية</div>
+        <p style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:18px">شغّل أو أوقف أي زرار — التغيير فوري على كل الأجهزة</p>
+
+        <div class="btn-toggle-row">
+          <div class="btn-toggle-info">
+            🎂 زرار "صمم تورتتك"
+            <small>يوجّه العميل لتطبيق الكيك</small>
+          </div>
+          <label class="toggle-sw">
+            <input type="checkbox" id="tog-cake" checked onchange="ZZ.saveBtnSetting('cake', this.checked)">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="btn-toggle-row">
+          <div class="btn-toggle-info">
+            🔥 زرار "اطلب من المطعم"
+            <small>يوجّه العميل لتطبيق المطعم</small>
+          </div>
+          <label class="toggle-sw">
+            <input type="checkbox" id="tog-resto" checked onchange="ZZ.saveBtnSetting('restaurant', this.checked)">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="btn-toggle-row">
+          <div class="btn-toggle-info">
+            💼 قسم "وظائفنا" في الصفحة الرئيسية
+            <small>إظهار أو إخفاء قسم الوظائف</small>
+          </div>
+          <label class="toggle-sw">
+            <input type="checkbox" id="tog-jobs" onchange="ZZ.saveBtnSetting('jobs', this.checked)">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="admin-sec-divider"></div>
+        <div style="font-size:11px;color:rgba(255,255,255,.3);text-align:center">الإعدادات محفوظة في Firebase وتنعكس فوراً على كل الأجهزة</div>
+      </div>
+
+      <!-- ══ TAB: JOBS ══ -->
+      <div id="admin-tab-jobs" class="admin-panel-sec">
+        <div class="admin-sec-title">💼 إضافة وظيفة جديدة</div>
+        <div class="admin-form-grid">
+          <div><label class="admin-lbl">مسمى الوظيفة *</label><input id="jb-title" class="admin-inp" type="text" placeholder="مثال: كاشير — خدمة عملاء"></div>
+          <div><label class="admin-lbl">القسم / الإدارة</label><input id="jb-dept" class="admin-inp" type="text" placeholder="مثال: المبيعات — الإنتاج — الإدارة"></div>
+          <div><label class="admin-lbl">الموقع / الفرع</label><input id="jb-location" class="admin-inp" type="text" placeholder="مثال: طنطا — الغربية"></div>
+          <div><label class="admin-lbl">تفاصيل الوظيفة *</label><textarea id="jb-desc" class="admin-inp" rows="4" placeholder="اكتب وصف الوظيفة والمهام المطلوبة..."></textarea></div>
+          <div><label class="admin-lbl">المتطلبات والمؤهلات</label><textarea id="jb-req" class="admin-inp" rows="3" placeholder="الخبرات والمهارات المطلوبة..."></textarea></div>
+          <div>
+            <label class="admin-lbl">أرقام واتساب للتواصل *</label>
+            <div style="display:flex;gap:8px;margin-bottom:8px">
+              <input id="jb-wa-inp" class="admin-inp" type="tel" placeholder="01XXXXXXXXX" maxlength="11" inputmode="numeric" dir="ltr" style="flex:1">
+              <button onclick="ZZ.addJobWaNum()" style="padding:0 14px;background:rgba(244,63,94,.15);border:1px solid rgba(244,63,94,.3);color:#f43f5e;border-radius:10px;cursor:pointer;font-size:18px;font-weight:700">+</button>
+            </div>
+            <div id="jb-wa-list" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+          </div>
+        </div>
+        <button class="btn-admin-add" style="background:linear-gradient(135deg,#7c3aed,#5b21b6)" onclick="ZZ.addJob()">💼 إضافة الوظيفة</button>
+        <div class="admin-note" id="job-save-note">✅ تم حفظ الوظيفة</div>
+
+        <div style="margin-top:24px">
+          <div class="admin-sec-title">الوظائف الحالية</div>
+          <div id="admin-jobs-list"><div style="text-align:center;color:rgba(255,255,255,.3);padding:20px;font-size:13px">لا توجد وظائف بعد</div></div>
+        </div>
+      </div>
       <!-- ══ TAB: SECURITY ══ -->
       <div id="admin-tab-security" class="admin-panel-sec">
       <div class="admin-sec-divider"></div>
@@ -987,7 +1166,7 @@ a{text-decoration:none;color:inherit}
     </div>
   </div>
   <div class="nav-links">
-    <a href="#hero">الحلويات</a>
+    <a href="#hero">الرئيسية</a>
     <a href="#restaurant">مطعم زمزم</a>
     <a href="#about">من نحن</a>
     <a href="#" onclick="ZZ.openContact();return false">تواصل معنا</a>
@@ -1168,6 +1347,23 @@ a{text-decoration:none;color:inherit}
 <!-- ═══════════════════════════════════════
      SECTION 3 — ZAMZAM RESTAURANT & CAFE
 ═══════════════════════════════════════ -->
+
+<!-- ══ OFFERS CAROUSEL ══ -->
+<section id="offers-carousel-section" style="display:none">
+  <div class="carousel-header">
+    <h2 class="carousel-title">عروض<span>نا</span> المميزة</h2>
+    <a href="#" onclick="ZZ.showOffers();return false" style="font-size:13px;color:rgba(255,255,255,.4);text-decoration:none;font-weight:600;transition:.2s" onmouseover="this.style.color='#f43f5e'" onmouseout="this.style.color='rgba(255,255,255,.4)'">عرض الكل ←</a>
+  </div>
+  <div class="carousel-track-wrap" id="cTrackWrap">
+    <div class="carousel-track" id="cTrack"></div>
+  </div>
+  <div class="carousel-nav">
+    <button class="c-nav-btn" onclick="ZZ.carouselPrev()">→</button>
+    <div class="c-dots" id="cDots"></div>
+    <button class="c-nav-btn" onclick="ZZ.carouselNext()">←</button>
+  </div>
+</section>
+
 <section id="restaurant">
   <!-- Image background + overlays -->
   <div class="resto-bg"></div>
@@ -1276,6 +1472,20 @@ a{text-decoration:none;color:inherit}
   </div>
 </section>
 
+
+<!-- ══ JOBS SECTION ══ -->
+<section id="jobs-section">
+  <div class="jobs-inner">
+    <div class="jobs-header">
+      <h2 class="jobs-title">انضم إلى <span>فريقنا</span></h2>
+      <p class="jobs-sub">اكتشف الفرص المتاحة وابدأ مسيرتك المهنية معنا</p>
+    </div>
+    <div class="jobs-grid" id="jobs-grid">
+      <div style="text-align:center;color:rgba(255,255,255,.3);padding:40px;grid-column:1/-1">جاري التحميل...</div>
+    </div>
+  </div>
+</section>
+
 <footer id="footer">
   <div class="footer-inner">
       <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:18px;flex-wrap:wrap">
@@ -1327,7 +1537,7 @@ a{text-decoration:none;color:inherit}
     </div>
 
     <div class="footer-bottom">
-      <span>© 2025 ZAMZAM DESSERT · جميع الحقوق محفوظة</span>
+      <span>© 2026 ZAMZAM DESSERT · جميع الحقوق محفوظة</span>
       <span>تأسست عام 1990 🍰</span>
     </div>
     <div style="text-align:center;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.04)">
@@ -2729,6 +2939,455 @@ if (typeof ZZ !== 'undefined') window.ZZ = ZZ;
 if (window.ZZ_AUTH_READY && typeof _zzInit === 'function') {
   _zzInit();
 }
+
+
+/* ════════════════════════════════════════════════════════
+   OFFERS CAROUSEL
+════════════════════════════════════════════════════════ */
+ZZ._carIdx = 0;
+ZZ._carTimer = null;
+ZZ._carDragging = false;
+ZZ._carDragStart = 0;
+ZZ._carDragOffset = 0;
+
+ZZ.buildCarousel = function() {
+  var offs = ZZ._offersCache;
+  var sec = document.getElementById('offers-carousel-section');
+  if (!sec) return;
+  if (!offs || !offs.length) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+
+  var track = document.getElementById('cTrack');
+  var dots  = document.getElementById('cDots');
+  if (!track || !dots) return;
+
+  track.innerHTML = offs.map(function(o) {
+    var badge = o.offerType==='bogo' ? '<div class="c-badge bogo">🎁 هدية مجانية</div>' :
+                o.offerType==='discount' ? '<div class="c-badge discount">🔥 خصم خاص</div>' :
+                '<div class="c-badge standard">🏷️ عرض خاص</div>';
+    var prices = (o.offerType==='discount' && o.origPrice && o.salePrice)
+      ? '<div class="c-prices"><span class="c-orig">'+o.origPrice+'</span><span class="c-sale">'+o.salePrice+'</span></div>'
+      : '';
+    var desc = o.offerType==='bogo' ? (o.bogoDesc||o.caption||'') : (o.caption||'');
+    var btn = o.link
+      ? '<a href="'+o.link+'" target="_blank" class="c-btn">اطلب الآن ←</a>'
+      : '<div class="c-btn" style="opacity:.4;pointer-events:none">اطلب الآن ←</div>';
+    return '<div class="c-card">'
+      +'<div class="c-card-img" id="cimg_'+o.id+'">'+badge+'</div>'
+      +'<div class="c-body">'
+      +'<div class="c-title">'+(o.title||'')+'</div>'
+      +prices
+      +(desc?'<div class="c-desc">'+desc+'</div>':'')
+      +btn
+      +'</div></div>';
+  }).join('');
+
+  offs.forEach(function(o) {
+    var d = document.getElementById('cimg_'+o.id);
+    if (d && o.img) d.style.backgroundImage = 'url("'+o.img+'")';
+  });
+
+  dots.innerHTML = offs.map(function(_,i) {
+    return '<div class="c-dot'+(i===0?' on':'')+'" onclick="ZZ.goCarousel('+i+')"></div>';
+  }).join('');
+
+  ZZ._carIdx = 0;
+  ZZ._startCarousel();
+  ZZ._initCarDrag();
+};
+
+ZZ._startCarousel = function() {
+  if (ZZ._carTimer) clearInterval(ZZ._carTimer);
+  var wrap = document.getElementById('cTrackWrap');
+  if (wrap) {
+    wrap.onmouseenter = function() { clearInterval(ZZ._carTimer); };
+    wrap.onmouseleave = function() { ZZ._carTimer = setInterval(function(){ ZZ.carouselNext(); }, 4000); };
+  }
+  if (ZZ._offersCache && ZZ._offersCache.length > 1)
+    ZZ._carTimer = setInterval(function(){ ZZ.carouselNext(); }, 4000);
+};
+
+ZZ._initCarDrag = function() {
+  var wrap = document.getElementById('cTrackWrap');
+  if (!wrap) return;
+  var startX = 0, isDrag = false;
+  wrap.addEventListener('mousedown', function(e){ isDrag=true; startX=e.clientX; });
+  wrap.addEventListener('mousemove', function(e){ if(!isDrag) return; });
+  wrap.addEventListener('mouseup', function(e){
+    if(!isDrag) return; isDrag=false;
+    var diff = e.clientX - startX;
+    if (diff < -40) ZZ.carouselNext();
+    else if (diff > 40) ZZ.carouselPrev();
+  });
+  wrap.addEventListener('touchstart', function(e){ startX=e.touches[0].clientX; },{passive:true});
+  wrap.addEventListener('touchend', function(e){
+    var diff = e.changedTouches[0].clientX - startX;
+    if (diff < -40) ZZ.carouselNext();
+    else if (diff > 40) ZZ.carouselPrev();
+  });
+};
+
+ZZ.goCarousel = function(i) {
+  var offs = ZZ._offersCache;
+  if (!offs||!offs.length) return;
+  ZZ._carIdx = Math.max(0, Math.min(i, offs.length-1));
+  var track = document.getElementById('cTrack');
+  var cardW = 260 + 16;
+  var wrap = document.getElementById('cTrackWrap');
+  var wrapW = wrap ? wrap.offsetWidth : 0;
+  var offset = Math.max(0, ZZ._carIdx * cardW - (wrapW/2 - cardW/2));
+  if (track) track.style.transform = 'translateX(-'+offset+'px)';
+  document.querySelectorAll('.c-dot').forEach(function(d,j){ d.classList.toggle('on',j===ZZ._carIdx); });
+};
+ZZ.carouselNext = function() { ZZ.goCarousel((ZZ._carIdx+1) % (ZZ._offersCache&&ZZ._offersCache.length||1)); };
+ZZ.carouselPrev = function() { var l=ZZ._offersCache&&ZZ._offersCache.length||1; ZZ.goCarousel((ZZ._carIdx-1+l)%l); };
+
+/* ════════════════════════════════════════════════════════
+   BUTTON CONTROLS (Admin + Public)
+════════════════════════════════════════════════════════ */
+ZZ._btnSettings = { cake: true, restaurant: true, jobs: false };
+
+ZZ.loadBtnSettings = function() {
+  if (!window.zzdb) return;
+  zzdb.ref('landing/settings/btns').on('value', function(snap) {
+    var v = snap.val() || {};
+    ZZ._btnSettings = {
+      cake:       v.cake       !== false,
+      restaurant: v.restaurant !== false,
+      jobs:       v.jobs       === true
+    };
+    ZZ._applyBtnSettings();
+    /* Sync admin toggles if panel open */
+    var tc = document.getElementById('tog-cake');
+    var tr = document.getElementById('tog-resto');
+    var tj = document.getElementById('tog-jobs');
+    if(tc) tc.checked = ZZ._btnSettings.cake;
+    if(tr) tr.checked = ZZ._btnSettings.restaurant;
+    if(tj) tj.checked = ZZ._btnSettings.jobs;
+  });
+};
+
+ZZ._applyBtnSettings = function() {
+  /* CTA buttons */
+  var cakeBtn  = document.querySelector('.btn-cake');
+  var restoBtn = document.querySelector('.btn-fire2');
+  if (cakeBtn)  cakeBtn.style.display  = ZZ._btnSettings.cake       ? '' : 'none';
+  if (restoBtn) restoBtn.style.display = ZZ._btnSettings.restaurant  ? '' : 'none';
+  /* Jobs section */
+  var jobsSec = document.getElementById('jobs-section');
+  if (jobsSec) jobsSec.classList.toggle('active', ZZ._btnSettings.jobs);
+  var navJobs = document.getElementById('nav-jobs-link');
+  if (navJobs) navJobs.style.display = ZZ._btnSettings.jobs ? '' : 'none';
+};
+
+ZZ.saveBtnSetting = function(key, val) {
+  /* Apply locally immediately regardless of Firebase */
+  ZZ._btnSettings[key] = val;
+  ZZ._applyBtnSettings();
+  /* Then save to Firebase if connected */
+  if (window.zzdb) {
+    var upd = {}; upd[key] = val;
+    zzdb.ref('landing/settings/btns').update(upd)
+      .catch(function(e) { console.warn('Settings not saved to Firebase:', e.message); });
+  }
+};
+
+/* ════════════════════════════════════════════════════════
+   JOBS SYSTEM — Admin
+════════════════════════════════════════════════════════ */
+ZZ._jobsCache    = [];
+ZZ._jobsSubbed   = false;
+ZZ._jobWaNums    = [];
+ZZ._editingJobId = null;
+
+ZZ.subscribeJobs = function() {
+  if (ZZ._jobsSubbed || !window.zzdb) return;
+  ZZ._jobsSubbed = true;
+  zzdb.ref('landing/jobs').orderByChild('createdAt').on('value', function(snap) {
+    ZZ._jobsCache = [];
+    snap.forEach(function(ch) { ZZ._jobsCache.unshift(Object.assign({id:ch.key}, ch.val())); });
+    ZZ.renderJobsPublic();
+    ZZ._renderAdminJobs();
+  });
+};
+
+ZZ.addJobWaNum = function() {
+  var inp = document.getElementById('jb-wa-inp');
+  if (!inp) return;
+  var num = inp.value.trim();
+  if (!/^0(10|11|12|15)[0-9]{8}$/.test(num)) { alert('رقم غير صحيح — لازم 11 رقم ويبدأ بـ 010/011/012/015'); return; }
+  if (ZZ._jobWaNums.indexOf(num) > -1) { alert('الرقم موجود بالفعل'); return; }
+  ZZ._jobWaNums.push(num);
+  inp.value = '';
+  ZZ._renderWaChips('jb-wa-list', ZZ._jobWaNums);
+};
+
+ZZ._renderWaChips = function(containerId, nums) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = nums.map(function(n,i) {
+    return '<span style="display:inline-flex;align-items:center;gap:6px;background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.25);color:#4ade80;border-radius:9999px;padding:4px 10px;font-size:12px;font-weight:700">'
+      +n+'<button onclick="ZZ._removeWaNum('+i+')" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:14px;padding:0 0 0 4px">×</button></span>';
+  }).join('');
+};
+
+ZZ._removeWaNum = function(i) {
+  ZZ._jobWaNums.splice(i,1);
+  ZZ._renderWaChips('jb-wa-list', ZZ._jobWaNums);
+};
+
+ZZ.addJob = function() {
+  var title = (document.getElementById('jb-title')||{}).value||'';
+  var desc  = (document.getElementById('jb-desc') ||{}).value||'';
+  if (!title.trim()) { alert('من فضلك أدخل مسمى الوظيفة'); return; }
+  if (!desc.trim())  { alert('من فضلك أدخل تفاصيل الوظيفة'); return; }
+  if (!ZZ._jobWaNums.length) { alert('من فضلك أضف رقم واتساب على الأقل'); return; }
+  if (!window.zzdb) { alert('⚠️ الفايربيز مش متصل\nافتح الموقع من zamzamdessert.com مش locally'); return; }
+  var job = {
+    title:    title.trim(),
+    dept:     ((document.getElementById('jb-dept')    ||{}).value||'').trim(),
+    location: ((document.getElementById('jb-location')||{}).value||'').trim(),
+    desc:     desc.trim(),
+    req:      ((document.getElementById('jb-req')     ||{}).value||'').trim(),
+    whatsapp: ZZ._jobWaNums.slice(),
+    active:   true,
+    createdAt: Date.now()
+  };
+  zzdb.ref('landing/jobs').push(job)
+    .then(function() {
+      ['jb-title','jb-dept','jb-location','jb-desc','jb-req','jb-wa-inp'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
+      ZZ._jobWaNums = [];
+      ZZ._renderWaChips('jb-wa-list',[]);
+      var n=document.getElementById('job-save-note'); if(n){n.classList.add('show');setTimeout(function(){n.classList.remove('show');},2500);}
+    })
+    .catch(function(e){ alert('❌ '+e.message); });
+};
+
+ZZ.deleteJob = function(id) {
+  if (!confirm('حذف هذه الوظيفة؟')) return;
+  if (!window.zzdb) return;
+  zzdb.ref('landing/jobs/'+id).remove();
+};
+
+ZZ.toggleJobActive = function(id, val) {
+  if (!window.zzdb) return;
+  zzdb.ref('landing/jobs/'+id+'/active').set(val);
+};
+
+ZZ._renderAdminJobs = function() {
+  var el = document.getElementById('admin-jobs-list'); if(!el) return;
+  if (!ZZ._jobsCache.length) { el.innerHTML='<div style="text-align:center;color:rgba(255,255,255,.3);padding:20px;font-size:13px">لا توجد وظائف بعد</div>'; return; }
+  el.innerHTML = ZZ._jobsCache.map(function(j) {
+    var jid = String(j.id);
+    return '<div class="job-admin-card" data-jid="'+jid+'">'
+      +'<div class="jac-info"><div class="jac-title">'+(j.title||'')+'</div><div class="jac-dept">'+(j.dept||'')+'</div></div>'
+      +'<div class="jac-actions">'
+      +'<button class="mai-btn mai-btn-tog '+(j.active?'on':'off')+'" data-jid="'+jid+'" data-active="'+(j.active?'1':'0')+'" title="'+(j.active?'إخفاء':'إظهار')+'">'+(j.active?'✅':'🔴')+'</button>'
+      +'<button class="mai-btn mai-btn-del"  data-jid="'+jid+'" title="حذف">🗑</button>'
+      +'</div></div>';
+  }).join('');
+  /* Event delegation */
+  el.onclick = function(ev) {
+    var btn = ev.target.closest('[data-jid]');
+    if (!btn || btn === el) return;
+    var row = btn.closest('.job-admin-card');
+    var jid2 = row ? row.getAttribute('data-jid') : null;
+    if (!jid2) return;
+    if (btn.classList.contains('mai-btn-del')) ZZ.deleteJob(jid2);
+    if (btn.classList.contains('mai-btn-tog')) {
+      var cur = btn.getAttribute('data-active') === '1';
+      ZZ.toggleJobActive(jid2, !cur);
+    }
+  };
+};
+
+/* ════════════════════════════════════════════════════════
+   JOBS PUBLIC VIEW + APPLICATION
+════════════════════════════════════════════════════════ */
+ZZ._currentJob = null;
+
+ZZ.renderJobsPublic = function() {
+  var el = document.getElementById('jobs-grid'); if(!el) return;
+  var active = ZZ._jobsCache.filter(function(j){ return j.active!==false; });
+  if (!active.length) {
+    el.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.3);padding:40px;grid-column:1/-1;font-size:14px">لا توجد وظائف متاحة حالياً — تابعنا قريباً</div>';
+    return;
+  }
+  el.innerHTML = active.map(function(j) {
+    var tags = '';
+    if (j.location) tags += '<span class="job-tag">📍 '+j.location+'</span>';
+    if (j.dept)     tags += '<span class="job-tag">🏢 '+j.dept+'</span>';
+    return '<div class="job-card" onclick="ZZ.openJobDetail(\''  +j.id+'\')">'
+      +(j.dept?'<div class="job-dept">'+j.dept+'</div>':'')
+      +'<div class="job-title">'+(j.title||'')+'</div>'
+      +(tags?'<div class="job-meta">'+tags+'</div>':'')
+      +'<div class="job-desc-preview">'+(j.desc||'')+'</div>'
+      +'<button class="btn-job-apply">انضم إلينا 🚀</button>'
+      +'</div>';
+  }).join('');
+};
+
+ZZ.openJobDetail = function(id) {
+  var j = ZZ._jobsCache.find(function(x){ return x.id===id; }); if(!j) return;
+  ZZ._currentJob = j;
+  var f = function(elId,val){ var e=document.getElementById(elId); if(e) e.innerHTML=val||''; };
+  f('jd-dept',     j.dept||'');
+  f('jd-title',    j.title||'');
+  f('jd-desc',     (j.desc||'').replace(/\n/g,'<br>'));
+  var reqLbl = document.getElementById('jd-req-lbl');
+  if(reqLbl) reqLbl.style.display = j.req ? 'block':'none';
+  f('jd-req', j.req ? j.req.replace(/\n/g,'<br>') : '');
+  var meta = '';
+  if(j.location) meta += '<span class="job-tag">📍 '+j.location+'</span>';
+  if(j.dept)     meta += '<span class="job-tag">🏢 '+j.dept+'</span>';
+  f('jd-meta', meta);
+  /* Reset form */
+  var afs = document.getElementById('apply-form-section');
+  var suc = document.getElementById('apply-success');
+  if(afs){ afs.classList.remove('open'); }
+  if(suc){ suc.classList.remove('show'); }
+  ['ap-name','ap-phone','ap-wa','ap-notes'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
+  var cv=document.getElementById('ap-cv'); if(cv) cv.value='';
+  var cs=document.getElementById('cv-selected'); if(cs){cs.style.display='none';cs.textContent='';}
+  ['ap-name-err','ap-phone-err','ap-wa-err','ap-cv-err'].forEach(function(id){ var e=document.getElementById(id); if(e) e.classList.remove('show'); });
+  document.getElementById('modal-job-detail').classList.add('open');
+};
+ZZ.closeJobDetail = function() {
+  document.getElementById('modal-job-detail').classList.remove('open');
+};
+
+ZZ.openApplyForm = function() {
+  var afs = document.getElementById('apply-form-section');
+  if(afs){ afs.classList.add('open'); afs.scrollIntoView({behavior:'smooth',block:'start'}); }
+};
+
+ZZ.onCvSelect = function(inp) {
+  var el = document.getElementById('cv-selected');
+  if(!el) return;
+  if(inp.files&&inp.files[0]){
+    el.textContent='✅ '+inp.files[0].name; el.style.display='block';
+  }
+};
+
+ZZ._validateEgPhone = function(v) {
+  return /^0(10|11|12|15)[0-9]{8}$/.test(v.trim());
+};
+
+ZZ.submitApplication = function() {
+  var job = ZZ._currentJob; if(!job) return;
+  var name  = (document.getElementById('ap-name') ||{}).value||'';
+  var phone = (document.getElementById('ap-phone')||{}).value||'';
+  var wa    = (document.getElementById('ap-wa')   ||{}).value||'';
+  var notes = (document.getElementById('ap-notes')||{}).value||'';
+  var cvEl  = document.getElementById('ap-cv');
+  var cvFile= cvEl&&cvEl.files&&cvEl.files[0];
+
+  var ok = true;
+  function showErr(id,show){ var e=document.getElementById(id); if(e) e.classList.toggle('show',show); }
+  function markInp(id,err){ var e=document.getElementById(id); if(e) e.classList.toggle('err',err); }
+
+  if(!name.trim()){ showErr('ap-name-err',true); markInp('ap-name',true); ok=false; } else { showErr('ap-name-err',false); markInp('ap-name',false); }
+  if(!ZZ._validateEgPhone(phone)){ showErr('ap-phone-err',true); markInp('ap-phone',true); ok=false; } else { showErr('ap-phone-err',false); markInp('ap-phone',false); }
+  if(!ZZ._validateEgPhone(wa))   { showErr('ap-wa-err',true);    markInp('ap-wa',true);    ok=false; } else { showErr('ap-wa-err',false);    markInp('ap-wa',false); }
+  if(!cvFile){ showErr('ap-cv-err',true); ok=false; } else { showErr('ap-cv-err',false); }
+  if(!ok) return;
+
+  /* Save to Firebase */
+  var appData = {
+    jobId:    job.id,
+    jobTitle: job.title||'',
+    name:     name.trim(),
+    phone:    phone.trim(),
+    whatsapp: wa.trim(),
+    notes:    notes.trim(),
+    cvName:   cvFile.name,
+    createdAt: Date.now()
+  };
+  if(window.zzdb && window.ZZ_AUTH_READY) {
+    zzdb.ref('landing/applications').push(appData).catch(function(){});
+  }
+
+  /* Build WhatsApp message */
+  var nums = job.whatsapp || [];
+  var now = new Date();
+  var dateStr = now.toLocaleDateString('ar-EG') + ' — ' + now.toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
+  var msg = encodeURIComponent(
+    '━━━━━━━━━━━━━━━━━━━━━━\n'
+    +'🏢 *طلب توظيف جديد*\n'
+    +'━━━━━━━━━━━━━━━━━━━━━━\n\n'
+    +'📋 *الوظيفة:* '+job.title+'\n'
+    +(job.dept     ? '🏬 *القسم:* '+job.dept+'\n' : '')
+    +(job.location ? '📍 *الفرع:* '+job.location+'\n' : '')
+    +'\n'
+    +'👤 *بيانات المتقدم*\n'
+    +'━━━━━━━━━━━━━━\n'
+    +'• الاسم: '+name.trim()+'\n'
+    +'• التليفون: '+phone.trim()+'\n'
+    +'• الواتساب: wa.me/2'+wa.trim()+'\n'
+    +(notes ? '• ملاحظات: '+notes.trim()+'\n' : '')
+    +'\n'
+    +'📎 *السيرة الذاتية:* '+cvFile.name+'\n'
+    +'⚠️ _سيرسل الملف في رسالة منفصلة_\n'
+    +'\n'
+    +'🕐 *تاريخ التقديم:* '+dateStr+'\n'
+    +'━━━━━━━━━━━━━━━━━━━━━━'
+  );
+
+  if (!nums || !nums.length) {
+    alert('⚠️ لم يتم تحديد رقم واتساب للوظيفة — تواصل مع الأدمن');
+    return;
+  }
+  /* Open WhatsApp for each number */
+  nums.forEach(function(n, i) {
+    var waNum = '2' + n;
+    setTimeout(function() {
+      window.open('https://wa.me/'+waNum+'?text='+msg, '_blank');
+    }, i * 1000); /* stagger by 1 second each */
+  });
+  /* Show success */
+  var suc = document.getElementById('apply-success');
+  var apf = document.getElementById('apply-form-section');
+  if(apf) { var formEls=apf.querySelectorAll('.form-row,.btn-submit-apply'); formEls.forEach(function(e){e.style.display='none';}); }
+  if(suc) suc.classList.add('show');
+};
+
+/* Close modals on backdrop click — null-safe */
+var _jdModal = document.getElementById('modal-job-detail');
+if (_jdModal) _jdModal.addEventListener('click', function(e){
+  if(e.target===this) ZZ.closeJobDetail();
+});
+
+/* ════════════════════════════════════════════════════════
+   INIT UPDATE — hook into existing _zzInit
+════════════════════════════════════════════════════════ */
+var _origZzInit = (typeof _zzInit === 'function') ? _zzInit : null;
+function _zzInit() {
+  if (_origZzInit) _origZzInit();
+  ZZ.subscribeJobs();
+  ZZ.loadBtnSettings();
+}
+
+/* Override admin tab to handle new tabs */
+var _prevAdminTab = ZZ.adminTab;
+ZZ.adminTab = function(tab) {
+  _prevAdminTab(tab);
+  if(tab==='jobs') ZZ._renderAdminJobs();
+};
+
+/* Override renderAdminList to also build carousel */
+var _prevRenderAdminList = ZZ.renderAdminList;
+ZZ.renderAdminList = function() {
+  _prevRenderAdminList();
+  ZZ.buildCarousel();
+};
+
+/* Override renderOffersPage to also update carousel */
+var _prevForceRefreshOffers = ZZ._forceRefreshOffers;
+ZZ._forceRefreshOffers = function() {
+  _prevForceRefreshOffers();
+  setTimeout(function(){ ZZ.buildCarousel(); }, 300);
+};
+
 </script>
 
 
@@ -2775,4 +3434,77 @@ if (window.ZZ_AUTH_READY && typeof _zzInit === 'function') {
     </div>
   </div>
 </div>
+
+<!-- ══ JOB DETAIL MODAL ══ -->
+<div class="modal-job" id="modal-job-detail">
+  <div class="job-modal-box">
+    <div class="job-modal-hdr">
+      <div class="job-modal-hdr-title">تفاصيل الوظيفة</div>
+      <button onclick="ZZ.closeJobDetail()" style="width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:none;color:rgba(255,255,255,.6);font-size:15px;cursor:pointer">✕</button>
+    </div>
+    <div class="job-modal-body">
+      <div class="job-modal-dept" id="jd-dept"></div>
+      <div class="job-modal-title" id="jd-title"></div>
+      <div class="job-meta" id="jd-meta"></div>
+      <div class="job-section-lbl">تفاصيل الوظيفة</div>
+      <div class="job-modal-text" id="jd-desc"></div>
+      <div class="job-section-lbl" id="jd-req-lbl" style="display:none">المتطلبات</div>
+      <div class="job-modal-text" id="jd-req"></div>
+      <button class="btn-open-apply" onclick="ZZ.openApplyForm()">
+        🚀 قدّم الآن — انضم إلى الفريق
+      </button>
+
+      <!-- Application Form -->
+      <div class="apply-form-section" id="apply-form-section">
+        <div style="font-weight:900;font-size:16px;color:#fff;margin-bottom:18px">📝 نموذج التقديم</div>
+
+        <div class="form-row">
+          <label class="form-lbl">الاسم الكامل <span>*</span></label>
+          <input id="ap-name" class="form-inp" type="text" placeholder="اكتب اسمك الكامل" maxlength="60">
+          <div class="form-err" id="ap-name-err">من فضلك أدخل اسمك</div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-lbl">رقم التليفون <span>*</span></label>
+          <input id="ap-phone" class="form-inp" type="tel" placeholder="01XXXXXXXXX" maxlength="11" inputmode="numeric" dir="ltr">
+          <div class="form-err" id="ap-phone-err">رقم غير صحيح — لازم يكون 11 رقم ويبدأ بـ 010/011/012/015</div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-lbl">رقم الواتساب <span>*</span></label>
+          <input id="ap-wa" class="form-inp" type="tel" placeholder="01XXXXXXXXX" maxlength="11" inputmode="numeric" dir="ltr">
+          <div class="form-err" id="ap-wa-err">رقم غير صحيح — لازم يكون 11 رقم ويبدأ بـ 010/011/012/015</div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-lbl">السيرة الذاتية (CV) <span>*</span></label>
+          <div class="cv-upload-area" id="cv-area">
+            <input type="file" id="ap-cv" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.bmp,.webp,.odt,.rtf" onchange="ZZ.onCvSelect(this)">
+            <div class="cv-icon">📎</div>
+            <div class="cv-text">اسحب ملف هنا أو <span>اضغط للاختيار</span></div>
+            <div class="cv-text" style="font-size:11px;margin-top:4px">PDF, Word, صورة — أي صيغة مقبولة</div>
+            <div class="cv-selected" id="cv-selected" style="display:none"></div>
+          </div>
+          <div class="form-err" id="ap-cv-err">من فضلك أرفق السيرة الذاتية</div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-lbl">ملاحظات إضافية (اختياري)</label>
+          <textarea id="ap-notes" class="form-inp" rows="3" placeholder="أي معلومات إضافية تريد ذكرها..."></textarea>
+        </div>
+
+        <button class="btn-submit-apply" onclick="ZZ.submitApplication()" id="ap-submit-btn">
+          إرسال الطلب على واتساب 📲
+        </button>
+
+        <div class="apply-success" id="apply-success">
+          <div class="s-icon">🎉</div>
+          <div style="font-weight:900;font-size:18px;color:#fff;margin-bottom:8px">تم إرسال طلبك!</div>
+          <p>تم فتح واتساب لإرسال بياناتك — تأكد من إرسال الرسالة والـ CV<br>سيتواصل معك فريقنا قريباً</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
