@@ -553,17 +553,18 @@ a{text-decoration:none;color:inherit}
 .bogo-badge{background:rgba(124,58,237,.9)}
 .disc-badge{background:rgba(220,38,38,.9)}
 
-/* ══ OFFERS CAROUSEL (Main Page) ══ */
+/* ══ OFFERS CAROUSEL — Infinite Ticker ══ */
 #offers-carousel-section{background:linear-gradient(180deg,#080204 0%,#0a0206 100%);padding:56px 0 60px;position:relative;overflow:hidden}
-#offers-carousel-section::before{content:'أحدث عروضنا';position:absolute;top:20px;right:28px;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:rgba(255,255,255,.2);font-weight:700;font-family:'Cairo',sans-serif}
 .carousel-header{max-width:1100px;margin:0 auto 24px;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
 .carousel-title{font-weight:900;font-size:clamp(1.3rem,3.5vw,2rem);color:#fff}
 .carousel-title span{color:#f43f5e}
-.carousel-track-wrap{overflow:hidden;position:relative;cursor:grab;user-select:none}
-.carousel-track-wrap:active{cursor:grabbing}
-.carousel-track{display:flex;gap:16px;padding:0 28px 20px;transition:transform .5s cubic-bezier(.25,.46,.45,.94);will-change:transform}
-.c-card{flex:0 0 260px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden;transition:all .3s;position:relative}
-.c-card:hover{transform:translateY(-6px);border-color:rgba(244,63,94,.3);box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.carousel-track-wrap{overflow:hidden;position:relative;width:100%}
+.carousel-track-wrap::before,.carousel-track-wrap::after{content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none}
+.carousel-track-wrap::before{right:0;background:linear-gradient(to left,#080204,transparent)}
+.carousel-track-wrap::after{left:0;background:linear-gradient(to right,#080204,transparent)}
+.carousel-track{display:flex;gap:16px;padding:8px 0 20px;width:max-content;will-change:transform}
+.c-card{flex:0 0 260px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden;transition:transform .3s,border-color .3s,box-shadow .3s;position:relative}
+.c-card:hover{transform:translateY(-6px) scale(1.02);border-color:rgba(244,63,94,.3);box-shadow:0 20px 50px rgba(0,0,0,.5)}
 .c-card-img{width:100%;aspect-ratio:16/10;background-size:cover;background-position:center;position:relative}
 .c-card-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7),transparent 60%)}
 .c-badge{position:absolute;top:10px;right:10px;font-size:10px;font-weight:800;border-radius:9999px;padding:4px 10px;color:#fff;backdrop-filter:blur(6px);z-index:1}
@@ -577,13 +578,7 @@ a{text-decoration:none;color:inherit}
 .c-sale{font-size:1.2rem;font-weight:900;color:#fbbf24}
 .c-desc{font-size:.82rem;color:rgba(255,255,255,.45);margin-bottom:12px;line-height:1.5}
 .c-btn{display:block;text-align:center;background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;font-weight:800;font-size:13px;border-radius:10px;padding:10px;text-decoration:none;transition:all .25s;font-family:'Cairo',sans-serif}
-.c-btn:hover{filter:brightness(1.1)}
-.carousel-nav{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:18px}
-.c-nav-btn{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);font-size:16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
-.c-nav-btn:hover{background:rgba(244,63,94,.2);border-color:rgba(244,63,94,.4);color:#f43f5e}
-.c-dots{display:flex;gap:6px}
-.c-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;transition:all .25s}
-.c-dot.on{background:#f43f5e;width:18px;border-radius:3px}
+.c-btn:hover{filter:brightness(1.15);transform:translateY(-1px)}
 
 /* ══ BUTTON CONTROLS (Admin) ══ */
 .btn-toggle-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px 18px;margin-bottom:10px}
@@ -838,7 +833,7 @@ a{text-decoration:none;color:inherit}
       <div id="auth-err" class="auth-err">❌ بيانات خاطئة</div>
       <input type="password" id="auth-pass" class="auth-inp" placeholder="🔑 كلمة السر" autocomplete="off">
       <div id="auth-pin-wrap" style="display:none">
-        <input type="password" id="auth-pin" class="auth-inp" placeholder="🔢 PIN الفايربيز" maxlength="8" inputmode="numeric" autocomplete="off">
+        <input type="password" id="auth-pin" class="auth-inp" placeholder="🔢 PIN " maxlength="8" inputmode="numeric" autocomplete="off">
       </div>
       <button class="auth-btn-go" onclick="ZZ.checkAuth()">دخول ←</button>
       <button class="auth-btn-no" onclick="ZZ.closeAuth()">إلغاء</button>
@@ -1080,22 +1075,30 @@ a{text-decoration:none;color:inherit}
       <div class="admin-sec-title">🔐 تغيير كلمة السر</div>
       <div class="admin-form-grid" style="margin-bottom:10px">
         <div>
+          <label class="admin-lbl">🔑 كلمة السر الحالية *</label>
+          <input id="current-pass" type="password" class="admin-inp" placeholder="أدخل كلمة السر الحالية" autocomplete="current-password">
+        </div>
+        <div>
+          <label class="admin-lbl">🔢 الـ PIN *</label>
+          <input id="verify-pin" type="password" class="admin-inp" placeholder="أدخل الـ PIN للتأكيد" maxlength="8" inputmode="numeric">
+        </div>
+        <div>
           <label class="admin-lbl">كلمة السر الجديدة (6 أحرف على الأقل)</label>
           <input id="new-pass" type="password" class="admin-inp" placeholder="••••••••" autocomplete="new-password">
         </div>
         <div>
-          <label class="admin-lbl">تأكيد كلمة السر</label>
+          <label class="admin-lbl">تأكيد كلمة السر الجديدة</label>
           <input id="new-pass2" type="password" class="admin-inp" placeholder="••••••••" autocomplete="new-password">
         </div>
-        <button class="btn-admin-add" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)" onclick="ZZ.changePass()">تغيير كلمة السر</button>
+        <button class="btn-admin-add" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)" onclick="ZZ.changePass()">🔐 تغيير كلمة السر</button>
       </div>
       <div class="pass-status" id="pass-status"></div>
 
       <div class="admin-sec-divider"></div>
       <div class="admin-sec-title">🔑 PIN الفايربيز (حماية إضافية)</div>
       <div style="color:rgba(255,255,255,.38);font-size:11px;margin-bottom:12px;line-height:1.6">
-        PIN إضافي مخزّن مشفّر في الفايربيز يُطلب عند تسجيل الدخول.<br>
-        يعمل فقط لو أضفت Firebase config في الكود (ابحث عن ZZ_FB_CONFIG).
+        يتوفر مستوى تحقق إضافي يعتمد على التكوين الداخلي للتطبيق.<br>
+        يتم استخدام آلية تحقق إضافية عند توفر بيانات النظام اللازمة.
       </div>
       <div class="admin-form-grid" style="margin-bottom:10px">
         <div>
@@ -1356,11 +1359,6 @@ a{text-decoration:none;color:inherit}
   </div>
   <div class="carousel-track-wrap" id="cTrackWrap">
     <div class="carousel-track" id="cTrack"></div>
-  </div>
-  <div class="carousel-nav">
-    <button class="c-nav-btn" onclick="ZZ.carouselPrev()">→</button>
-    <div class="c-dots" id="cDots"></div>
-    <button class="c-nav-btn" onclick="ZZ.carouselNext()">←</button>
   </div>
 </section>
 
@@ -2090,16 +2088,44 @@ document.getElementById('modal-auth').addEventListener('click', function(e) {
 
 /* Change password */
 ZZ.changePass = async function() {
-  const p1 = document.getElementById('new-pass').value;
-  const p2 = document.getElementById('new-pass2').value;
-  const st = document.getElementById('pass-status');
-  if(!p1 || p1.length < 6) { st.textContent='❌ كلمة السر يجب أن تكون 6 أحرف على الأقل'; st.style.color='#f87171'; return; }
-  if(p1 !== p2) { st.textContent='❌ كلمتا السر غير متطابقتين'; st.style.color='#f87171'; return; }
+  var st = document.getElementById('pass-status');
+  var currentPass = (document.getElementById('current-pass')||{}).value||'';
+  var verifyPin   = (document.getElementById('verify-pin')  ||{}).value||'';
+  var p1 = (document.getElementById('new-pass') ||{}).value||'';
+  var p2 = (document.getElementById('new-pass2')||{}).value||'';
+
+  function showErr(msg) { if(st){st.textContent=msg; st.style.color='#f87171';} }
+  function showOk(msg)  { if(st){st.textContent=msg; st.style.color='#4ade80';} }
+
+  /* Step 1: Check all fields filled */
+  if (!currentPass) { showErr('❌ أدخل كلمة السر الحالية أولاً'); return; }
+  if (!verifyPin)   { showErr('❌ أدخل الـ PIN للتأكيد'); return; }
+  if (!p1 || p1.length < 6) { showErr('❌ كلمة السر الجديدة يجب أن تكون 6 أحرف على الأقل'); return; }
+  if (p1 !== p2)    { showErr('❌ كلمتا السر الجديدة غير متطابقتين'); return; }
+
+  /* Step 2: Verify current password */
+  var currentHash = await _zzHash(currentPass);
+  var storedPass  = localStorage.getItem('zz_admin_pass') || await _zzHash('zamzam2024');
+  if (currentHash !== storedPass) { showErr('❌ كلمة السر الحالية غير صحيحة'); return; }
+
+  /* Step 3: Verify PIN from Firebase */
+  try {
+    var pinHash = await _zzHash(verifyPin);
+    var snap = await zzdb.ref('landing/admin/pin').once('value');
+    var storedPin = snap.val();
+    if (storedPin && pinHash !== storedPin) { showErr('❌ الـ PIN غير صحيح'); return; }
+  } catch(e) {
+    showErr('❌ تعذر التحقق من الـ PIN — تأكد من الاتصال بالإنترنت');
+    return;
+  }
+
+  /* Step 4: All checks passed — save new password */
   localStorage.setItem('zz_admin_pass', await _zzHash(p1));
-  document.getElementById('new-pass').value = '';
-  document.getElementById('new-pass2').value = '';
-  st.textContent = '✅ تم تغيير كلمة السر بنجاح';
-  st.style.color = '#4ade80';
+  document.getElementById('current-pass').value = '';
+  document.getElementById('verify-pin').value   = '';
+  document.getElementById('new-pass').value     = '';
+  document.getElementById('new-pass2').value    = '';
+  showOk('✅ تم تغيير كلمة السر بنجاح');
 };
 
 /* Change PIN in Firebase */
@@ -2417,6 +2443,7 @@ ZZ.subscribeOffers = function() {
     snap.forEach(function(ch) { ZZ._offersCache.unshift(Object.assign({ id: ch.key }, ch.val())); });
     ZZ._updatePromoCache();
     ZZ.renderAdminList();
+    ZZ.buildCarousel();
     var vo = document.getElementById('view-offers');
     if (vo && vo.style.display !== 'none') ZZ.renderOffersPage();
   });
@@ -2952,97 +2979,96 @@ ZZ._carDragging = false;
 ZZ._carDragStart = 0;
 ZZ._carDragOffset = 0;
 
+/* ════ CAROUSEL — Smart infinite ticker ════ */
+ZZ._ticker = { x:0, speed:0.7, setW:0, cardW:0, raf:null, paused:false };
+
 ZZ.buildCarousel = function() {
-  var offs = ZZ._offersCache;
-  var sec = document.getElementById('offers-carousel-section');
-  if (!sec) return;
-  if (!offs || !offs.length) { sec.style.display = 'none'; return; }
+  var offs  = ZZ._offersCache;
+  var sec   = document.getElementById('offers-carousel-section');
+  var track = document.getElementById('cTrack');
+  var wrap  = document.getElementById('cTrackWrap');
+  if (!sec || !track || !wrap) return;
+  if (!offs || !offs.length) { sec.style.display='none'; return; }
   sec.style.display = 'block';
 
-  var track = document.getElementById('cTrack');
-  var dots  = document.getElementById('cDots');
-  if (!track || !dots) return;
+  /* Stop previous ticker */
+  if (ZZ._ticker.raf) cancelAnimationFrame(ZZ._ticker.raf);
+  ZZ._ticker.x = 0; ZZ._ticker.paused = false;
 
-  track.innerHTML = offs.map(function(o) {
-    var badge = o.offerType==='bogo' ? '<div class="c-badge bogo">🎁 هدية مجانية</div>' :
-                o.offerType==='discount' ? '<div class="c-badge discount">🔥 خصم خاص</div>' :
-                '<div class="c-badge standard">🏷️ عرض خاص</div>';
+  /* ── Smart card sizing ──
+     Fill viewport with exactly (count + 0.5) cards so edge card is always partial
+     This ensures user never sees 2 identical cards simultaneously */
+  var gap       = 18;
+  var minCard   = 240;
+  var maxCard   = 380;
+  var vw        = window.innerWidth;
+  var wrapW     = Math.min(vw, 1200); /* max usable width */
+  /* how many cards to show at once (max 4, min 2) */
+  var showCount = Math.max(2, Math.min(4, offs.length));
+  /* card width = fill wrapW with showCount + 0.4 partial card on left edge */
+  var cardW = Math.floor((wrapW - gap * showCount) / (showCount + 0.4));
+  cardW = Math.max(minCard, Math.min(maxCard, cardW));
+  ZZ._ticker.cardW = cardW;
+
+  function makeCard(o) {
+    var badge = o.offerType==='bogo'     ? '<div class="c-badge bogo">🎁 هدية مجانية</div>'
+              : o.offerType==='discount' ? '<div class="c-badge discount">🔥 خصم خاص</div>'
+              :                            '<div class="c-badge standard">🏷️ عرض خاص</div>';
     var prices = (o.offerType==='discount' && o.origPrice && o.salePrice)
-      ? '<div class="c-prices"><span class="c-orig">'+o.origPrice+'</span><span class="c-sale">'+o.salePrice+'</span></div>'
-      : '';
+      ? '<div class="c-prices"><span class="c-orig">'+o.origPrice+'</span><span class="c-sale">'+o.salePrice+'</span></div>' : '';
     var desc = o.offerType==='bogo' ? (o.bogoDesc||o.caption||'') : (o.caption||'');
-    var btn = o.link
+    var btn  = o.link
       ? '<a href="'+o.link+'" target="_blank" class="c-btn">اطلب الآن ←</a>'
       : '<div class="c-btn" style="opacity:.4;pointer-events:none">اطلب الآن ←</div>';
-    return '<div class="c-card">'
-      +'<div class="c-card-img" id="cimg_'+o.id+'">'+badge+'</div>'
-      +'<div class="c-body">'
-      +'<div class="c-title">'+(o.title||'')+'</div>'
-      +prices
-      +(desc?'<div class="c-desc">'+desc+'</div>':'')
-      +btn
-      +'</div></div>';
-  }).join('');
-
-  offs.forEach(function(o) {
-    var d = document.getElementById('cimg_'+o.id);
-    if (d && o.img) d.style.backgroundImage = 'url("'+o.img+'")';
-  });
-
-  dots.innerHTML = offs.map(function(_,i) {
-    return '<div class="c-dot'+(i===0?' on':'')+'" onclick="ZZ.goCarousel('+i+')"></div>';
-  }).join('');
-
-  ZZ._carIdx = 0;
-  ZZ._startCarousel();
-  ZZ._initCarDrag();
-};
-
-ZZ._startCarousel = function() {
-  if (ZZ._carTimer) clearInterval(ZZ._carTimer);
-  var wrap = document.getElementById('cTrackWrap');
-  if (wrap) {
-    wrap.onmouseenter = function() { clearInterval(ZZ._carTimer); };
-    wrap.onmouseleave = function() { ZZ._carTimer = setInterval(function(){ ZZ.carouselNext(); }, 4000); };
+    return '<div class="c-card" data-img="'+(o.img||'')+'" style="flex:0 0 '+cardW+'px;min-width:'+cardW+'px">'
+      +'<div class="c-card-img">'+badge+'</div>'
+      +'<div class="c-body"><div class="c-title">'+(o.title||'')+'</div>'
+      +prices+(desc?'<div class="c-desc">'+desc+'</div>':'')+btn+'</div></div>';
   }
-  if (ZZ._offersCache && ZZ._offersCache.length > 1)
-    ZZ._carTimer = setInterval(function(){ ZZ.carouselNext(); }, 4000);
-};
 
-ZZ._initCarDrag = function() {
-  var wrap = document.getElementById('cTrackWrap');
-  if (!wrap) return;
-  var startX = 0, isDrag = false;
-  wrap.addEventListener('mousedown', function(e){ isDrag=true; startX=e.clientX; });
-  wrap.addEventListener('mousemove', function(e){ if(!isDrag) return; });
-  wrap.addEventListener('mouseup', function(e){
-    if(!isDrag) return; isDrag=false;
-    var diff = e.clientX - startX;
-    if (diff < -40) ZZ.carouselNext();
-    else if (diff > 40) ZZ.carouselPrev();
-  });
-  wrap.addEventListener('touchstart', function(e){ startX=e.touches[0].clientX; },{passive:true});
-  wrap.addEventListener('touchend', function(e){
-    var diff = e.changedTouches[0].clientX - startX;
-    if (diff < -40) ZZ.carouselNext();
-    else if (diff > 40) ZZ.carouselPrev();
-  });
-};
+  /* Exact setWidth = one complete set */
+  var setW = offs.length * (cardW + gap);
+  ZZ._ticker.setW = setW;
 
-ZZ.goCarousel = function(i) {
-  var offs = ZZ._offersCache;
-  if (!offs||!offs.length) return;
-  ZZ._carIdx = Math.max(0, Math.min(i, offs.length-1));
-  var track = document.getElementById('cTrack');
-  var cardW = 260 + 16;
-  var wrap = document.getElementById('cTrackWrap');
-  var wrapW = wrap ? wrap.offsetWidth : 0;
-  var offset = Math.max(0, ZZ._carIdx * cardW - (wrapW/2 - cardW/2));
-  if (track) track.style.transform = 'translateX(-'+offset+'px)';
-  document.querySelectorAll('.c-dot').forEach(function(d,j){ d.classList.toggle('on',j===ZZ._carIdx); });
+  /* Need at least 2 full copies to cover viewport during animation */
+  var copies = Math.max(2, Math.ceil((vw * 1.5) / setW) + 1);
+  var singleSet = offs.map(makeCard).join('');
+  track.style.gap = gap + 'px';
+  track.innerHTML = Array(copies).fill(singleSet).join('');
+
+  /* Apply background images */
+  track.querySelectorAll('.c-card').forEach(function(card) {
+    var img    = card.getAttribute('data-img');
+    var imgDiv = card.querySelector('.c-card-img');
+    if (imgDiv && img) imgDiv.style.backgroundImage = 'url("'+img+'")';
+  });
+
+  /* Hover pause/resume */
+  wrap.onmouseenter = function() { ZZ._ticker.paused = true; };
+  wrap.onmouseleave = function() { ZZ._ticker.paused = false; };
+
+  /* Touch support */
+  var tStart = 0;
+  wrap.ontouchstart = function(e) { tStart = e.touches[0].clientX; ZZ._ticker.paused = true; };
+  wrap.ontouchend   = function(e) {
+    var diff = e.changedTouches[0].clientX - tStart;
+    ZZ._ticker.paused = false;
+    /* Give direction nudge based on swipe */
+    if (diff < -30) ZZ._ticker.x += cardW * 0.5;
+    if (diff >  30) ZZ._ticker.x = Math.max(0, ZZ._ticker.x - cardW * 0.5);
+  };
+
+  /* RAF smooth loop */
+  function tick() {
+    if (!ZZ._ticker.paused) {
+      ZZ._ticker.x += ZZ._ticker.speed;
+      if (ZZ._ticker.x >= setW) ZZ._ticker.x -= setW; /* seamless reset */
+      track.style.transform = 'translateX(-' + ZZ._ticker.x.toFixed(2) + 'px)';
+    }
+    ZZ._ticker.raf = requestAnimationFrame(tick);
+  }
+  ZZ._ticker.raf = requestAnimationFrame(tick);
 };
-ZZ.carouselNext = function() { ZZ.goCarousel((ZZ._carIdx+1) % (ZZ._offersCache&&ZZ._offersCache.length||1)); };
-ZZ.carouselPrev = function() { var l=ZZ._offersCache&&ZZ._offersCache.length||1; ZZ.goCarousel((ZZ._carIdx-1+l)%l); };
 
 /* ════════════════════════════════════════════════════════
    BUTTON CONTROLS (Admin + Public)
@@ -3110,6 +3136,8 @@ ZZ.subscribeJobs = function() {
     snap.forEach(function(ch) { ZZ._jobsCache.unshift(Object.assign({id:ch.key}, ch.val())); });
     ZZ.renderJobsPublic();
     ZZ._renderAdminJobs();
+  }, function(err) {
+    console.warn('[ZZ Jobs] Read error:', err.message);
   });
 };
 
@@ -3211,6 +3239,12 @@ ZZ._currentJob = null;
 ZZ.renderJobsPublic = function() {
   var el = document.getElementById('jobs-grid'); if(!el) return;
   var active = ZZ._jobsCache.filter(function(j){ return j.active!==false; });
+  /* Show/hide section based on both settings AND having active jobs */
+  var jobsSec = document.getElementById('jobs-section');
+  if (jobsSec && active.length > 0 && ZZ._btnSettings.jobs) {
+    jobsSec.style.display = 'block';
+    jobsSec.classList.add('active');
+  }
   if (!active.length) {
     el.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.3);padding:40px;grid-column:1/-1;font-size:14px">لا توجد وظائف متاحة حالياً — تابعنا قريباً</div>';
     return;
