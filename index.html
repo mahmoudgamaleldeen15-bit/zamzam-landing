@@ -3334,6 +3334,49 @@ ZZ._jobWaNums    = [];
 ZZ._editingJobId = null;
 ZZ._jobImgMode   = 'url';
 
+ZZ.addJobWaNum = function() {
+  var inp = document.getElementById('jb-wa-inp');
+  if (!inp) return;
+  var num = inp.value.trim();
+  if (!/^0(10|11|12|15)[0-9]{8}$/.test(num)) {
+    alert('رقم غير صحيح — لازم 11 رقم ويبدأ بـ 010/011/012/015');
+    return;
+  }
+  if (ZZ._jobWaNums.indexOf(num) > -1) { alert('الرقم موجود بالفعل'); return; }
+  ZZ._jobWaNums.push(num);
+  inp.value = '';
+  ZZ._renderWaChips('jb-wa-list', ZZ._jobWaNums);
+};
+
+ZZ._renderWaChips = function(containerId, nums) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = nums.map(function(n, i) {
+    return '<span style="display:inline-flex;align-items:center;gap:6px;background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.25);color:#4ade80;border-radius:9999px;padding:4px 10px;font-size:12px;font-weight:700">'
+      + n
+      + '<button onclick="ZZ._removeWaNum(' + i + ')" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:14px;padding:0 0 0 4px">×</button>'
+      + '</span>';
+  }).join('');
+};
+
+ZZ._removeWaNum = function(i) {
+  ZZ._jobWaNums.splice(i, 1);
+  ZZ._renderWaChips('jb-wa-list', ZZ._jobWaNums);
+};
+
+ZZ._resetJobForm = function() {
+  ['jb-title','jb-dept','jb-location','jb-desc','jb-req','jb-benefits','jb-imgurl','jb-wa-inp'].forEach(function(id) {
+    var e = document.getElementById(id); if (e) e.value = '';
+  });
+  ZZ._jobWaNums = [];
+  ZZ._renderWaChips('jb-wa-list', []);
+  ZZ._editingJobId = null;
+  var btn = document.querySelector('#admin-tab-jobs .btn-admin-add');
+  if (btn) { btn.textContent = '💼 إضافة الوظيفة'; btn.style.background = 'linear-gradient(135deg,#7c3aed,#5b21b6)'; }
+  var title = document.querySelector('#admin-tab-jobs .admin-sec-title');
+  if (title) title.textContent = '💼 إضافة وظيفة جديدة';
+};
+
 ZZ.setJobImgMode = function(m) {
   ZZ._jobImgMode = m;
   var ur=document.getElementById('jb-url-row');
