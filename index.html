@@ -593,7 +593,7 @@ a{text-decoration:none;color:inherit}
 
 /* ══ JOBS SECTION ══ */
 #jobs-section{background:linear-gradient(160deg,#06030a 0%,#080210 100%);padding:72px 0 80px;position:relative;overflow:hidden;display:none}
-#jobs-section.active{display:block}
+#jobs-section.active{display:block!important}
 .jobs-inner{max-width:1100px;margin:0 auto;padding:0 24px}
 .jobs-header{text-align:center;margin-bottom:40px}
 .jobs-title{font-weight:900;font-size:clamp(1.6rem,4vw,2.5rem);color:#fff}
@@ -3097,13 +3097,19 @@ ZZ.loadBtnSettings = function() {
 
 ZZ._applyBtnSettings = function() {
   /* CTA buttons */
-  var cakeBtn  = document.querySelector('.btn-cake');
-  var restoBtn = document.querySelector('.btn-fire2');
-  if (cakeBtn)  cakeBtn.style.display  = ZZ._btnSettings.cake       ? '' : 'none';
-  if (restoBtn) restoBtn.style.display = ZZ._btnSettings.restaurant  ? '' : 'none';
-  /* Jobs section */
+  document.querySelectorAll('.btn-cake, a.btn-cake').forEach(function(el) {
+    el.style.display = ZZ._btnSettings.cake ? '' : 'none';
+  });
+  document.querySelectorAll('.btn-fire2, a.btn-fire2').forEach(function(el) {
+    el.style.display = ZZ._btnSettings.restaurant ? '' : 'none';
+  });
+  /* Jobs section — force display + render */
   var jobsSec = document.getElementById('jobs-section');
-  if (jobsSec) jobsSec.classList.toggle('active', ZZ._btnSettings.jobs);
+  if (jobsSec) {
+    jobsSec.style.display = ZZ._btnSettings.jobs ? 'block' : 'none';
+    if (ZZ._btnSettings.jobs) ZZ.renderJobsPublic();
+  }
+  /* Jobs nav link */
   var navJobs = document.getElementById('nav-jobs-link');
   if (navJobs) navJobs.style.display = ZZ._btnSettings.jobs ? '' : 'none';
 };
@@ -3239,12 +3245,6 @@ ZZ._currentJob = null;
 ZZ.renderJobsPublic = function() {
   var el = document.getElementById('jobs-grid'); if(!el) return;
   var active = ZZ._jobsCache.filter(function(j){ return j.active!==false; });
-  /* Show/hide section based on both settings AND having active jobs */
-  var jobsSec = document.getElementById('jobs-section');
-  if (jobsSec && active.length > 0 && ZZ._btnSettings.jobs) {
-    jobsSec.style.display = 'block';
-    jobsSec.classList.add('active');
-  }
   if (!active.length) {
     el.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.3);padding:40px;grid-column:1/-1;font-size:14px">لا توجد وظائف متاحة حالياً — تابعنا قريباً</div>';
     return;
