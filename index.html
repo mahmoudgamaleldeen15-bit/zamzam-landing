@@ -1971,12 +1971,14 @@ try {
         console.log('[ZAMZAM] ✅ Auth ready — uid:', cred.user.uid);
         /* Start real-time listeners AFTER auth */
         if(typeof _zzInit==='function') _zzInit();
+        if(typeof ZZ!=='undefined' && ZZ._extraInit) ZZ._extraInit();
       })
       .catch(function(e) {
         console.warn('[ZAMZAM] Auth failed:', e.code, '— check Anonymous Auth in Firebase Console');
         window.ZZ_AUTH_READY = false;
         /* Try listeners anyway (for read-only) */
         if(typeof _zzInit==='function') _zzInit();
+        if(typeof ZZ!=='undefined' && ZZ._extraInit) ZZ._extraInit();
       });
     console.log('[ZAMZAM] Firebase connected ✅');
   }
@@ -2925,10 +2927,10 @@ function _zzInit() {
   ZZ.subscribeMenu('cake');
   ZZ.subscribeMenu('restaurant');
 }
-/* _zzInit will be called by auth callback — no polling needed */
-/* But keep as fallback for when auth completes before this block runs */
+/* Fallback: run if auth already completed */
 if (window.ZZ_AUTH_READY && window.zzdb) {
   _zzInit();
+  if (ZZ._extraInit) ZZ._extraInit();
 }
 
 /* Failsafe: ensure window.ZZ is always available */
@@ -3358,14 +3360,13 @@ if (_jdModal) _jdModal.addEventListener('click', function(e){
 });
 
 /* ════════════════════════════════════════════════════════
-   INIT UPDATE — hook into existing _zzInit
+   EXTEND _zzInit safely (avoid hoisting conflict)
 ════════════════════════════════════════════════════════ */
-var _origZzInit = (typeof _zzInit === 'function') ? _zzInit : null;
-function _zzInit() {
-  if (_origZzInit) _origZzInit();
+/* Run extra inits after auth completes — called from auth callback */
+ZZ._extraInit = function() {
   ZZ.subscribeJobs();
   ZZ.loadBtnSettings();
-}
+};
 
 /* Override admin tab to handle new tabs */
 var _prevAdminTab = ZZ.adminTab;
