@@ -3436,6 +3436,16 @@ ZZ.addJob = function() {
 ZZ.subscribeJobs = function() {
   if (ZZ._jobsSubbed || !window.zzdb) return;
   ZZ._jobsSubbed = true;
+  zzdb.ref('landing/jobs').orderByChild('createdAt').on('value', function(snap) {
+    ZZ._jobsCache = [];
+    snap.forEach(function(ch) {
+      ZZ._jobsCache.unshift(Object.assign({ id: ch.key }, ch.val()));
+    });
+    ZZ.renderJobsPublic();
+    ZZ._renderAdminJobs();
+  }, function(err) {
+    console.warn('[ZZ Jobs] Read error:', err.message);
+  });
 };
 
 ZZ.openEditJob = function(id) {
