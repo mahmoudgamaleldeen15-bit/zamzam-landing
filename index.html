@@ -591,6 +591,14 @@ a{text-decoration:none;color:inherit}
 .toggle-sw input:checked + .slider{background:#f43f5e}
 .toggle-sw input:checked + .slider:before{transform:translateX(-20px)}
 
+/* ══ JOB CARD WITH IMAGE ══ */
+.job-card{display:flex;gap:0;align-items:stretch}
+.job-card-content{flex:1;min-width:0;padding:22px}
+.job-card-img-side{width:140px;flex-shrink:0;border-radius:0 18px 18px 0;background-size:cover;background-position:center;background-color:rgba(255,255,255,.04);display:none;position:relative;overflow:hidden}
+.job-card-img-side::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.3),transparent)}
+.job-card.has-img .job-card-img-side{display:block}
+@media(max-width:500px){.job-card-img-side{width:100px}}
+
 /* ══ JOBS SECTION ══ */
 #jobs-section{background:linear-gradient(160deg,#06030a 0%,#080210 100%);padding:72px 0 80px;position:relative;overflow:hidden;display:none}
 #jobs-section.active{display:block!important}
@@ -655,6 +663,17 @@ a{text-decoration:none;color:inherit}
 .jac-title{font-weight:700;font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .jac-dept{font-size:11px;color:rgba(244,63,94,.7);font-weight:600}
 .jac-actions{display:flex;gap:5px;flex-shrink:0}
+
+/* ══ MENU CATEGORIES ══ */
+.cat-tabs-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px}
+.cat-tabs-wrap::-webkit-scrollbar{display:none}
+.cat-tabs{display:flex;gap:8px;margin-bottom:24px;padding:2px 0;width:max-content;min-width:100%}
+.cat-tab{padding:9px 20px;border-radius:9999px;border:1px solid rgba(255,255,255,.12);background:transparent;color:rgba(255,255,255,.55);font-size:13px;font-weight:700;cursor:pointer;transition:all .25s;font-family:'Cairo',sans-serif;white-space:nowrap;flex-shrink:0}
+.cat-tab:hover{background:rgba(255,255,255,.08);color:#fff}
+.cat-tab.on{background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(244,63,94,.35)}
+.admin-cat-item{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:10px 13px;margin-bottom:6px}
+.admin-cat-name{flex:1;font-weight:700;font-size:13px;color:#fff}
+.admin-cat-btns{display:flex;gap:4px;flex-shrink:0}
 
 /* ══ AUTH MODAL ══ */
 #modal-auth{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.95);backdrop-filter:blur(28px);display:none;align-items:center;justify-content:center;font-family:'Cairo',sans-serif;direction:rtl}
@@ -801,6 +820,7 @@ a{text-decoration:none;color:inherit}
       <div class="admin-form-grid">
         <div><label class="admin-lbl">اسم المنتج *</label><input id="em-name" class="admin-inp" type="text"></div>
         <div><label class="admin-lbl">الوصف</label><textarea id="em-desc" class="admin-inp" rows="3"></textarea></div>
+        <div><label class="admin-lbl">القسم الرئيسي</label><select id="em-cat" class="admin-inp"><option value="">-- بدون قسم --</option></select></div>
         <div><label class="admin-lbl">السعر</label><input id="em-price" class="admin-inp" type="text"></div>
         <div id="em-delivery-row" style="display:none">
           <label class="admin-lbl">طريقة الاستلام</label>
@@ -923,7 +943,20 @@ a{text-decoration:none;color:inherit}
 
       <!-- ══ TAB: CAKE MENU ══ -->
       <div id="admin-tab-cake-menu" class="admin-panel-sec">
-        <div class="admin-sec-title">🎂 إضافة تورتة / حلوى جديدة</div>
+        <!-- Category Management -->
+        <div class="admin-sec-title" style="margin-bottom:10px">📁 أقسام الحلويات</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <input id="cake-cat-inp" class="admin-inp" placeholder="اسم القسم (مثال: تورتات — حلويات — مشروبات)" type="text" style="flex:1">
+          <button onclick="ZZ.addMenuCat('cake')" style="padding:0 14px;background:rgba(244,63,94,.15);border:1px solid rgba(244,63,94,.3);color:#f43f5e;border-radius:10px;cursor:pointer;font-family:Cairo,sans-serif;font-weight:700;white-space:nowrap">+ إضافة</button>
+        </div>
+        <div id="cake-cats-list" style="margin-bottom:16px"></div>
+
+        <div class="admin-sec-divider"></div>
+        <div class="admin-sec-title">🎂 إضافة منتج جديد</div>
+        <div style="margin-bottom:10px">
+          <label class="admin-lbl">القسم</label>
+          <select id="cm-cat" class="admin-inp"><option value="">-- بدون قسم --</option></select>
+        </div>
         <div class="admin-form-grid">
           <div>
             <label class="admin-lbl">اسم المنتج *</label>
@@ -957,7 +990,20 @@ a{text-decoration:none;color:inherit}
 
       <!-- ══ TAB: RESTAURANT MENU ══ -->
       <div id="admin-tab-resto-menu" class="admin-panel-sec">
+        <!-- Category Management -->
+        <div class="admin-sec-title" style="margin-bottom:10px">📁 أقسام المطعم</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <input id="resto-cat-inp" class="admin-inp" placeholder="اسم القسم (مثال: بيتزا — كريب — مشاوي)" type="text" style="flex:1">
+          <button onclick="ZZ.addMenuCat('restaurant')" style="padding:0 14px;background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);color:#f97316;border-radius:10px;cursor:pointer;font-family:Cairo,sans-serif;font-weight:700;white-space:nowrap">+ إضافة</button>
+        </div>
+        <div id="resto-cats-list" style="margin-bottom:16px"></div>
+
+        <div class="admin-sec-divider"></div>
         <div class="admin-sec-title">🍔 إضافة صنف جديد للمطعم</div>
+        <div style="margin-bottom:10px">
+          <label class="admin-lbl">القسم</label>
+          <select id="rm-cat" class="admin-inp"><option value="">-- بدون قسم --</option></select>
+        </div>
         <div class="admin-form-grid">
           <div>
             <label class="admin-lbl">اسم الصنف *</label>
@@ -1052,6 +1098,16 @@ a{text-decoration:none;color:inherit}
           <div><label class="admin-lbl">الموقع / الفرع</label><input id="jb-location" class="admin-inp" type="text" placeholder="مثال: طنطا — الغربية"></div>
           <div><label class="admin-lbl">تفاصيل الوظيفة *</label><textarea id="jb-desc" class="admin-inp" rows="4" placeholder="اكتب وصف الوظيفة والمهام المطلوبة..."></textarea></div>
           <div><label class="admin-lbl">المتطلبات والمؤهلات</label><textarea id="jb-req" class="admin-inp" rows="3" placeholder="الخبرات والمهارات المطلوبة..."></textarea></div>
+          <div><label class="admin-lbl">مميزات الوظيفة (سطر لكل ميزة)</label><textarea id="jb-benefits" class="admin-inp" rows="3" placeholder="راتب مجزي&#10;تأمين صحي&#10;بيئة عمل محترفة&#10;فرص تطوير..."></textarea></div>
+          <div>
+            <label class="admin-lbl">صورة الوظيفة (اختياري)</label>
+            <div class="img-tabs" style="margin-bottom:8px">
+              <button class="img-tab on" id="jb-imgbtn-url"  onclick="ZZ.setJobImgMode('url')">🔗 رابط صورة</button>
+              <button class="img-tab"    id="jb-imgbtn-file" onclick="ZZ.setJobImgMode('file')">📁 رفع صورة</button>
+            </div>
+            <div id="jb-url-row"><input id="jb-imgurl" class="admin-inp" placeholder="رابط صورة الوظيفة (اختياري)" type="url"></div>
+            <div id="jb-file-row" style="display:none"><input id="jb-imgfile" class="admin-inp" type="file" accept="image/*" style="padding:8px;cursor:pointer"></div>
+          </div>
           <div>
             <label class="admin-lbl">أرقام واتساب للتواصل *</label>
             <div style="display:flex;gap:8px;margin-bottom:8px">
@@ -1452,20 +1508,16 @@ a{text-decoration:none;color:inherit}
       </div>
     </div>
 
-    <!-- Cake Menu Grid -->
+    <!-- Cake Menu -->
     <div id="cake-menu-display">
-      <div class="no-menu-msg">
-        <div class="ni">🎂</div>
-        <p>جاري تحميل القائمة...</p>
-      </div>
+      <div class="cat-tabs-wrap"><div class="cat-tabs" id="cake-cat-tabs"></div></div>
+      <div id="cake-items-grid"><div class="no-menu-msg"><div class="ni">🎂</div><p>جاري التحميل...</p></div></div>
     </div>
 
-    <!-- Restaurant Menu Grid -->
+    <!-- Restaurant Menu -->
     <div id="resto-menu-display" style="display:none">
-      <div class="no-menu-msg">
-        <div class="ni">🍔</div>
-        <p>جاري تحميل القائمة...</p>
-      </div>
+      <div class="cat-tabs-wrap"><div class="cat-tabs" id="resto-cat-tabs"></div></div>
+      <div id="resto-items-grid"><div class="no-menu-msg"><div class="ni">🍔</div><p>جاري التحميل...</p></div></div>
     </div>
   </div>
 </section>
@@ -2880,6 +2932,16 @@ ZZ.openEditMenu = function(type, id) {
     document.getElementById('em-name').value  = it.name  || '';
     document.getElementById('em-desc').value  = it.desc  || '';
     document.getElementById('em-price').value = it.price || '';
+    /* Populate category dropdown */
+    var emCat = document.getElementById('em-cat');
+    if (emCat) {
+      var cats = ZZ._menuCats[type] || {};
+      var opts = '<option value="">-- بدون قسم --</option>';
+      Object.keys(cats).forEach(function(cid) {
+        opts += '<option value="'+cid+'"'+(it.categoryId===cid?' selected':'')+'>'+cats[cid].name+'</option>';
+      });
+      emCat.innerHTML = opts;
+    }
     var eu = document.getElementById('em-imgurl');  if (eu) eu.value = '';
     var ef = document.getElementById('em-imgfile'); if (ef) ef.value = '';
     var prev = document.getElementById('em-preview');
@@ -2946,6 +3008,143 @@ ZZ.adminTab = function(tab) {
   if (tab==='cake-menu')  ZZ._renderAdminMenuList('cake');
   if (tab==='resto-menu') ZZ._renderAdminMenuList('restaurant');
 };
+
+
+/* ════ MENU CATEGORIES SYSTEM ════ */
+ZZ._menuCats = { cake: {}, restaurant: {} };
+ZZ._menuCatsSub = { cake: false, restaurant: false };
+ZZ._activeCat = { cake: 'all', restaurant: 'all' };
+
+ZZ.subscribeMenuCats = function(type) {
+  if (ZZ._menuCatsSub[type] || !window.zzdb) return;
+  ZZ._menuCatsSub[type] = true;
+  var key = type === 'cake' ? 'cake_cats' : 'resto_cats';
+  zzdb.ref('landing/menus/'+key).orderByChild('order').on('value', function(snap) {
+    ZZ._menuCats[type] = {};
+    snap.forEach(function(ch) { ZZ._menuCats[type][ch.key] = ch.val(); });
+    ZZ._updateCatSelect(type);
+    ZZ.renderMenuDisplay(type);
+    ZZ._renderAdminCats(type);
+  });
+};
+
+ZZ.addMenuCat = function(type) {
+  var inpId = type==='cake' ? 'cake-cat-inp' : 'resto-cat-inp';
+  var inp = document.getElementById(inpId);
+  if (!inp || !inp.value.trim()) { alert('أدخل اسم القسم'); return; }
+  if (!window.zzdb) return;
+  var key = type==='cake' ? 'cake_cats' : 'resto_cats';
+  var order = Object.keys(ZZ._menuCats[type]).length;
+  zzdb.ref('landing/menus/'+key).push({ name: inp.value.trim(), order: order, createdAt: Date.now() })
+    .then(function() { inp.value = ''; })
+    .catch(function(e) { alert('❌ '+e.message); });
+};
+
+ZZ.deleteMenuCat = function(type, catId) {
+  if (!confirm('حذف هذا القسم؟ المنتجات داخله ستبقى بدون قسم')) return;
+  if (!window.zzdb) return;
+  var key = type==='cake' ? 'cake_cats' : 'resto_cats';
+  zzdb.ref('landing/menus/'+key+'/'+catId).remove();
+};
+
+ZZ._updateCatSelect = function(type) {
+  var selId = type==='cake' ? 'cm-cat' : 'rm-cat';
+  var sel = document.getElementById(selId); if(!sel) return;
+  var cats = ZZ._menuCats[type];
+  var opts = '<option value="">-- بدون قسم --</option>';
+  Object.keys(cats).forEach(function(id) { opts += '<option value="'+id+'">'+cats[id].name+'</option>'; });
+  sel.innerHTML = opts;
+};
+
+ZZ._renderAdminCats = function(type) {
+  var elId = type==='cake' ? 'cake-cats-list' : 'resto-cats-list';
+  var el = document.getElementById(elId); if(!el) return;
+  var cats = ZZ._menuCats[type];
+  var ids = Object.keys(cats);
+  if (!ids.length) { el.innerHTML='<div style="font-size:12px;color:rgba(255,255,255,.3);padding:8px">لا توجد أقسام بعد</div>'; return; }
+  el.innerHTML = ids.map(function(id) {
+    return '<div class="admin-cat-item">'
+      +'<div class="admin-cat-name">📁 '+cats[id].name+'</div>'
+      +'<div class="admin-cat-btns">'
+      +'<button class="mai-btn mai-btn-del" onclick="ZZ.deleteMenuCat(\''  +type+'\',\''  +id+'\')">🗑</button>'
+      +'</div></div>';
+  }).join('');
+};
+
+/* Override renderMenuDisplay to support categories */
+ZZ.renderMenuDisplay = function(type) {
+  var displayEl   = document.getElementById(type==='cake' ? 'cake-menu-display' : 'resto-menu-display');
+  var catTabsEl   = document.getElementById(type==='cake' ? 'cake-cat-tabs'     : 'resto-cat-tabs');
+  var gridEl      = document.getElementById(type==='cake' ? 'cake-items-grid'   : 'resto-items-grid');
+  if (!displayEl || !gridEl) return;
+
+  var items  = (ZZ._menuCache[type]||[]).filter(function(it){ return it.available!==false; });
+  var cats   = ZZ._menuCats[type] || {};
+  var hasCats = Object.keys(cats).length > 0;
+  var tUrl   = type==='cake' ? ZZ_CAKE_URL : ZZ_RESTO_URL;
+  var bCls   = type==='restaurant' ? 'btn-prod-order resto' : 'btn-prod-order';
+
+  /* Build category tabs */
+  if (catTabsEl && hasCats) {
+    var activeCat = ZZ._activeCat[type] || 'all';
+    var tabs = '<button class="cat-tab'+(activeCat==='all'?' on':'')+'" onclick="ZZ.filterByCat(\'' +type+'\',\'all\')">الكل</button>';
+    Object.keys(cats).forEach(function(id) {
+      tabs += '<button class="cat-tab'+(activeCat===id?' on':'')+'" onclick="ZZ.filterByCat(\'' +type+'\',\''+id+'\')">'+cats[id].name+'</button>';
+    });
+    catTabsEl.innerHTML = tabs;
+    catTabsEl.parentElement.style.display = 'block';
+  } else if (catTabsEl) {
+    catTabsEl.parentElement.style.display = 'none';
+  }
+
+  /* Filter items by active category */
+  var activeCat2 = ZZ._activeCat[type] || 'all';
+  var filtered = activeCat2==='all' ? items : items.filter(function(it){ return it.categoryId===activeCat2; });
+
+  if (!filtered.length) {
+    gridEl.innerHTML='<div class="no-menu-msg"><div class="ni">'+(type==='cake'?'🎂':'🍔')+'</div><p>لا توجد منتجات حالياً</p></div>';
+    return;
+  }
+
+  var g = '<div class="menu-grid">' + filtered.map(function(it) {
+    var bdg = it.available!==false ? '<span class="pbadge pbadge-avail">✅ متاح</span>' : '';
+    if (type==='restaurant') {
+      if (it.delivery) bdg += '<span class="pbadge pbadge-delivery">🛵 ديليفري</span>';
+      if (it.pickup)   bdg += '<span class="pbadge pbadge-pickup">🏃 استلام</span>';
+    }
+    return '<div class="prod-card">'
+      +'<div class="prod-img" id="pi_'+it.id+'"><div class="prod-badges">'+bdg+'</div></div>'
+      +'<div class="prod-body">'
+      +'<div class="prod-name">'+(it.name||'')+'</div>'
+      +(it.desc  ?'<div class="prod-desc">'+it.desc+'</div>':'')
+      +(it.price ?'<div class="prod-price">'+it.price+'</div>':'')
+      +'<a href="'+tUrl+'" target="_blank" class="'+bCls+'">اطلب الآن <span style="display:inline-block;transform:scaleX(-1)">→</span></a>'
+      +'</div></div>';
+  }).join('')+'</div>';
+  gridEl.innerHTML = g;
+  filtered.forEach(function(it) {
+    var d=document.getElementById('pi_'+it.id);
+    if(d&&it.img) d.style.backgroundImage='url("'+it.img+'")';
+  });
+};
+
+ZZ.filterByCat = function(type, catId) {
+  ZZ._activeCat[type] = catId;
+  ZZ.renderMenuDisplay(type);
+};
+
+/* Also add category to addMenuItem saved object */
+var _origAddMenuItem = ZZ.addMenuItem;
+ZZ.addMenuItem = function(type) {
+  var selId = type==='cake' ? 'cm-cat' : 'rm-cat';
+  var sel = document.getElementById(selId);
+  ZZ._currentAddCat = sel ? sel.value : '';
+  _origAddMenuItem(type);
+};
+
+/* Patch _saveItem to include categoryId */
+var _origSaveItem = ZZ._saveItem;
+
 
 /* ════ INIT LISTENERS ════ */
 function _zzInit() {
@@ -3111,7 +3310,7 @@ ZZ._applyBtnSettings = function() {
   }
   /* Jobs nav link */
   var navJobs = document.getElementById('nav-jobs-link');
-  if (navJobs) navJobs.style.display = ZZ._btnSettings.jobs ? '' : 'none';
+  /* Jobs nav always visible — leads to jobs page */
 };
 
 ZZ.saveBtnSetting = function(key, val) {
@@ -3147,69 +3346,53 @@ ZZ.setJobImgMode = function(m) {
   if(fb) fb.classList.toggle('on',m==='file');
 };
 
-ZZ.subscribeJobs = function() {
-  if (ZZ._jobsSubbed || !window.zzdb) return;
-  ZZ._jobsSubbed = true;
-  zzdb.ref('landing/jobs').orderByChild('createdAt').on('value', function(snap) {
-    ZZ._jobsCache = [];
-    snap.forEach(function(ch) { ZZ._jobsCache.unshift(Object.assign({id:ch.key}, ch.val())); });
-    ZZ.renderJobsPublic();
-    ZZ._renderAdminJobs();
-  }, function(err) {
-    console.warn('[ZZ Jobs] Read error:', err.message);
-  });
-};
-
-ZZ.addJobWaNum = function() {
-  var inp = document.getElementById('jb-wa-inp');
-  if (!inp) return;
-  var num = inp.value.trim();
-  if (!/^0(10|11|12|15)[0-9]{8}$/.test(num)) { alert('رقم غير صحيح — لازم 11 رقم ويبدأ بـ 010/011/012/015'); return; }
-  if (ZZ._jobWaNums.indexOf(num) > -1) { alert('الرقم موجود بالفعل'); return; }
-  ZZ._jobWaNums.push(num);
-  inp.value = '';
-  ZZ._renderWaChips('jb-wa-list', ZZ._jobWaNums);
-};
-
-ZZ._renderWaChips = function(containerId, nums) {
-  var el = document.getElementById(containerId);
-  if (!el) return;
-  el.innerHTML = nums.map(function(n,i) {
-    return '<span style="display:inline-flex;align-items:center;gap:6px;background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.25);color:#4ade80;border-radius:9999px;padding:4px 10px;font-size:12px;font-weight:700">'
-      +n+'<button onclick="ZZ._removeWaNum('+i+')" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:14px;padding:0 0 0 4px">×</button></span>';
-  }).join('');
-};
-
-ZZ._removeWaNum = function(i) {
-  ZZ._jobWaNums.splice(i,1);
-  ZZ._renderWaChips('jb-wa-list', ZZ._jobWaNums);
-};
-
 ZZ.addJob = function() {
   var title = (document.getElementById('jb-title')||{}).value||'';
   var desc  = (document.getElementById('jb-desc') ||{}).value||'';
   if (!title.trim()) { alert('من فضلك أدخل مسمى الوظيفة'); return; }
   if (!desc.trim())  { alert('من فضلك أدخل تفاصيل الوظيفة'); return; }
   if (!ZZ._jobWaNums.length) { alert('من فضلك أضف رقم واتساب على الأقل'); return; }
-  if (!window.zzdb) { alert('⚠️ الفايربيز مش متصل\nافتح الموقع من zamzamdessert.com مش locally'); return; }
+  if (!window.zzdb) { alert('⚠️ الفايربيز مش متصل'); return; }
+
   var job = {
     title:    title.trim(),
     dept:     ((document.getElementById('jb-dept')    ||{}).value||'').trim(),
     location: ((document.getElementById('jb-location')||{}).value||'').trim(),
     desc:     desc.trim(),
     req:      ((document.getElementById('jb-req')     ||{}).value||'').trim(),
+    benefits: ((document.getElementById('jb-benefits')||{}).value||'').trim(),
     whatsapp: ZZ._jobWaNums.slice(),
     active:   true,
     createdAt: Date.now()
   };
-  zzdb.ref('landing/jobs').push(job)
-    .then(function() {
-      ['jb-title','jb-dept','jb-location','jb-desc','jb-req','jb-wa-inp'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
-      ZZ._jobWaNums = [];
-      ZZ._renderWaChips('jb-wa-list',[]);
+
+  function _doSaveJob(img) {
+    job.img = img || '';
+    var ref = ZZ._editingJobId
+      ? zzdb.ref('landing/jobs/'+ZZ._editingJobId).update(job)
+      : zzdb.ref('landing/jobs').push(job);
+    ref.then(function() {
+      ZZ._resetJobForm();
+      var fe=document.getElementById('jb-imgfile'); if(fe) try{fe.value='';}catch(e){}
       var n=document.getElementById('job-save-note'); if(n){n.classList.add('show');setTimeout(function(){n.classList.remove('show');},2500);}
-    })
-    .catch(function(e){ alert('❌ '+e.message); });
+    }).catch(function(e){ alert('❌ '+e.message); });
+  }
+
+  if (ZZ._jobImgMode === 'file') {
+    var fe2 = document.getElementById('jb-imgfile');
+    var f2  = fe2 && fe2.files && fe2.files[0];
+    if (f2) {
+      _zzReadFile(f2).then(function(raw){ return _zzCompress(raw,800,0.75); }).then(_doSaveJob).catch(function(e){alert('❌ '+e.message);});
+    } else { _doSaveJob(''); }
+  } else {
+    var urlEl = document.getElementById('jb-imgurl');
+    _doSaveJob(urlEl ? urlEl.value.trim() : '');
+  }
+};
+
+ZZ.subscribeJobs = function() {
+  if (ZZ._jobsSubbed || !window.zzdb) return;
+  ZZ._jobsSubbed = true;
 };
 
 ZZ.openEditJob = function(id) {
@@ -3220,7 +3403,9 @@ ZZ.openEditJob = function(id) {
     j.id=id;
     var f=function(eid,v){var e=document.getElementById(eid);if(e)e.value=v||'';};
     f('jb-title',j.title); f('jb-dept',j.dept); f('jb-location',j.location);
-    f('jb-desc',j.desc);   f('jb-req',j.req);   f('jb-imgurl',j.img||'');
+    f('jb-desc',j.desc);   f('jb-req',j.req);   f('jb-benefits',j.benefits||'');
+    document.getElementById('jb-imgurl') && (document.getElementById('jb-imgurl').value = j.img||'');
+    if (j.img) ZZ.setJobImgMode('url');
     ZZ._jobWaNums=(j.whatsapp||[]).slice();
     ZZ._renderWaChips('jb-wa-list',ZZ._jobWaNums);
     ZZ._editingJobId=id;
@@ -3246,10 +3431,13 @@ ZZ._renderAdminJobs = function() {
   if (!ZZ._jobsCache.length) { el.innerHTML='<div style="text-align:center;color:rgba(255,255,255,.3);padding:20px;font-size:13px">لا توجد وظائف بعد</div>'; return; }
   el.innerHTML = ZZ._jobsCache.map(function(j) {
     var jid = String(j.id);
+    var thumb = j.img ? '<div class="mai-thumb" style="background-image:url(\"'+j.img+'\");background-size:cover;background-position:center"></div>' : '<div class="mai-thumb" style="background:#1a1020"></div>';
     return '<div class="job-admin-card" data-jid="'+jid+'">'
+      +thumb
       +'<div class="jac-info"><div class="jac-title">'+(j.title||'')+'</div><div class="jac-dept">'+(j.dept||'')+'</div></div>'
       +'<div class="jac-actions">'
       +'<button class="mai-btn mai-btn-tog '+(j.active?'on':'off')+'" data-jid="'+jid+'" data-active="'+(j.active?'1':'0')+'" title="'+(j.active?'إخفاء':'إظهار')+'">'+(j.active?'✅':'🔴')+'</button>'
+      +'<button class="mai-btn mai-btn-edit" data-jid="'+jid+'" title="تعديل">✏️</button>'
       +'<button class="mai-btn mai-btn-del"  data-jid="'+jid+'" title="حذف">🗑</button>'
       +'</div></div>';
   }).join('');
@@ -3285,14 +3473,25 @@ ZZ.renderJobsPublic = function() {
     var tags = '';
     if (j.location) tags += '<span class="job-tag">📍 '+j.location+'</span>';
     if (j.dept)     tags += '<span class="job-tag">🏢 '+j.dept+'</span>';
-    return '<div class="job-card" onclick="ZZ.openJobDetail(\''  +j.id+'\')">'
+    var hasImg = j.img && j.img.length > 5;
+    return '<div class="job-card'+(hasImg?' has-img':'')+'" onclick="ZZ.openJobDetail(\''  +j.id+'\')">'
+      +'<div class="job-card-content">'
       +(j.dept?'<div class="job-dept">'+j.dept+'</div>':'')
       +'<div class="job-title">'+(j.title||'')+'</div>'
       +(tags?'<div class="job-meta">'+tags+'</div>':'')
       +'<div class="job-desc-preview">'+(j.desc||'')+'</div>'
       +'<button class="btn-job-apply">انضم إلينا 🚀</button>'
+      +'</div>'
+      +(hasImg?'<div class="job-card-img-side" id="jci_'+j.id+'"></div>':'')
       +'</div>';
   }).join('');
+  /* Set images */
+  active.forEach(function(j) {
+    if (j.img) {
+      var d = document.getElementById('jci_'+j.id);
+      if (d) d.style.backgroundImage = 'url("'+j.img+'")';
+    }
+  });
 };
 
 ZZ.openJobDetail = function(id) {
@@ -3309,6 +3508,16 @@ ZZ.openJobDetail = function(id) {
   if(j.location) meta += '<span class="job-tag">📍 '+j.location+'</span>';
   if(j.dept)     meta += '<span class="job-tag">🏢 '+j.dept+'</span>';
   f('jd-meta', meta);
+  /* Job image in modal */
+  var jdImg = document.getElementById('jd-img-wrap');
+  if (jdImg) {
+    if (j.img) {
+      jdImg.style.backgroundImage = 'url("'+j.img+'")';
+      jdImg.style.display = 'block';
+    } else {
+      jdImg.style.display = 'none';
+    }
+  }
   /* Reset form */
   var afs = document.getElementById('apply-form-section');
   var suc = document.getElementById('apply-success');
@@ -3423,9 +3632,33 @@ if (_jdModal) _jdModal.addEventListener('click', function(e){
    EXTEND _zzInit safely (avoid hoisting conflict)
 ════════════════════════════════════════════════════════ */
 /* Run extra inits after auth completes — called from auth callback */
+ZZ.scrollToJobs = function() {
+  var sec = document.getElementById('jobs-section');
+  if (sec && sec.style.display !== 'none') {
+    sec.scrollIntoView({behavior:'smooth', block:'start'});
+  } else {
+    window.location.href = '?page=jobs';
+  }
+};
+
 ZZ._extraInit = function() {
   ZZ.subscribeJobs();
   ZZ.loadBtnSettings();
+  ZZ.subscribeMenuCats('cake');
+  ZZ.subscribeMenuCats('restaurant');
+  /* Check URL parameter for direct job link: ?page=jobs */
+  var urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('page') === 'jobs') {
+    setTimeout(function() {
+      var sec = document.getElementById('jobs-section');
+      if (sec && sec.style.display !== 'none') {
+        sec.scrollIntoView({behavior:'smooth', block:'start'});
+      } else {
+        /* Enable jobs section if admin set it */
+        if (ZZ._btnSettings.jobs && sec) sec.scrollIntoView({behavior:'smooth'});
+      }
+    }, 1500);
+  }
 };
 
 /* Override admin tab to handle new tabs */
@@ -3504,13 +3737,20 @@ ZZ._forceRefreshOffers = function() {
       <button onclick="ZZ.closeJobDetail()" style="width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:none;color:rgba(255,255,255,.6);font-size:15px;cursor:pointer">✕</button>
     </div>
     <div class="job-modal-body">
-      <div class="job-modal-dept" id="jd-dept"></div>
-      <div class="job-modal-title" id="jd-title"></div>
+      <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:4px">
+        <div style="flex:1">
+          <div class="job-modal-dept" id="jd-dept"></div>
+          <div class="job-modal-title" id="jd-title"></div>
+        </div>
+        <div id="jd-img-wrap" style="display:none;width:120px;height:90px;flex-shrink:0;border-radius:12px;background-size:cover;background-position:center;border:1px solid rgba(255,255,255,.1)"></div>
+      </div>
       <div class="job-meta" id="jd-meta"></div>
       <div class="job-section-lbl">تفاصيل الوظيفة</div>
       <div class="job-modal-text" id="jd-desc"></div>
       <div class="job-section-lbl" id="jd-req-lbl" style="display:none">المتطلبات</div>
       <div class="job-modal-text" id="jd-req"></div>
+      <div class="job-section-lbl" id="jd-ben-lbl" style="display:none">🌟 مميزات الوظيفة</div>
+      <div id="jd-benefits" style="margin-bottom:16px"></div>
       <button class="btn-open-apply" onclick="ZZ.openApplyForm()">
         🚀 قدّم الآن — انضم إلى الفريق
       </button>
@@ -3538,7 +3778,13 @@ ZZ._forceRefreshOffers = function() {
         </div>
 
         <div class="form-row">
-          <label class="form-lbl">السيرة الذاتية (CV) <span>*</span></label>
+          <label class="form-lbl">عنوان السكن <span>*</span></label>
+          <input id="ap-address" class="form-inp" type="text" placeholder="مثال: طنطا — الغربية — شارع ...">
+          <div class="form-err" id="ap-address-err">من فضلك أدخل عنوانك</div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-lbl">السيرة الذاتية (CV) <span style="color:rgba(255,255,255,.4);font-weight:400">— اختياري</span></label>
           <div class="cv-upload-area" id="cv-area">
             <input type="file" id="ap-cv" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.bmp,.webp,.odt,.rtf" onchange="ZZ.onCvSelect(this)">
             <div class="cv-icon">📎</div>
@@ -3546,12 +3792,11 @@ ZZ._forceRefreshOffers = function() {
             <div class="cv-text" style="font-size:11px;margin-top:4px">PDF, Word, صورة — أي صيغة مقبولة</div>
             <div class="cv-selected" id="cv-selected" style="display:none"></div>
           </div>
-          <div class="form-err" id="ap-cv-err">من فضلك أرفق السيرة الذاتية</div>
         </div>
 
         <div class="form-row">
           <label class="form-lbl">ملاحظات إضافية (اختياري)</label>
-          <textarea id="ap-notes" class="form-inp" rows="3" placeholder="أي معلومات إضافية تريد ذكرها..."></textarea>
+          <textarea id="ap-notes" class="form-inp" rows="3" placeholder="خبرات سابقة، مهارات، أي معلومات إضافية..."></textarea>
         </div>
 
         <button class="btn-submit-apply" onclick="ZZ.submitApplication()" id="ap-submit-btn">
