@@ -3133,6 +3133,19 @@ ZZ._jobsCache    = [];
 ZZ._jobsSubbed   = false;
 ZZ._jobWaNums    = [];
 ZZ._editingJobId = null;
+ZZ._jobImgMode   = 'url';
+
+ZZ.setJobImgMode = function(m) {
+  ZZ._jobImgMode = m;
+  var ur=document.getElementById('jb-url-row');
+  var fr=document.getElementById('jb-file-row');
+  var ub=document.getElementById('jb-imgbtn-url');
+  var fb=document.getElementById('jb-imgbtn-file');
+  if(ur) ur.style.display=m==='url' ?'block':'none';
+  if(fr) fr.style.display=m==='file'?'block':'none';
+  if(ub) ub.classList.toggle('on',m==='url');
+  if(fb) fb.classList.toggle('on',m==='file');
+};
 
 ZZ.subscribeJobs = function() {
   if (ZZ._jobsSubbed || !window.zzdb) return;
@@ -3199,6 +3212,24 @@ ZZ.addJob = function() {
     .catch(function(e){ alert('❌ '+e.message); });
 };
 
+ZZ.openEditJob = function(id) {
+  if (!window.zzdb) return;
+  var tab = document.getElementById('admin-tab-jobs');
+  zzdb.ref('landing/jobs/'+id).once('value').then(function(snap) {
+    var j=snap.val(); if(!j) return;
+    j.id=id;
+    var f=function(eid,v){var e=document.getElementById(eid);if(e)e.value=v||'';};
+    f('jb-title',j.title); f('jb-dept',j.dept); f('jb-location',j.location);
+    f('jb-desc',j.desc);   f('jb-req',j.req);   f('jb-imgurl',j.img||'');
+    ZZ._jobWaNums=(j.whatsapp||[]).slice();
+    ZZ._renderWaChips('jb-wa-list',ZZ._jobWaNums);
+    ZZ._editingJobId=id;
+    var btn=document.querySelector('#admin-tab-jobs .btn-admin-add');
+    if(btn){btn.textContent='حفظ التعديلات';btn.style.background='linear-gradient(135deg,#0d9488,#0f766e)';}
+    if(tab) tab.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+};
+
 ZZ.deleteJob = function(id) {
   if (!confirm('حذف هذه الوظيفة؟')) return;
   if (!window.zzdb) return;
@@ -3229,7 +3260,8 @@ ZZ._renderAdminJobs = function() {
     var row = btn.closest('.job-admin-card');
     var jid2 = row ? row.getAttribute('data-jid') : null;
     if (!jid2) return;
-    if (btn.classList.contains('mai-btn-del')) ZZ.deleteJob(jid2);
+    if (btn.classList.contains('mai-btn-del'))  ZZ.deleteJob(jid2);
+    if (btn.classList.contains('mai-btn-edit')) ZZ.openEditJob(jid2);
     if (btn.classList.contains('mai-btn-tog')) {
       var cur = btn.getAttribute('data-active') === '1';
       ZZ.toggleJobActive(jid2, !cur);
@@ -3310,7 +3342,8 @@ ZZ._validateEgPhone = function(v) {
 };
 
 ZZ.submitApplication = function() {
-  var job = ZZ._currentJob; if(!job) return;
+  var job = ZZ._currentJob;
+  if (!job) { alert('حدث خطأ - اعد فتح الوظيفة وحاول مجددا'); return; }
   var name  = (document.getElementById('ap-name') ||{}).value||'';
   var phone = (document.getElementById('ap-phone')||{}).value||'';
   var wa    = (document.getElementById('ap-wa')   ||{}).value||'';
@@ -3348,25 +3381,18 @@ ZZ.submitApplication = function() {
   var now = new Date();
   var dateStr = now.toLocaleDateString('ar-EG') + ' — ' + now.toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
   var msg = encodeURIComponent(
-    '━━━━━━━━━━━━━━━━━━━━━━\n'
-    +'🏢 *طلب توظيف جديد*\n'
-    +'━━━━━━━━━━━━━━━━━━━━━━\n\n'
-    +'📋 *الوظيفة:* '+job.title+'\n'
-    +(job.dept     ? '🏬 *القسم:* '+job.dept+'\n' : '')
-    +(job.location ? '📍 *الفرع:* '+job.location+'\n' : '')
-    +'\n'
-    +'👤 *بيانات المتقدم*\n'
-    +'━━━━━━━━━━━━━━\n'
-    +'• الاسم: '+name.trim()+'\n'
-    +'• التليفون: '+phone.trim()+'\n'
-    +'• الواتساب: wa.me/2'+wa.trim()+'\n'
-    +(notes ? '• ملاحظات: '+notes.trim()+'\n' : '')
-    +'\n'
-    +'📎 *السيرة الذاتية:* '+cvFile.name+'\n'
-    +'⚠️ _سيرسل الملف في رسالة منفصلة_\n'
-    +'\n'
-    +'🕐 *تاريخ التقديم:* '+dateStr+'\n'
-    +'━━━━━━━━━━━━━━━━━━━━━━'
+    '== طلب توظيف جديد ==' + '\n'
+    + 'الوظيفة: ' + (job.title||'') + '\n'
+    + (job.dept     ? 'القسم: '  + job.dept     + '\n' : '')
+    + (job.location ? 'الفرع: '  + job.location + '\n' : '')
+    + '\nbيانات المتقدم\n'
+    + 'الاسم: '     + name.trim()  + '\n'
+    + 'التليفون: '  + phone.trim() + '\n'
+    + 'الواتساب: wa.me/2' + wa.trim() + '\n'
+    + (notes.trim() ? 'ملاحظات: ' + notes.trim() + '\n' : '')
+    + '\nالسيرة الذاتية: ' + cvFile.name + '\n'
+    + 'يرجى ارسال ملف CV في رسالة منفصلة\n'
+    + 'تاريخ التقديم: ' + dateStr
   );
 
   if (!nums || !nums.length) {
@@ -3534,8 +3560,13 @@ ZZ._forceRefreshOffers = function() {
 
         <div class="apply-success" id="apply-success">
           <div class="s-icon">🎉</div>
-          <div style="font-weight:900;font-size:18px;color:#fff;margin-bottom:8px">تم إرسال طلبك!</div>
-          <p>تم فتح واتساب لإرسال بياناتك — تأكد من إرسال الرسالة والـ CV<br>سيتواصل معك فريقنا قريباً</p>
+          <div style="font-weight:900;font-size:20px;color:#fff;margin-bottom:10px">تم تقديم طلبك بنجاح!</div>
+          <p style="color:rgba(255,255,255,.65);line-height:1.8;font-size:14px">
+            شكراً لاهتمامك بالانضمام الى فريق ZAMZAM DESSERT<br>
+            تم فتح واتساب - يرجى ارسال الرسالة وملف السيرة الذاتية<br><br>
+            <span style="color:#4ade80;font-weight:700">سيتم التواصل معك في اقرب وقت ممكن</span>
+          </p>
+          <button onclick="ZZ.closeJobDetail()" style="margin-top:16px;padding:11px 28px;border-radius:9999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:Cairo,sans-serif">اغلاق</button>
         </div>
       </div>
     </div>
