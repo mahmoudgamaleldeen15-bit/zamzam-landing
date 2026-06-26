@@ -3339,8 +3339,8 @@ ZZ.submitApplication = function() {
   else                             { showErr('ap-phone-err',false);  markInp('ap-phone',false); }
   if (!ZZ._validateEgPhone(wa))    { showErr('ap-wa-err',true);      markInp('ap-wa',true);      ok=false; }
   else                             { showErr('ap-wa-err',false);     markInp('ap-wa',false); }
-  if (!address.trim())             { showErr('ap-address-err',true); markInp('ap-address',true); ok=false; }
-  else                             { showErr('ap-address-err',false);markInp('ap-address',false); }
+  if (!address.trim())             { showErr('ap-address-err2',true); markInp('ap-address',true); ok=false; }
+  else                             { showErr('ap-address-err2',false);markInp('ap-address',false); }
   if (!ok) return;
 
   var nums = (job.whatsapp && job.whatsapp.length) ? job.whatsapp : null;
@@ -3375,11 +3375,31 @@ ZZ.submitApplication = function() {
 
   var msg = encodeURIComponent(parts.join('\n'));
 
-  nums.forEach(function(n, i) {
-    setTimeout(function() {
-      window.open('https://wa.me/2' + n + '?text=' + msg, '_blank');
-    }, i * 1000);
-  });
+  /* Use location.href for first number — never blocked by browser */
+  var firstNum = '2' + nums[0];
+  var waUrl = 'https://wa.me/' + firstNum + '?text=' + msg;
+  /* Create and click a link — most reliable cross-browser method */
+  var aLink = document.createElement('a');
+  aLink.href = waUrl;
+  aLink.target = '_blank';
+  aLink.rel = 'noopener';
+  document.body.appendChild(aLink);
+  aLink.click();
+  document.body.removeChild(aLink);
+  /* Additional numbers open after short delay */
+  for (var ni = 1; ni < nums.length; ni++) {
+    (function(num) {
+      setTimeout(function() {
+        var a2 = document.createElement('a');
+        a2.href = 'https://wa.me/2' + num + '?text=' + msg;
+        a2.target = '_blank';
+        a2.rel = 'noopener';
+        document.body.appendChild(a2);
+        a2.click();
+        document.body.removeChild(a2);
+      }, ni * 1500);
+    })(nums[ni]);
+  }
 
   var apf = document.getElementById('apply-form-section');
   var suc = document.getElementById('apply-success');
@@ -3514,7 +3534,12 @@ ZZ._forceRefreshOffers = function() {
         </div>
 
         <div class="form-row">
-          <label class="form-lbl">السيرة الذاتية (CV) <span>*</span></label>
+          <label class="form-lbl">عنوان السكن <span>*</span></label>
+          <input id="ap-address" class="form-inp" type="text" placeholder="مثال: طنطا — الغربية — شارع ...">
+          <div class="form-err" id="ap-address-err2">من فضلك أدخل عنوانك</div>
+        </div>
+        <div class="form-row">
+          <label class="form-lbl">السيرة الذاتية (CV) — اختياري</label>
           <div class="cv-upload-area" id="cv-area">
             <input type="file" id="ap-cv" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.bmp,.webp,.odt,.rtf" onchange="ZZ.onCvSelect(this)">
             <div class="cv-icon">📎</div>
