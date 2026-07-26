@@ -528,6 +528,21 @@ a{text-decoration:none;color:inherit}
 .no-menu-msg p{font-size:15px;font-weight:600}
 
 /* ══════════════════════════════════
+   CATEGORY TABS (أقسام المنيو)
+══════════════════════════════════ */
+.cat-tabs-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;direction:rtl}
+.cat-tab{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:9999px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);font-family:"Cairo",sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .25s;white-space:nowrap}
+.cat-tab:hover{border-color:rgba(244,63,94,.45);color:#fff;background:rgba(244,63,94,.08)}
+.cat-tab.on{background:linear-gradient(135deg,#f43f5e,#e11d48);border-color:transparent;color:#fff;box-shadow:0 4px 18px rgba(244,63,94,.4)}
+.cat-panel{display:none}
+.cat-panel.on{display:block}
+@media(max-width:767px){
+  .cat-tabs-wrap{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px}
+  .cat-tabs-wrap::-webkit-scrollbar{display:none}
+  .cat-tab{font-size:12px;padding:8px 15px;flex-shrink:0}
+}
+
+/* ══════════════════════════════════
    ADMIN MENU MANAGEMENT
 ══════════════════════════════════ */
 .menu-admin-item{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:11px 13px;transition:all .2s;margin-bottom:8px}
@@ -3965,11 +3980,11 @@ ZZ.saveEditMenu = function() {
   }
 };
 
-/* ── renderMenuDisplay مع الأقسام ── */
-ZZ.renderMenuDisplay = function(type) {
+/* ── renderMenuDisplay مع category tabs أفقية ── */
+ZZ.renderMenuDisplay = function(type, activeCatId) {
   var el = document.getElementById(type==='cake' ? 'cake-menu-display' : 'resto-menu-display');
   if (!el) return;
-  var allItems = (ZZ._menuCache[type]||[]).filter(function(it) { return it.available !== false; });
+  var allItems = (ZZ._menuCache[type]||[]).filter(function(it){ return it.available !== false; });
   var cats     = ZZ._catsCache[type] || [];
   var tUrl     = type==='cake' ? ZZ_CAKE_URL : ZZ_RESTO_URL;
   var bCls     = type==='restaurant' ? 'btn-prod-order resto' : 'btn-prod-order';
@@ -3995,45 +4010,74 @@ ZZ.renderMenuDisplay = function(type) {
       + '</div></div>';
   }
 
-  var html = '';
-
+  /* ── بدون أقسام: عرض عادي ── */
   if (!cats.length) {
-    /* بدون أقسام — عرض عادي */
-    html = '<div class="menu-grid">' + allItems.map(renderCard).join('') + '</div>';
-  } else {
-    /* عرض مع أقسام */
-    var usedIds = {};
-    cats.forEach(function(cat) {
-      var catItems = allItems.filter(function(it) { return it.categoryId === cat.id; });
-      if (!catItems.length) return;
-      catItems.forEach(function(it) { usedIds[it.id] = true; });
-      html += '<div class="menu-category-block" id="menu-cat-' + cat.id + '">'
-        + '<div class="menu-cat-header">'
-        + '<span class="menu-cat-icon">' + (cat.icon||'📂') + '</span>'
-        + '<div>'
-        + '<div class="menu-cat-title">' + (cat.name||'') + '</div>'
-        + '<div class="menu-cat-count">' + catItems.length + ' منتج</div>'
-        + '</div></div>'
-        + '<div class="menu-grid">' + catItems.map(renderCard).join('') + '</div>'
-        + '</div>';
+    el.innerHTML = '<div class="menu-grid">' + allItems.map(renderCard).join('') + '</div>';
+    allItems.forEach(function(it){
+      var d = document.getElementById('pi_' + it.id);
+      if (d && it.img) d.style.backgroundImage = 'url("' + it.img + '")';
     });
-    /* الأصناف بدون قسم */
-    var uncategorized = allItems.filter(function(it) { return !usedIds[it.id]; });
-    if (uncategorized.length) {
-      html += '<div class="menu-category-block">'
-        + '<div class="menu-cat-header"><span class="menu-cat-icon">📌</span>'
-        + '<div><div class="menu-cat-title">متنوعات</div>'
-        + '<div class="menu-cat-count">' + uncategorized.length + ' منتج</div></div></div>'
-        + '<div class="menu-grid">' + uncategorized.map(renderCard).join('') + '</div>'
-        + '</div>';
-    }
+    return;
   }
 
-  el.innerHTML = html;
-  allItems.forEach(function(it) {
+  /* ── مع أقسام: نبني قائمة الأقسام اللي فيها أصناف فعلاً ── */
+  var catsWithItems = [];
+  var usedIds = {};
+  cats.forEach(function(cat) {
+    var items = allItems.filter(function(it){ return it.categoryId === cat.id; });
+    if (items.length) { catsWithItems.push({ cat: cat, items: items }); }
+  });
+  var uncategorized = allItems.filter(function(it){ return !catsWithItems.some(function(g){ return g.items.some(function(x){ return x.id===it.id; }); }); });
+  if (uncategorized.length) catsWithItems.push({ cat: { id: '__other__', name: 'متنوعات', icon: '📌' }, items: uncategorized });
+
+  /* أول قسم افتراضي */
+  var firstId  = activeCatId || catsWithItems[0].cat.id;
+  /* لو الـ id مش موجود في القائمة نرجع للأول */
+  if (!catsWithItems.some(function(g){ return g.cat.id === firstId; })) firstId = catsWithItems[0].cat.id;
+
+  /* ── بناء الـ tabs ── */
+  var tabsHtml = '<div class="cat-tabs-wrap" id="cat-tabs-' + type + '">';
+  catsWithItems.forEach(function(g) {
+    var isOn = g.cat.id === firstId;
+    tabsHtml += '<button class="cat-tab' + (isOn?' on':'') + '" '
+      + 'onclick="ZZ.switchCatTab(\'' + type + '\',\'' + g.cat.id + '\')">'
+      + (g.cat.icon||'📂') + ' ' + (g.cat.name||'') + '</button>';
+  });
+  tabsHtml += '</div>';
+
+  /* ── بناء محتوى كل قسم ── */
+  var panelsHtml = '<div class="cat-panels-wrap" id="cat-panels-' + type + '">';
+  catsWithItems.forEach(function(g) {
+    var isOn = g.cat.id === firstId;
+    panelsHtml += '<div class="cat-panel' + (isOn?' on':'') + '" data-cat="' + g.cat.id + '">'
+      + '<div class="menu-grid">' + g.items.map(renderCard).join('') + '</div>'
+      + '</div>';
+  });
+  panelsHtml += '</div>';
+
+  el.innerHTML = tabsHtml + panelsHtml;
+
+  /* تحميل الصور */
+  allItems.forEach(function(it){
     var d = document.getElementById('pi_' + it.id);
     if (d && it.img) d.style.backgroundImage = 'url("' + it.img + '")';
   });
+};
+
+/* ── تبديل قسم داخل المنيو ── */
+ZZ.switchCatTab = function(type, catId) {
+  var tabsWrap   = document.getElementById('cat-tabs-'   + type);
+  var panelsWrap = document.getElementById('cat-panels-' + type);
+  if (!tabsWrap || !panelsWrap) return;
+  tabsWrap.querySelectorAll('.cat-tab').forEach(function(b, i){
+    b.classList.toggle('on', b.getAttribute('onclick').indexOf("'" + catId + "'") !== -1);
+  });
+  panelsWrap.querySelectorAll('.cat-panel').forEach(function(p){
+    p.classList.toggle('on', p.dataset.cat === catId);
+  });
+  /* تحديث الـ hash */
+  var menuType = type;
+  history.replaceState(null,'','#menu/' + menuType + '/' + catId);
 };
 
 /* ════ EXTEND BTN SETTINGS ════ */
