@@ -497,6 +497,14 @@ a{text-decoration:none;color:inherit}
    PRODUCT CARDS
 ══════════════════════════════════ */
 .menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;direction:rtl}
+@media(max-width:767px){
+  .menu-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .prod-body{padding:11px 12px 13px}
+  .prod-name{font-size:.88rem}
+  .prod-desc{font-size:.75rem;margin-bottom:8px}
+  .prod-price{font-size:1rem;margin-bottom:10px}
+  .btn-prod-order{font-size:11px;padding:9px 10px;border-radius:10px}
+}
 .prod-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:20px;overflow:hidden;transition:all .35s;display:flex;flex-direction:column;position:relative}
 .prod-card:hover{transform:translateY(-6px);border-color:rgba(244,63,94,.25);box-shadow:0 24px 60px rgba(0,0,0,.5),0 0 0 1px rgba(244,63,94,.15)}
 .prod-card.unavailable{opacity:.55}
@@ -3263,11 +3271,9 @@ ZZ.loadBtnSettings = function() {
 };
 
 ZZ._applyBtnSettings = function() {
-  /* CTA buttons */
-  var cakeBtn  = document.querySelector('.btn-cake');
-  var restoBtn = document.querySelector('.btn-fire2');
-  if (cakeBtn)  cakeBtn.style.display  = ZZ._btnSettings.cake       ? '' : 'none';
-  if (restoBtn) restoBtn.style.display = ZZ._btnSettings.restaurant  ? '' : 'none';
+  /* CTA buttons — querySelectorAll to cover ALL instances */
+  document.querySelectorAll('.btn-cake').forEach(function(b){ b.style.display = ZZ._btnSettings.cake ? '' : 'none'; });
+  document.querySelectorAll('.btn-fire2').forEach(function(b){ b.style.display = ZZ._btnSettings.restaurant ? '' : 'none'; });
   /* Jobs section */
   var jobsSec = document.getElementById('jobs-section');
   if (jobsSec) jobsSec.classList.toggle('active', ZZ._btnSettings.jobs);
@@ -3656,7 +3662,13 @@ ZZ.addCategory = function() {
       var n = document.getElementById('cat-save-note');
       if (n) { n.classList.add('show'); setTimeout(function(){ n.classList.remove('show'); }, 2500); }
     })
-    .catch(function(e) { alert('❌ ' + e.message); });
+    .catch(function(e) {
+      if (e.code === 'PERMISSION_DENIED' || (e.message && e.message.indexOf('PERMISSION_DENIED') !== -1)) {
+        alert('❌ Firebase Rules لا تسمح بإضافة أقسام.\n\nاذهب لـ Firebase Console → Realtime Database → Rules\nوتأكد أن landing/categories مسموح بالكتابة.\n\nاطلع على التعليمات في الكود.');
+      } else {
+        alert('❌ ' + e.message);
+      }
+    });
 };
 
 /* ── حذف قسم ── */
@@ -4019,14 +4031,11 @@ ZZ.loadBtnSettings = function() {
 
 /* تطبيق إعدادات الأزرار بما فيها offers وmenus */
 ZZ._applyBtnSettings = function() {
-  var cakeBtn  = document.querySelector('.btn-cake');
-  var restoBtn = document.querySelector('.btn-fire2');
-  var offersBtn = document.querySelector('.btn-offers-hero');
-  var menusBtn  = document.querySelector('.btn-menu-nav');
-  if (cakeBtn)   cakeBtn.style.display   = ZZ._btnSettings.cake        ? '' : 'none';
-  if (restoBtn)  restoBtn.style.display  = ZZ._btnSettings.restaurant  ? '' : 'none';
-  if (offersBtn) offersBtn.style.display = ZZ._btnSettings.offers !== false ? '' : 'none';
-  if (menusBtn)  menusBtn.style.display  = ZZ._btnSettings.menus  !== false ? '' : 'none';
+  /* querySelectorAll — بيطبق على كل أزرار الـ class مش الأول بس */
+  document.querySelectorAll('.btn-cake').forEach(function(b){ b.style.display = ZZ._btnSettings.cake ? '' : 'none'; });
+  document.querySelectorAll('.btn-fire2').forEach(function(b){ b.style.display = ZZ._btnSettings.restaurant ? '' : 'none'; });
+  document.querySelectorAll('.btn-offers-hero').forEach(function(b){ b.style.display = ZZ._btnSettings.offers !== false ? '' : 'none'; });
+  document.querySelectorAll('.btn-menu-nav').forEach(function(b){ b.style.display = ZZ._btnSettings.menus !== false ? '' : 'none'; });
   var jobsSec = document.getElementById('jobs-section');
   if (jobsSec) jobsSec.classList.toggle('active', ZZ._btnSettings.jobs);
   var navJobs = document.getElementById('nav-jobs-link');
