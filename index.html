@@ -1240,6 +1240,7 @@ a{text-decoration:none;color:inherit}
           <div><label class="admin-lbl">مسمى الوظيفة *</label><input id="jb-title" class="admin-inp" type="text" placeholder="مثال: كاشير — خدمة عملاء"></div>
           <div><label class="admin-lbl">القسم / الإدارة</label><input id="jb-dept" class="admin-inp" type="text" placeholder="مثال: المبيعات — الإنتاج — الإدارة"></div>
           <div><label class="admin-lbl">الموقع / الفرع</label><input id="jb-location" class="admin-inp" type="text" placeholder="مثال: طنطا — الغربية"></div>
+          <div><label class="admin-lbl">🖼️ رابط صورة الوظيفة <span style="opacity:.5;font-size:11px">(اختياري — يظهر في الكارد)</span></label><input id="jb-img" class="admin-inp" type="url" placeholder="https://..." dir="ltr" oninput="ZZ._previewJobImg(this.value)"><div id="jb-img-preview" style="display:none;margin-top:8px;width:80px;height:80px;border-radius:10px;background-size:cover;background-position:center;border:1.5px solid rgba(255,255,255,.1)"></div></div>
           <div><label class="admin-lbl">تفاصيل الوظيفة *</label><textarea id="jb-desc" class="admin-inp" rows="4" placeholder="اكتب وصف الوظيفة والمهام المطلوبة..."></textarea></div>
           <div><label class="admin-lbl">المتطلبات والمؤهلات</label><textarea id="jb-req" class="admin-inp" rows="3" placeholder="الخبرات والمهارات المطلوبة..."></textarea></div>
           <div>
@@ -3389,6 +3390,18 @@ ZZ._removeWaNum = function(i) {
   ZZ._renderWaChips('jb-wa-list', ZZ._jobWaNums);
 };
 
+ZZ._previewJobImg = function(url) {
+  var prev = document.getElementById('jb-img-preview');
+  if (!prev) return;
+  if (url && url.length > 8) {
+    prev.style.display = 'block';
+    prev.style.backgroundImage = 'url("' + url + '")';
+  } else {
+    prev.style.display = 'none';
+    prev.style.backgroundImage = '';
+  }
+};
+
 ZZ.addJob = function() {
   var title = (document.getElementById('jb-title')||{}).value||'';
   var desc  = (document.getElementById('jb-desc') ||{}).value||'';
@@ -3396,6 +3409,7 @@ ZZ.addJob = function() {
   if (!desc.trim())  { alert('من فضلك أدخل تفاصيل الوظيفة'); return; }
   if (!ZZ._jobWaNums.length) { alert('من فضلك أضف رقم واتساب على الأقل'); return; }
   if (!window.zzdb) { alert('⚠️ الفايربيز مش متصل\nافتح الموقع من zamzamdessert.com مش locally'); return; }
+  var imgUrl = ((document.getElementById('jb-img')||{}).value||'').trim();
   var job = {
     title:    title.trim(),
     dept:     ((document.getElementById('jb-dept')    ||{}).value||'').trim(),
@@ -3406,9 +3420,11 @@ ZZ.addJob = function() {
     active:   true,
     createdAt: Date.now()
   };
+  if (imgUrl) job.img = imgUrl;
   zzdb.ref('landing/jobs').push(job)
     .then(function() {
-      ['jb-title','jb-dept','jb-location','jb-desc','jb-req','jb-wa-inp'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
+      ['jb-title','jb-dept','jb-location','jb-desc','jb-req','jb-wa-inp','jb-img'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
+      var prev=document.getElementById('jb-img-preview'); if(prev){prev.style.display='none';prev.style.backgroundImage='';}
       ZZ._jobWaNums = [];
       ZZ._renderWaChips('jb-wa-list',[]);
       var n=document.getElementById('job-save-note'); if(n){n.classList.add('show');setTimeout(function(){n.classList.remove('show');},2500);}
