@@ -3038,11 +3038,46 @@ ZZ.renderMenuDisplay = function(type) {
   });
 };
 
-ZZ.switchMenuDisplay = function(type) {
-  document.getElementById('cake-menu-display').style.display = type==='cake' ? 'block' : 'none';
+ZZ.switchMenuDisplay = function(type, catId, noHash) {
+  document.getElementById('cake-menu-display').style.display  = type==='cake'       ? 'block' : 'none';
   document.getElementById('resto-menu-display').style.display = type==='restaurant' ? 'block' : 'none';
-  document.querySelectorAll('.mtype').forEach(function(b) { b.classList.remove('on'); });
-  if (event && event.target) event.target.classList.add('on');
+  document.querySelectorAll('.mtype').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelectorAll('.mtype').forEach(function(b){
+    if ((type==='cake' && b.textContent.indexOf('حلويات')!==-1) ||
+        (type==='restaurant' && b.textContent.indexOf('مطعم')!==-1))
+      b.classList.add('on');
+  });
+  /* تحديث الـ URL hash */
+  if (!noHash) {
+    var h = '#menu/' + type;
+    if (catId) h += '/' + catId;
+    history.replaceState(null,'',h);
+  }
+  /* Scroll للـ section */
+  var sec = document.getElementById('menus-section');
+  if (sec) sec.scrollIntoView({behavior:'smooth'});
+  /* Scroll للقسم المحدد بعد ما الـ render يخلص */
+  if (catId) {
+    setTimeout(function(){
+      var el = document.getElementById('menu-cat-' + catId);
+      if (el) el.scrollIntoView({behavior:'smooth',block:'start'});
+    }, 350);
+  }
+};
+
+/* ── قراءة الـ hash عند فتح الصفحة ── */
+ZZ._handleMenuHash = function() {
+  var hash = window.location.hash;
+  if (!hash || hash.indexOf('#menu/') !== 0) return;
+  var parts = hash.replace('#menu/','').split('/');
+  var type  = parts[0];
+  var catId = parts[1] || null;
+  if (type !== 'cake' && type !== 'restaurant') return;
+  setTimeout(function(){
+    var sec = document.getElementById('menus-section');
+    if (sec) sec.scrollIntoView({behavior:'instant'});
+    ZZ.switchMenuDisplay(type, catId, true);
+  }, 900);
 };
 
 ZZ.openEditMenu = function(type, id) {
@@ -3972,7 +4007,7 @@ ZZ.renderMenuDisplay = function(type) {
       var catItems = allItems.filter(function(it) { return it.categoryId === cat.id; });
       if (!catItems.length) return;
       catItems.forEach(function(it) { usedIds[it.id] = true; });
-      html += '<div class="menu-category-block">'
+      html += '<div class="menu-category-block" id="menu-cat-' + cat.id + '">'
         + '<div class="menu-cat-header">'
         + '<span class="menu-cat-icon">' + (cat.icon||'📂') + '</span>'
         + '<div>'
@@ -4048,6 +4083,10 @@ ZZ._extraInit = function() {
   _prevExtraInit();
   ZZ.subscribeCategories('cake');
   ZZ.subscribeCategories('restaurant');
+  /* قراءة الـ hash لو فيه deep link */
+  if (window.location.hash && window.location.hash.indexOf('#menu/') === 0) {
+    ZZ._handleMenuHash();
+  }
 };
 
 /* ════ EXTEND adminTab ════ */
