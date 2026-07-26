@@ -709,6 +709,34 @@ a{text-decoration:none;color:inherit}
 .admin-sec-divider{height:1px;background:rgba(255,255,255,.07);margin:24px 0}
 .pass-status,.pin-status{font-size:12px;font-weight:700;text-align:center;margin-top:10px;min-height:18px}
 
+/* ══ CATEGORIES SYSTEM ══ */
+.cat-item{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:10px 14px;margin-bottom:8px;transition:all .2s}
+.cat-item:hover{border-color:rgba(244,63,94,.2)}
+.cat-drag-handle{color:rgba(255,255,255,.25);cursor:grab;font-size:16px;flex-shrink:0;user-select:none}
+.cat-drag-handle:active{cursor:grabbing}
+.cat-name-lbl{flex:1;font-weight:700;font-size:13px;color:#fff;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cat-count{font-size:11px;color:rgba(255,255,255,.3);font-weight:600;flex-shrink:0}
+.cat-item.dragging{opacity:.4;border-style:dashed}
+.cat-item.drag-over{border-color:#f43f5e;background:rgba(244,63,94,.08)}
+
+/* القسم الرئيسي في عرض المنيو */
+.menu-category-block{margin-bottom:32px}
+.menu-cat-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)}
+.menu-cat-icon{font-size:24px}
+.menu-cat-title{font-size:1.1rem;font-weight:900;color:#fff;letter-spacing:.04em}
+.menu-cat-count{font-size:11px;color:rgba(255,255,255,.35);font-weight:600;margin-top:2px}
+
+/* ══ BUTTON VISIBILITY TOGGLES ══ */
+.btn-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;margin-bottom:10px}
+.btn-toggle-info{flex:1;min-width:0}
+.btn-toggle-info small{display:block;font-size:11px;color:rgba(255,255,255,.32);margin-top:3px;font-weight:600}
+.toggle-sw{position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0}
+.toggle-sw input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.15);border-radius:9999px;transition:.3s}
+.slider::before{position:absolute;content:'';height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+.toggle-sw input:checked+.slider{background:#f43f5e}
+.toggle-sw input:checked+.slider::before{transform:translateX(20px)}
+
 </style>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -799,6 +827,12 @@ a{text-decoration:none;color:inherit}
       <input type="hidden" id="em-type">
       <input type="hidden" id="em-id">
       <div class="admin-form-grid">
+        <div>
+          <label class="admin-lbl">القسم الرئيسي</label>
+          <select id="em-category" class="admin-inp">
+            <option value="">— بدون قسم —</option>
+          </select>
+        </div>
         <div><label class="admin-lbl">اسم المنتج *</label><input id="em-name" class="admin-inp" type="text"></div>
         <div><label class="admin-lbl">الوصف</label><textarea id="em-desc" class="admin-inp" rows="3"></textarea></div>
         <div><label class="admin-lbl">السعر</label><input id="em-price" class="admin-inp" type="text"></div>
@@ -856,8 +890,10 @@ a{text-decoration:none;color:inherit}
         <button class="ant on" onclick="ZZ.adminTab('offers')">🏷️ العروض</button>
         <button class="ant" onclick="ZZ.adminTab('cake-menu')">🎂 منيو الحلويات</button>
         <button class="ant" onclick="ZZ.adminTab('resto-menu')">🍔 منيو المطعم</button>
+        <button class="ant" onclick="ZZ.adminTab('categories')">📂 الأقسام</button>
         <button class="ant" onclick="ZZ.adminTab('jobs')">💼 التوظيف</button>
         <button class="ant" onclick="ZZ.adminTab('btns')">🎛️ الأزرار</button>
+        <button class="ant" onclick="ZZ.adminTab('herobg')">🖼️ الخلفية</button>
         <button class="ant" onclick="ZZ.adminTab('security')">🔐 الأمان</button>
       </div>
 
@@ -926,6 +962,12 @@ a{text-decoration:none;color:inherit}
         <div class="admin-sec-title">🎂 إضافة تورتة / حلوى جديدة</div>
         <div class="admin-form-grid">
           <div>
+            <label class="admin-lbl">القسم الرئيسي</label>
+            <select id="cm-category" class="admin-inp">
+              <option value="">— بدون قسم —</option>
+            </select>
+          </div>
+          <div>
             <label class="admin-lbl">اسم المنتج *</label>
             <input id="cm-name" class="admin-inp" placeholder="مثال: تورتة شوكولاتة فاخرة" type="text">
           </div>
@@ -959,6 +1001,12 @@ a{text-decoration:none;color:inherit}
       <div id="admin-tab-resto-menu" class="admin-panel-sec">
         <div class="admin-sec-title">🍔 إضافة صنف جديد للمطعم</div>
         <div class="admin-form-grid">
+          <div>
+            <label class="admin-lbl">القسم الرئيسي</label>
+            <select id="rm-category" class="admin-inp">
+              <option value="">— بدون قسم —</option>
+            </select>
+          </div>
           <div>
             <label class="admin-lbl">اسم الصنف *</label>
             <input id="rm-name" class="admin-inp" placeholder="مثال: برجر كلاسيك" type="text">
@@ -1001,6 +1049,103 @@ a{text-decoration:none;color:inherit}
       </div><!-- end tab-resto-menu -->
 
 
+      <!-- ══ TAB: CATEGORIES ══ -->
+      <div id="admin-tab-categories" class="admin-panel-sec">
+        <div class="admin-sec-title">📂 إضافة قسم رئيسي جديد</div>
+        <p style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:14px">أنشئ أقساماً رئيسية (بيتزا، كريب، برجر...) ثم عند إضافة أي صنف اختار القسم التابع له</p>
+
+        <!-- اختيار المنيو -->
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+          <button class="img-tab on" id="cat-type-cake" onclick="ZZ.switchCatType('cake')">🎂 حلويات</button>
+          <button class="img-tab" id="cat-type-restaurant" onclick="ZZ.switchCatType('restaurant')">🍔 مطعم</button>
+        </div>
+
+        <div class="admin-form-grid">
+          <div>
+            <label class="admin-lbl">اسم القسم *</label>
+            <input id="cat-name" class="admin-inp" type="text" placeholder="مثال: بيتزا | كريب | برجر | تورتات أفراح">
+          </div>
+          <div>
+            <label class="admin-lbl">أيقونة (إيموجي)</label>
+            <input id="cat-icon" class="admin-inp" type="text" placeholder="مثال: 🍕 🌯 🎂" maxlength="4">
+          </div>
+        </div>
+        <button class="btn-admin-add" style="background:linear-gradient(135deg,#7c3aed,#5b21b6)" onclick="ZZ.addCategory()">➕ إضافة القسم</button>
+        <div class="admin-note" id="cat-save-note">✅ تم حفظ القسم</div>
+
+        <div style="margin-top:24px">
+          <div class="admin-sec-title">أقسام الحلويات <span id="cat-list-cake-count" style="opacity:.4;font-weight:400"></span></div>
+          <div id="cat-list-cake" style="margin-bottom:20px"><div style="text-align:center;color:rgba(255,255,255,.3);padding:16px;font-size:13px">لا توجد أقسام بعد</div></div>
+
+          <div class="admin-sec-title">أقسام المطعم <span id="cat-list-resto-count" style="opacity:.4;font-weight:400"></span></div>
+          <div id="cat-list-restaurant"><div style="text-align:center;color:rgba(255,255,255,.3);padding:16px;font-size:13px">لا توجد أقسام بعد</div></div>
+        </div>
+
+        <div style="margin-top:14px;font-size:11px;color:rgba(255,255,255,.28);text-align:center">
+          💡 اسحب الأقسام بالـ ⠿ لتعديل ترتيبها في المنيو
+        </div>
+      </div><!-- end tab-categories -->
+
+      <!-- ══ TAB: HERO BACKGROUND ══ -->
+      <div id="admin-tab-herobg" class="admin-panel-sec">
+        <div class="admin-sec-title">🖼️ صورة خلفية الصفحة الرئيسية</div>
+        <p style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:18px">
+          غيّر صورة الخلفية حسب المناسبة أو الموسم — التغيير يظهر فوراً لكل الزوار
+        </p>
+
+        <!-- معاينة الصورة الحالية -->
+        <div id="hero-bg-preview" style="
+          width:100%;aspect-ratio:16/9;border-radius:14px;
+          background-size:cover;background-position:center;
+          background-color:rgba(255,255,255,.05);
+          border:1px solid rgba(255,255,255,.1);
+          margin-bottom:16px;position:relative;overflow:hidden;
+          display:flex;align-items:center;justify-content:center;
+        ">
+          <span id="hero-bg-preview-label" style="color:rgba(255,255,255,.3);font-size:13px;font-weight:600">جاري التحميل...</span>
+        </div>
+
+        <!-- تبويبات اختيار المصدر -->
+        <div class="img-tabs" style="margin-bottom:12px">
+          <button class="img-tab on" id="hbg-btn-url"  onclick="ZZ.setHeroBgMode('url')">🔗 رابط صورة</button>
+          <button class="img-tab"    id="hbg-btn-file" onclick="ZZ.setHeroBgMode('file')">📁 رفع صورة</button>
+        </div>
+
+        <!-- رابط -->
+        <div id="hbg-url-row">
+          <label class="admin-lbl">رابط الصورة الجديدة</label>
+          <input id="hbg-imgurl" class="admin-inp" type="url" placeholder="https://example.com/image.jpg">
+        </div>
+
+        <!-- رفع ملف -->
+        <div id="hbg-file-row" style="display:none">
+          <label class="admin-lbl">ارفع صورة من جهازك</label>
+          <input id="hbg-imgfile" class="admin-inp" type="file" accept="image/*" style="padding:10px;cursor:pointer"
+                 onchange="ZZ.previewHeroBgFile(this)">
+          <p style="font-size:11px;color:rgba(255,255,255,.3);margin-top:6px">
+            ✅ صور عريضة (16:9) أفضل — مثل 1920×1080 — للحصول على نتيجة أجمل
+          </p>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+          <button class="btn-admin-add" style="background:linear-gradient(135deg,#f43f5e,#e11d48);flex:2"
+                  onclick="ZZ.saveHeroBg()">💾 حفظ الصورة الجديدة</button>
+          <button onclick="ZZ.resetHeroBg()" style="
+            flex:1;padding:14px;border-radius:12px;
+            background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);
+            color:rgba(255,255,255,.55);font-size:13px;font-weight:700;
+            cursor:pointer;font-family:Cairo,sans-serif;transition:.25s;
+          " onmouseover="this.style.background='rgba(239,68,68,.12)';this.style.color='#f87171'"
+             onmouseout="this.style.background='rgba(255,255,255,.05)';this.style.color='rgba(255,255,255,.55)'">
+            🔄 إعادة الصورة الأصلية
+          </button>
+        </div>
+        <div class="admin-note" id="herobg-save-note">✅ تم تغيير الصورة بنجاح</div>
+        <div style="margin-top:14px;font-size:11px;color:rgba(255,255,255,.28);text-align:center">
+          الصورة تُحفظ في Firebase وتظهر لكل الزوار فوراً بدون إعادة تحميل الصفحة
+        </div>
+      </div><!-- end tab-herobg -->
+
       <!-- ══ TAB: BUTTON CONTROLS ══ -->
       <div id="admin-tab-btns" class="admin-panel-sec">
         <div class="admin-sec-title">🎛️ التحكم في أزرار الصفحة الرئيسية</div>
@@ -1024,6 +1169,28 @@ a{text-decoration:none;color:inherit}
           </div>
           <label class="toggle-sw">
             <input type="checkbox" id="tog-resto" checked onchange="ZZ.saveBtnSetting('restaurant', this.checked)">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="btn-toggle-row">
+          <div class="btn-toggle-info">
+            🏷️ زرار "عروضنا"
+            <small>يفتح صفحة العروض للعميل</small>
+          </div>
+          <label class="toggle-sw">
+            <input type="checkbox" id="tog-offers" checked onchange="ZZ.saveBtnSetting('offers', this.checked)">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="btn-toggle-row">
+          <div class="btn-toggle-info">
+            🍽️ زرار "تصفح القوائم"
+            <small>يوجّه العميل لقسم المنيو</small>
+          </div>
+          <label class="toggle-sw">
+            <input type="checkbox" id="tog-menus" checked onchange="ZZ.saveBtnSetting('menus', this.checked)">
             <span class="slider"></span>
           </label>
         </div>
@@ -1213,7 +1380,7 @@ a{text-decoration:none;color:inherit}
 ═══════════════════════════════════════ -->
 <section id="hero">
   <!-- Image + overlays -->
-  <div class="hero-bg"></div>
+  <div class="hero-bg" id="hero-bg-el"></div>
   <div class="hero-overlay"></div>
   <div class="hero-vignette"></div>
   <div class="hero-grade"></div>
@@ -3440,6 +3607,620 @@ var _prevForceRefreshOffers = ZZ._forceRefreshOffers;
 ZZ._forceRefreshOffers = function() {
   _prevForceRefreshOffers();
   setTimeout(function(){ ZZ.buildCarousel(); }, 300);
+};
+
+/* ════════════════════════════════════════════════════════
+   CATEGORIES SYSTEM — نظام الأقسام الرئيسية
+════════════════════════════════════════════════════════ */
+ZZ._catsCache     = { cake: [], restaurant: [] };
+ZZ._catsSubbed    = { cake: false, restaurant: false };
+ZZ._catType       = 'cake';       /* النوع المختار حالياً في تاب الأقسام */
+ZZ._dragSrcIdx    = null;         /* drag-and-drop */
+
+/* ── الاشتراك في الأقسام من Firebase ── */
+ZZ.subscribeCategories = function(type) {
+  if (ZZ._catsSubbed[type] || !window.zzdb) return;
+  ZZ._catsSubbed[type] = true;
+  zzdb.ref('landing/categories/' + type).orderByChild('order').on('value', function(snap) {
+    var arr = [];
+    snap.forEach(function(ch) { arr.push(Object.assign({ id: ch.key }, ch.val())); });
+    ZZ._catsCache[type] = arr;
+    ZZ._renderCatList(type);
+    ZZ._refreshCatDropdowns(type);
+    /* إعادة رسم المنيو العام بالأقسام */
+    ZZ.renderMenuDisplay(type);
+  });
+};
+
+/* ── تغيير نوع الأقسام في الـ tab ── */
+ZZ.switchCatType = function(type) {
+  ZZ._catType = type;
+  ['cake','restaurant'].forEach(function(t) {
+    document.getElementById('cat-type-' + t).classList.toggle('on', t === type);
+  });
+};
+
+/* ── إضافة قسم جديد ── */
+ZZ.addCategory = function() {
+  var name = (document.getElementById('cat-name') || {}).value || '';
+  var icon = (document.getElementById('cat-icon') || {}).value || '';
+  if (!name.trim()) { alert('من فضلك أدخل اسم القسم'); return; }
+  if (!window.zzdb) { alert('⚠️ الفايربيز مش متصل'); return; }
+  var type = ZZ._catType;
+  var cats = ZZ._catsCache[type] || [];
+  var cat  = { name: name.trim(), icon: icon.trim() || '📂', order: cats.length, createdAt: Date.now() };
+  zzdb.ref('landing/categories/' + type).push(cat)
+    .then(function() {
+      document.getElementById('cat-name').value = '';
+      document.getElementById('cat-icon').value = '';
+      var n = document.getElementById('cat-save-note');
+      if (n) { n.classList.add('show'); setTimeout(function(){ n.classList.remove('show'); }, 2500); }
+    })
+    .catch(function(e) { alert('❌ ' + e.message); });
+};
+
+/* ── حذف قسم ── */
+ZZ.deleteCategory = function(type, id) {
+  if (!confirm('حذف هذا القسم؟ الأصناف المرتبطة به لن تُحذف — ستظهر بدون قسم')) return;
+  if (!window.zzdb) return;
+  zzdb.ref('landing/categories/' + type + '/' + id).remove();
+};
+
+/* ── تعديل اسم قسم ── */
+ZZ.editCategoryName = function(type, id, currentName, currentIcon) {
+  var newName = prompt('اسم القسم الجديد:', currentName);
+  if (newName === null) return;
+  newName = newName.trim();
+  if (!newName) { alert('الاسم لا يمكن أن يكون فارغاً'); return; }
+  var newIcon = prompt('الأيقونة (إيموجي):', currentIcon || '📂');
+  if (newIcon === null) return;
+  zzdb.ref('landing/categories/' + type + '/' + id).update({
+    name: newName,
+    icon: newIcon.trim() || '📂'
+  });
+};
+
+/* ── رسم قائمة الأقسام في الأدمن ── */
+ZZ._renderCatList = function(type) {
+  var elId = type === 'cake' ? 'cat-list-cake' : 'cat-list-restaurant';
+  var cntId = type === 'cake' ? 'cat-list-cake-count' : 'cat-list-resto-count';
+  var el  = document.getElementById(elId);
+  var cnt = document.getElementById(cntId);
+  if (!el) return;
+  var cats = ZZ._catsCache[type] || [];
+  if (cnt) cnt.textContent = cats.length ? '(' + cats.length + ')' : '';
+  if (!cats.length) {
+    el.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.3);padding:16px;font-size:13px">لا توجد أقسام بعد — أضف قسماً أعلاه</div>';
+    return;
+  }
+  el.innerHTML = cats.map(function(c, i) {
+    return '<div class="cat-item" draggable="true" data-idx="' + i + '" data-id="' + c.id + '" data-type="' + type + '">'
+      + '<span class="cat-drag-handle" title="اسحب لتغيير الترتيب">⠿</span>'
+      + '<span style="font-size:20px">' + (c.icon || '📂') + '</span>'
+      + '<span class="cat-name-lbl">' + (c.name || '') + '</span>'
+      + '<span class="cat-count">' + ZZ._countItemsInCat(type, c.id) + ' صنف</span>'
+      + '<button onclick="ZZ.editCategoryName(\'' + type + '\',\'' + c.id + '\',\'' + (c.name||'').replace(/'/g,"\\'") + '\',\'' + (c.icon||'📂') + '\')" class="btn-edit" title="تعديل" style="margin-left:0">✏️</button>'
+      + '<button onclick="ZZ.deleteCategory(\'' + type + '\',\'' + c.id + '\')" class="btn-del" title="حذف">🗑</button>'
+      + '</div>';
+  }).join('');
+  /* Drag events */
+  ZZ._initCatDrag(el, type);
+};
+
+/* ── عدد الأصناف في كل قسم ── */
+ZZ._countItemsInCat = function(type, catId) {
+  var items = ZZ._menuCache[type] || [];
+  return items.filter(function(it) { return it.categoryId === catId; }).length;
+};
+
+/* ── Drag & Drop لإعادة ترتيب الأقسام ── */
+ZZ._initCatDrag = function(container, type) {
+  var items = container.querySelectorAll('.cat-item');
+  items.forEach(function(item) {
+    item.addEventListener('dragstart', function(e) {
+      ZZ._dragSrcIdx = parseInt(item.getAttribute('data-idx'));
+      e.dataTransfer.effectAllowed = 'move';
+      item.classList.add('dragging');
+    });
+    item.addEventListener('dragend', function() { item.classList.remove('dragging'); });
+    item.addEventListener('dragover', function(e) { e.preventDefault(); item.classList.add('drag-over'); });
+    item.addEventListener('dragleave', function() { item.classList.remove('drag-over'); });
+    item.addEventListener('drop', function(e) {
+      e.preventDefault();
+      item.classList.remove('drag-over');
+      var targetIdx = parseInt(item.getAttribute('data-idx'));
+      if (ZZ._dragSrcIdx === null || ZZ._dragSrcIdx === targetIdx) return;
+      /* إعادة ترتيب المصفوفة */
+      var cats = ZZ._catsCache[type].slice();
+      var moved = cats.splice(ZZ._dragSrcIdx, 1)[0];
+      cats.splice(targetIdx, 0, moved);
+      /* حفظ الترتيب الجديد في Firebase */
+      var updates = {};
+      cats.forEach(function(c, i) { updates['landing/categories/' + type + '/' + c.id + '/order'] = i; });
+      if (window.zzdb) zzdb.ref().update(updates);
+      ZZ._dragSrcIdx = null;
+    });
+  });
+};
+
+/* ── تحديث الـ dropdowns في فورمات الإضافة والتعديل ── */
+ZZ._refreshCatDropdowns = function(type) {
+  var cats = ZZ._catsCache[type] || [];
+  var opts = '<option value="">— بدون قسم —</option>'
+    + cats.map(function(c) {
+        return '<option value="' + c.id + '">' + (c.icon || '📂') + ' ' + (c.name || '') + '</option>';
+      }).join('');
+  /* dropdown إضافة */
+  var addSel = document.getElementById(type === 'cake' ? 'cm-category' : 'rm-category');
+  if (addSel) {
+    var saved = addSel.value;
+    addSel.innerHTML = opts;
+    addSel.value = saved;
+  }
+  /* dropdown تعديل — نحدّثه لو مفتوح على نفس النوع */
+  var emType = (document.getElementById('em-type') || {}).value;
+  if (emType === type) {
+    var editSel = document.getElementById('em-category');
+    if (editSel) {
+      var savedEdit = editSel.value;
+      editSel.innerHTML = opts;
+      editSel.value = savedEdit;
+    }
+  }
+};
+
+/* ── تعديل addMenuItem لحفظ الـ categoryId ── */
+var _origAddMenuItem = ZZ.addMenuItem;
+ZZ.addMenuItem = function(type) {
+  /* نحفظ الـ categoryId قبل ما _origAddMenuItem يشتغل */
+  var selId = type === 'cake' ? 'cm-category' : 'rm-category';
+  var catSel = document.getElementById(selId);
+  ZZ._pendingCategoryId = catSel ? catSel.value : '';
+  _origAddMenuItem.call(ZZ, type);
+};
+
+/* patch _saveItem ليشمل categoryId */
+var _origForceRefreshMenu = ZZ._forceRefreshMenu;
+ZZ._forceRefreshMenu = function(type) {
+  _origForceRefreshMenu.call(ZZ, type);
+};
+
+/* نعدّل addMenuItem مباشرة بدل ما نعتمد على patch هش */
+ZZ.addMenuItem = function(type) {
+  var ni  = type === 'cake' ? 'cm-name'    : 'rm-name';
+  var di  = type === 'cake' ? 'cm-desc'    : 'rm-desc';
+  var pi  = type === 'cake' ? 'cm-price'   : 'rm-price';
+  var ci  = type === 'cake' ? 'cm-category': 'rm-category';
+  var fi  = type === 'cake' ? 'cm-imgfile' : 'rm-imgfile';
+  var ui  = type === 'cake' ? 'cm-imgurl'  : 'rm-imgurl';
+  var mi  = type === 'cake' ? ZZ._cakeImgMode : ZZ._restoImgMode;
+
+  var nameEl  = document.getElementById(ni);
+  var descEl  = document.getElementById(di);
+  var priceEl = document.getElementById(pi);
+  var catEl   = document.getElementById(ci);
+
+  var name     = nameEl  ? nameEl.value.trim()  : '';
+  var desc     = descEl  ? descEl.value.trim()  : '';
+  var price    = priceEl ? priceEl.value.trim() : '';
+  var categoryId = catEl ? catEl.value : '';
+
+  if (!name) { alert('من فضلك أدخل اسم المنتج'); return; }
+  if (!window.zzdb) { alert('⚠️ الفايربيز مش متصل'); return; }
+  if (!window.ZZ_AUTH_READY) { alert('⏳ جاري تسجيل الدخول تلقائياً...\nانتظر ثانيتين وأعد المحاولة'); return; }
+
+  var item = { name: name, desc: desc, price: price, categoryId: categoryId, available: true, createdAt: Date.now() };
+  if (type === 'restaurant') {
+    item.delivery = ZZ._deliveryOpts ? ZZ._deliveryOpts.delivery !== false : true;
+    item.pickup   = ZZ._deliveryOpts ? ZZ._deliveryOpts.pickup   !== false : true;
+  }
+
+  function _saveItem(img) {
+    item.img = img || '';
+    zzdb.ref('landing/menus/' + type).push(item)
+      .then(function() {
+        [ni, di, pi, ui].forEach(function(id) { var el=document.getElementById(id); if(el) el.value=''; });
+        if (catEl) catEl.value = '';
+        var fe2 = document.getElementById(fi); if (fe2) try { fe2.value=''; } catch(e) {}
+        var noteId = type==='cake' ? 'cake-menu-note' : 'resto-menu-note';
+        var n = document.getElementById(noteId);
+        if (n) { n.classList.add('show'); setTimeout(function() { n.classList.remove('show'); }, 2500); }
+        ZZ._forceRefreshMenu(type);
+      })
+      .catch(function(err) { alert('❌ ' + err.message); });
+  }
+
+  if (mi === 'file') {
+    var fe = document.getElementById(fi);
+    var f  = fe && fe.files && fe.files[0];
+    if (!f) { alert('من فضلك اختار صورة'); return; }
+    _zzReadFile(f)
+      .then(function(raw) { return _zzCompress(raw, 900, 0.7); })
+      .then(function(img) { if (img.length > 900000) return _zzCompress(img, 600, 0.5); return img; })
+      .then(_saveItem)
+      .catch(function(err) { alert('❌ ' + err.message); });
+  } else {
+    var urlEl = document.getElementById(ui);
+    _saveItem(urlEl ? urlEl.value.trim() : '');
+  }
+};
+
+/* ── تعديل openEditMenu ليعبّي الـ category dropdown ── */
+var _origOpenEditMenu = ZZ.openEditMenu;
+ZZ.openEditMenu = function(type, id) {
+  if (!window.zzdb) return;
+  zzdb.ref('landing/menus/' + type + '/' + id).once('value').then(function(snap) {
+    var it = snap.val(); if (!it) return;
+    ZZ._editMenuData = { type: type, id: id, img: it.img };
+    document.getElementById('em-type').value  = type;
+    document.getElementById('em-id').value    = id;
+    document.getElementById('em-name').value  = it.name  || '';
+    document.getElementById('em-desc').value  = it.desc  || '';
+    document.getElementById('em-price').value = it.price || '';
+    /* category dropdown */
+    ZZ._refreshCatDropdowns(type);
+    setTimeout(function() {
+      var emCat = document.getElementById('em-category');
+      if (emCat) emCat.value = it.categoryId || '';
+    }, 80);
+    var eu = document.getElementById('em-imgurl');  if (eu) eu.value = '';
+    var ef = document.getElementById('em-imgfile'); if (ef) ef.value = '';
+    var prev = document.getElementById('em-preview');
+    if (prev && it.img) prev.style.backgroundImage = 'url("' + it.img + '")';
+    var dr = document.getElementById('em-delivery-row');
+    if (dr) dr.style.display = type==='restaurant' ? 'block' : 'none';
+    if (type==='restaurant') {
+      ZZ._editDeliveryOpts = { delivery: !!it.delivery, pickup: !!it.pickup };
+      ['delivery','pickup'].forEach(function(opt) {
+        var lbl = document.getElementById('em-'+opt+'-lbl');
+        var chk = document.getElementById('em-'+opt);
+        if (lbl) lbl.classList.toggle('on', !!it[opt]);
+        if (chk) chk.checked = !!it[opt];
+      });
+    }
+    document.getElementById('modal-edit-menu').style.display = 'flex';
+  });
+};
+
+/* ── تعديل saveEditMenu ليحفظ الـ categoryId ── */
+var _origSaveEditMenu = ZZ.saveEditMenu;
+ZZ.saveEditMenu = function() {
+  var type = document.getElementById('em-type').value;
+  var id   = document.getElementById('em-id').value;
+  var name = ((document.getElementById('em-name')||{}).value||'').trim();
+  if (!name) { alert('أدخل اسم المنتج'); return; }
+  if (!window.zzdb) return;
+  var catEl = document.getElementById('em-category');
+  var updates = {
+    name:       name,
+    desc:       ((document.getElementById('em-desc') ||{}).value||'').trim(),
+    price:      ((document.getElementById('em-price')||{}).value||'').trim(),
+    categoryId: catEl ? catEl.value : ''
+  };
+  if (type==='restaurant') {
+    updates.delivery = ZZ._editDeliveryOpts ? ZZ._editDeliveryOpts.delivery : true;
+    updates.pickup   = ZZ._editDeliveryOpts ? ZZ._editDeliveryOpts.pickup   : true;
+  }
+  var ef = document.getElementById('em-imgfile');
+  var eu = document.getElementById('em-imgurl');
+  var nf = ef && ef.files && ef.files[0];
+  var nu = eu && eu.value.trim();
+  function _doUpdate(img) {
+    updates.img = img || (ZZ._editMenuData ? ZZ._editMenuData.img : '');
+    zzdb.ref('landing/menus/' + type + '/' + id).update(updates)
+      .then(function() { ZZ.closeEditMenu(); })
+      .catch(function(err) { alert('❌ ' + err.message); });
+  }
+  if (nf) {
+    _zzReadFile(nf).then(function(r) { return _zzCompress(r,900,0.7); }).then(_doUpdate).catch(function(e) { alert('❌ '+e.message); });
+  } else {
+    _doUpdate(nu || null);
+  }
+};
+
+/* ── renderMenuDisplay مع الأقسام ── */
+ZZ.renderMenuDisplay = function(type) {
+  var el = document.getElementById(type==='cake' ? 'cake-menu-display' : 'resto-menu-display');
+  if (!el) return;
+  var allItems = (ZZ._menuCache[type]||[]).filter(function(it) { return it.available !== false; });
+  var cats     = ZZ._catsCache[type] || [];
+  var tUrl     = type==='cake' ? ZZ_CAKE_URL : ZZ_RESTO_URL;
+  var bCls     = type==='restaurant' ? 'btn-prod-order resto' : 'btn-prod-order';
+
+  if (!allItems.length) {
+    el.innerHTML = '<div class="no-menu-msg"><div class="ni">'+(type==='cake'?'🎂':'🍔')+'</div><p>لا توجد منتجات حالياً</p></div>';
+    return;
+  }
+
+  function renderCard(it) {
+    var bdg = it.available!==false ? '<span class="pbadge pbadge-avail">✅ متاح</span>' : '';
+    if (type==='restaurant') {
+      if (it.delivery) bdg += '<span class="pbadge pbadge-delivery">🛵 ديليفري</span>';
+      if (it.pickup)   bdg += '<span class="pbadge pbadge-pickup">🏃 استلام</span>';
+    }
+    return '<div class="prod-card">'
+      + '<div class="prod-img" id="pi_' + it.id + '"><div class="prod-badges">' + bdg + '</div></div>'
+      + '<div class="prod-body">'
+      + '<div class="prod-name">' + (it.name||'') + '</div>'
+      + (it.desc  ? '<div class="prod-desc">'  + it.desc  + '</div>' : '')
+      + (it.price ? '<div class="prod-price">' + it.price + '</div>' : '')
+      + '<a href="' + tUrl + '" target="_blank" class="' + bCls + '">اطلب الآن <span style="display:inline-block;transform:scaleX(-1)">→</span></a>'
+      + '</div></div>';
+  }
+
+  var html = '';
+
+  if (!cats.length) {
+    /* بدون أقسام — عرض عادي */
+    html = '<div class="menu-grid">' + allItems.map(renderCard).join('') + '</div>';
+  } else {
+    /* عرض مع أقسام */
+    var usedIds = {};
+    cats.forEach(function(cat) {
+      var catItems = allItems.filter(function(it) { return it.categoryId === cat.id; });
+      if (!catItems.length) return;
+      catItems.forEach(function(it) { usedIds[it.id] = true; });
+      html += '<div class="menu-category-block">'
+        + '<div class="menu-cat-header">'
+        + '<span class="menu-cat-icon">' + (cat.icon||'📂') + '</span>'
+        + '<div>'
+        + '<div class="menu-cat-title">' + (cat.name||'') + '</div>'
+        + '<div class="menu-cat-count">' + catItems.length + ' منتج</div>'
+        + '</div></div>'
+        + '<div class="menu-grid">' + catItems.map(renderCard).join('') + '</div>'
+        + '</div>';
+    });
+    /* الأصناف بدون قسم */
+    var uncategorized = allItems.filter(function(it) { return !usedIds[it.id]; });
+    if (uncategorized.length) {
+      html += '<div class="menu-category-block">'
+        + '<div class="menu-cat-header"><span class="menu-cat-icon">📌</span>'
+        + '<div><div class="menu-cat-title">متنوعات</div>'
+        + '<div class="menu-cat-count">' + uncategorized.length + ' منتج</div></div></div>'
+        + '<div class="menu-grid">' + uncategorized.map(renderCard).join('') + '</div>'
+        + '</div>';
+    }
+  }
+
+  el.innerHTML = html;
+  allItems.forEach(function(it) {
+    var d = document.getElementById('pi_' + it.id);
+    if (d && it.img) d.style.backgroundImage = 'url("' + it.img + '")';
+  });
+};
+
+/* ════ EXTEND BTN SETTINGS ════ */
+/* إضافة offers وmenus للـ settings */
+var _origLoadBtnSettings = ZZ.loadBtnSettings;
+ZZ.loadBtnSettings = function() {
+  if (!window.zzdb) return;
+  zzdb.ref('landing/settings/btns').on('value', function(snap) {
+    var v = snap.val() || {};
+    ZZ._btnSettings = {
+      cake:       v.cake       !== false,
+      restaurant: v.restaurant !== false,
+      offers:     v.offers     !== false,
+      menus:      v.menus      !== false,
+      jobs:       v.jobs       === true
+    };
+    ZZ._applyBtnSettings();
+    var tc = document.getElementById('tog-cake');
+    var tr = document.getElementById('tog-resto');
+    var to = document.getElementById('tog-offers');
+    var tm = document.getElementById('tog-menus');
+    var tj = document.getElementById('tog-jobs');
+    if (tc) tc.checked = ZZ._btnSettings.cake;
+    if (tr) tr.checked = ZZ._btnSettings.restaurant;
+    if (to) to.checked = ZZ._btnSettings.offers;
+    if (tm) tm.checked = ZZ._btnSettings.menus;
+    if (tj) tj.checked = ZZ._btnSettings.jobs;
+  });
+};
+
+/* تطبيق إعدادات الأزرار بما فيها offers وmenus */
+ZZ._applyBtnSettings = function() {
+  var cakeBtn  = document.querySelector('.btn-cake');
+  var restoBtn = document.querySelector('.btn-fire2');
+  var offersBtn = document.querySelector('.btn-offers-hero');
+  var menusBtn  = document.querySelector('.btn-menu-nav');
+  if (cakeBtn)   cakeBtn.style.display   = ZZ._btnSettings.cake        ? '' : 'none';
+  if (restoBtn)  restoBtn.style.display  = ZZ._btnSettings.restaurant  ? '' : 'none';
+  if (offersBtn) offersBtn.style.display = ZZ._btnSettings.offers !== false ? '' : 'none';
+  if (menusBtn)  menusBtn.style.display  = ZZ._btnSettings.menus  !== false ? '' : 'none';
+  var jobsSec = document.getElementById('jobs-section');
+  if (jobsSec) jobsSec.classList.toggle('active', ZZ._btnSettings.jobs);
+  var navJobs = document.getElementById('nav-jobs-link');
+  if (navJobs) navJobs.style.display = ZZ._btnSettings.jobs ? '' : 'none';
+};
+
+/* ════ EXTEND _extraInit ════ */
+var _prevExtraInit = ZZ._extraInit;
+ZZ._extraInit = function() {
+  _prevExtraInit();
+  ZZ.subscribeCategories('cake');
+  ZZ.subscribeCategories('restaurant');
+};
+
+/* ════ EXTEND adminTab ════ */
+var _prevAdminTab2 = ZZ.adminTab;
+ZZ.adminTab = function(tab) {
+  _prevAdminTab2(tab);
+  if (tab === 'categories') {
+    ZZ._renderCatList('cake');
+    ZZ._renderCatList('restaurant');
+  }
+  if (tab === 'herobg') {
+    ZZ._loadHeroBgPreview();
+  }
+};
+
+/* ════════════════════════════════════════════════════════
+   HERO BACKGROUND SYSTEM — نظام صورة الخلفية الرئيسية
+════════════════════════════════════════════════════════ */
+ZZ._heroBgMode    = 'url';
+ZZ._heroBgSubbed  = false;
+
+/* الصورة الأصلية (base64 محفوظة من الكود) */
+ZZ._heroBgDefault = null; /* يتم تخزينها مرة واحدة من الـ DOM */
+
+/* ── حفظ الصورة الأصلية عند أول تشغيل ── */
+(function() {
+  var el = document.getElementById('hero-bg-el');
+  if (el) {
+    var style = window.getComputedStyle(el);
+    ZZ._heroBgDefault = style.backgroundImage;
+  }
+})();
+
+/* ── تبديل مصدر الصورة ── */
+ZZ.setHeroBgMode = function(m) {
+  ZZ._heroBgMode = m;
+  document.getElementById('hbg-url-row').style.display  = m === 'url'  ? 'block' : 'none';
+  document.getElementById('hbg-file-row').style.display = m === 'file' ? 'block' : 'none';
+  document.getElementById('hbg-btn-url').classList.toggle('on',  m === 'url');
+  document.getElementById('hbg-btn-file').classList.toggle('on', m === 'file');
+};
+
+/* ── معاينة الصورة عند اختيار ملف ── */
+ZZ.previewHeroBgFile = function(inp) {
+  var f = inp && inp.files && inp.files[0];
+  if (!f) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var prev = document.getElementById('hero-bg-preview');
+    if (prev) {
+      prev.style.backgroundImage = 'url("' + e.target.result + '")';
+      var lbl = document.getElementById('hero-bg-preview-label');
+      if (lbl) lbl.style.display = 'none';
+    }
+  };
+  reader.readAsDataURL(f);
+};
+
+/* ── تحميل معاينة الصورة الحالية ── */
+ZZ._loadHeroBgPreview = function() {
+  var prev  = document.getElementById('hero-bg-preview');
+  var label = document.getElementById('hero-bg-preview-label');
+  if (!prev) return;
+  /* اقرأ الصورة الحالية من Firebase */
+  if (window.zzdb) {
+    zzdb.ref('landing/settings/heroBg').once('value').then(function(snap) {
+      var val = snap.val();
+      if (val) {
+        prev.style.backgroundImage = 'url("' + val + '")';
+        if (label) label.style.display = 'none';
+      } else {
+        /* الصورة الافتراضية من الـ DOM */
+        var el = document.getElementById('hero-bg-el');
+        if (el) {
+          var bg = window.getComputedStyle(el).backgroundImage;
+          prev.style.backgroundImage = bg;
+          if (label) label.style.display = 'none';
+        }
+      }
+    });
+  } else {
+    var el = document.getElementById('hero-bg-el');
+    if (el) {
+      prev.style.backgroundImage = window.getComputedStyle(el).backgroundImage;
+      if (label) label.style.display = 'none';
+    }
+  }
+};
+
+/* ── حفظ الصورة الجديدة ── */
+ZZ.saveHeroBg = function() {
+  if (!window.zzdb) { alert('⚠️ الفايربيز مش متصل'); return; }
+
+  function _doSave(imgUrl) {
+    zzdb.ref('landing/settings/heroBg').set(imgUrl)
+      .then(function() {
+        /* تطبيق فوري على الصفحة */
+        ZZ._applyHeroBg(imgUrl);
+        /* تحديث المعاينة */
+        var prev = document.getElementById('hero-bg-preview');
+        if (prev) { prev.style.backgroundImage = 'url("' + imgUrl + '")'; }
+        var lbl = document.getElementById('hero-bg-preview-label');
+        if (lbl) lbl.style.display = 'none';
+        /* رسالة نجاح */
+        var n = document.getElementById('herobg-save-note');
+        if (n) { n.classList.add('show'); setTimeout(function(){ n.classList.remove('show'); }, 2500); }
+        /* مسح الحقول */
+        var urlEl  = document.getElementById('hbg-imgurl');
+        var fileEl = document.getElementById('hbg-imgfile');
+        if (urlEl)  urlEl.value  = '';
+        if (fileEl) try { fileEl.value = ''; } catch(e) {}
+      })
+      .catch(function(err) { alert('❌ ' + err.message); });
+  }
+
+  if (ZZ._heroBgMode === 'file') {
+    var fe = document.getElementById('hbg-imgfile');
+    var f  = fe && fe.files && fe.files[0];
+    if (!f) { alert('من فضلك اختار صورة'); return; }
+    _zzReadFile(f)
+      .then(function(raw) { return _zzCompress(raw, 1200, 0.75); })
+      .then(function(img) {
+        /* لو الصورة أكبر من 900KB نضغطها أكتر */
+        if (img.length > 900000) return _zzCompress(img, 900, 0.6);
+        return img;
+      })
+      .then(_doSave)
+      .catch(function(err) { alert('❌ ' + err.message); });
+  } else {
+    var urlEl = document.getElementById('hbg-imgurl');
+    var url   = urlEl ? urlEl.value.trim() : '';
+    if (!url) { alert('من فضلك أدخل رابط الصورة'); return; }
+    _doSave(url);
+  }
+};
+
+/* ── إعادة الصورة الأصلية ── */
+ZZ.resetHeroBg = function() {
+  if (!confirm('هتتمسح الصورة المخصصة وترجع الصورة الأصلية — متأكد؟')) return;
+  if (!window.zzdb) return;
+  zzdb.ref('landing/settings/heroBg').remove().then(function() {
+    /* إزالة الـ override من الـ DOM */
+    var el = document.getElementById('hero-bg-el');
+    if (el) el.style.backgroundImage = '';
+    /* تحديث المعاينة */
+    ZZ._loadHeroBgPreview();
+    var n = document.getElementById('herobg-save-note');
+    if (n) {
+      n.textContent = '✅ تمت إعادة الصورة الأصلية';
+      n.classList.add('show');
+      setTimeout(function(){ n.classList.remove('show'); n.textContent = '✅ تم تغيير الصورة بنجاح'; }, 2500);
+    }
+  });
+};
+
+/* ── تطبيق الصورة على الـ hero-bg ── */
+ZZ._applyHeroBg = function(imgUrl) {
+  var el = document.getElementById('hero-bg-el');
+  if (!el) return;
+  if (imgUrl) {
+    el.style.backgroundImage = 'url("' + imgUrl + '")';
+    el.style.backgroundSize  = 'cover';
+    el.style.backgroundPosition = 'center center';
+  } else {
+    el.style.backgroundImage = '';
+  }
+};
+
+/* ── الاشتراك في تغييرات صورة الخلفية ── */
+ZZ._subscribeHeroBg = function() {
+  if (ZZ._heroBgSubbed || !window.zzdb) return;
+  ZZ._heroBgSubbed = true;
+  zzdb.ref('landing/settings/heroBg').on('value', function(snap) {
+    ZZ._applyHeroBg(snap.val());
+  });
+};
+
+/* ── تمديد _extraInit لتشمل الاشتراك بالخلفية ── */
+var _prevExtraInit2 = ZZ._extraInit;
+ZZ._extraInit = function() {
+  _prevExtraInit2();
+  ZZ._subscribeHeroBg();
 };
 
 </script>
