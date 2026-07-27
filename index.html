@@ -623,9 +623,14 @@ a{text-decoration:none;color:inherit}
 .jobs-title span{color:#f43f5e}
 .jobs-sub{color:rgba(255,255,255,.4);font-size:.9rem;margin-top:6px}
 .jobs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;direction:rtl}
-.job-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:22px;transition:all .3s;cursor:pointer;position:relative;overflow:hidden}
+.job-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:22px;transition:all .3s;cursor:pointer;position:relative;overflow:hidden;min-height:180px}
+.job-card-has-img{overflow:visible}
 .job-card::before{content:'';position:absolute;top:0;right:0;width:3px;height:100%;background:linear-gradient(135deg,#f43f5e,#a855f7);border-radius:0 18px 18px 0}
 .job-card:hover{transform:translateY(-4px);border-color:rgba(244,63,94,.25);box-shadow:0 16px 40px rgba(0,0,0,.4)}
+.job-card-body{position:relative;z-index:2}
+.job-card-has-img .job-card-body{padding-left:120px}
+.job-card-persona{position:absolute;bottom:0;left:-6px;height:110%;width:auto;max-width:42%;object-fit:contain;object-position:bottom center;pointer-events:none;z-index:1;filter:drop-shadow(0 0 20px rgba(0,0,0,.6));transition:transform .3s ease}
+.job-card:hover .job-card-persona{transform:translateY(-6px)}
 .job-dept{font-size:10px;font-weight:800;letter-spacing:.15em;color:#f43f5e;text-transform:uppercase;margin-bottom:8px}
 .job-title{font-weight:900;font-size:1.05rem;color:#fff;margin-bottom:8px}
 .job-meta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
@@ -633,6 +638,7 @@ a{text-decoration:none;color:inherit}
 .job-desc-preview{font-size:.83rem;color:rgba(255,255,255,.45);line-height:1.6;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .btn-job-apply{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;font-weight:800;font-size:13px;border-radius:10px;padding:10px 20px;border:none;cursor:pointer;font-family:'Cairo',sans-serif;transition:all .25s}
 .btn-job-apply:hover{filter:brightness(1.1);transform:translateY(-1px)}
+@media(max-width:767px){.job-card-has-img .job-card-body{padding-left:95px}.job-card-persona{max-width:36%;height:100%}}
 
 /* ══ JOB DETAIL + APPLICATION MODAL ══ */
 .modal-job{position:fixed;inset:0;z-index:1400;background:rgba(0,0,0,.92);backdrop-filter:blur(20px);display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;font-family:'Cairo',sans-serif;direction:rtl}
@@ -2229,7 +2235,22 @@ ZZ.checkAuth = async function() {
   err.style.display = 'none';
   if(!pass) { err.textContent = '❌ أدخل كلمة السر'; err.style.display = 'block'; return; }
   const passHash = await _zzHash(pass);
-  const storedPass = localStorage.getItem('zz_admin_pass') || ZZ_PASS_DEF;
+  /* قراءة الباسورد من Firebase أولاً، لو مش موجود نرجع للـ default */
+  let storedPass = ZZ_PASS_DEF;
+  if(window.zzdb) {
+    try {
+      const pSnap = await zzdb.ref('landing/admin/password').once('value');
+      if(pSnap.val()) storedPass = pSnap.val();
+      else {
+        /* لو مش موجود في Firebase خذ من localStorage للتوافق مع القديم */
+        storedPass = localStorage.getItem('zz_admin_pass') || ZZ_PASS_DEF;
+      }
+    } catch(e) {
+      storedPass = localStorage.getItem('zz_admin_pass') || ZZ_PASS_DEF;
+    }
+  } else {
+    storedPass = localStorage.getItem('zz_admin_pass') || ZZ_PASS_DEF;
+  }
   if(passHash !== storedPass) {
     err.textContent = '❌ كلمة السر غير صحيحة';
     err.style.display = 'block';
@@ -2294,9 +2315,20 @@ ZZ.changePass = async function() {
   if (!p1 || p1.length < 6) { showErr('❌ كلمة السر الجديدة يجب أن تكون 6 أحرف على الأقل'); return; }
   if (p1 !== p2)    { showErr('❌ كلمتا السر الجديدة غير متطابقتين'); return; }
 
-  /* Step 2: Verify current password */
+  /* Step 2: Verify current password (من Firebase أو default) */
   var currentHash = await _zzHash(currentPass);
-  var storedPass  = localStorage.getItem('zz_admin_pass') || await _zzHash('zamzam2024');
+  var storedPass  = ZZ_PASS_DEF;
+  if(window.zzdb) {
+    try {
+      var pSnap2 = await zzdb.ref('landing/admin/password').once('value');
+      if(pSnap2.val()) storedPass = pSnap2.val();
+      else storedPass = localStorage.getItem('zz_admin_pass') || ZZ_PASS_DEF;
+    } catch(e) {
+      storedPass = localStorage.getItem('zz_admin_pass') || ZZ_PASS_DEF;
+    }
+  } else {
+    storedPass = localStorage.getItem('zz_admin_pass') || ZZ_PASS_DEF;
+  }
   if (currentHash !== storedPass) { showErr('❌ كلمة السر الحالية غير صحيحة'); return; }
 
   /* Step 3: Verify PIN from Firebase */
@@ -2310,8 +2342,21 @@ ZZ.changePass = async function() {
     return;
   }
 
-  /* Step 4: All checks passed — save new password */
-  localStorage.setItem('zz_admin_pass', await _zzHash(p1));
+  /* Step 4: All checks passed — save new password in Firebase */
+  var newHash = await _zzHash(p1);
+  if(window.zzdb) {
+    try {
+      await zzdb.ref('landing/admin/password').set(newHash);
+      localStorage.removeItem('zz_admin_pass'); /* احذف القديم من localStorage */
+    } catch(e) {
+      /* لو Firebase فشل احفظ محلياً كـ fallback */
+      localStorage.setItem('zz_admin_pass', newHash);
+      showErr('⚠️ تم الحفظ محلياً فقط — تأكد من الاتصال بالإنترنت');
+      return;
+    }
+  } else {
+    localStorage.setItem('zz_admin_pass', newHash);
+  }
   document.getElementById('current-pass').value = '';
   document.getElementById('verify-pin').value   = '';
   document.getElementById('new-pass').value     = '';
@@ -3490,22 +3535,22 @@ ZZ.renderJobsPublic = function() {
   }
   el.innerHTML = active.map(function(j) {
     var tags = '';
-    if (j.location) tags += '<span class="job-tag">📍 '+j.location+'</span>';
     if (j.dept)     tags += '<span class="job-tag">🏢 '+j.dept+'</span>';
+    if (j.location) tags += '<span class="job-tag">📍 '+j.location+'</span>';
     var hasImg = j.img && j.img.length > 5;
-    return '<div class="job-card" onclick="ZZ.openJobDetail(\''  +j.id+'\')">'
+    return '<div class="job-card'+(hasImg?' job-card-has-img':'')+'" onclick="ZZ.openJobDetail(\''+j.id+'\')">'
+      /* محتوى النص */
+      +'<div class="job-card-body">'
       +(j.dept?'<div class="job-dept">'+j.dept+'</div>':'')
-      +'<div style="display:flex;align-items:flex-start;gap:12px">'
-      +(hasImg?'<div id="jci_'+j.id+'" style="width:68px;height:68px;border-radius:10px;flex-shrink:0;background-size:cover;background-position:center;background-color:rgba(255,255,255,.06)"></div>':'')
-      +'<div style="flex:1;min-width:0"><div class="job-title">'+(j.title||'')+'</div>'+(tags?'<div class="job-meta">'+tags+'</div>':'')+'</div>'
-      +'</div>'
-      +'<div class="job-desc-preview" style="margin-top:10px">'+(j.desc||'')+'</div>'
+      +'<div class="job-title">'+(j.title||'')+'</div>'
+      +(tags?'<div class="job-meta">'+tags+'</div>':'')
+      +'<div class="job-desc-preview">'+(j.desc||'')+'</div>'
       +'<button class="btn-job-apply">انضم إلينا 🚀</button>'
+      +'</div>'
+      /* صورة الشخصية تطلع من أسفل الكارد */
+      +(hasImg?'<img class="job-card-persona" src="'+j.img+'" alt="'+( j.title||'')+'" loading="lazy">':'')
       +'</div>';
   }).join('');
-  active.forEach(function(j) {
-    if (j.img) { var d=document.getElementById('jci_'+j.id); if(d) d.style.backgroundImage='url("'+j.img+'")'; }
-  });
 };
 
 ZZ.openJobDetail = function(id) {
