@@ -543,6 +543,20 @@ a{text-decoration:none;color:inherit}
 }
 
 /* ══════════════════════════════════
+   ISLAMIC BG ANIMATION SYSTEM
+══════════════════════════════════ */
+#islamic-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;opacity:0;transition:opacity 1.2s ease}
+#islamic-canvas.visible{opacity:1}
+.anim-selector-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.anim-opt{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;border-radius:14px;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);cursor:pointer;transition:all .25s;font-family:'Cairo',sans-serif;color:rgba(255,255,255,.6);font-size:12px;font-weight:700}
+.anim-opt:hover{border-color:rgba(244,63,94,.4);color:#fff;background:rgba(244,63,94,.07)}
+.anim-opt.on{border-color:#f43f5e;background:rgba(244,63,94,.15);color:#fff;box-shadow:0 0 18px rgba(244,63,94,.2)}
+.anim-opt-icon{font-size:26px}
+.anim-speed-row{display:flex;align-items:center;gap:12px;margin-top:10px}
+.anim-speed-row label{font-size:12px;color:rgba(255,255,255,.5);font-weight:700;white-space:nowrap}
+.anim-speed-row input[type=range]{flex:1;accent-color:#f43f5e}
+
+/* ══════════════════════════════════
    ADMIN MENU MANAGEMENT
 ══════════════════════════════════ */
 .menu-admin-item{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:11px 13px;transition:all .2s;margin-bottom:8px}
@@ -1173,6 +1187,29 @@ a{text-decoration:none;color:inherit}
         <div style="margin-top:14px;font-size:11px;color:rgba(255,255,255,.28);text-align:center">
           الصورة تُحفظ في Firebase وتظهر لكل الزوار فوراً بدون إعادة تحميل الصفحة
         </div>
+
+        <!-- ════ أنيميشن الخلفية ════ -->
+        <div class="admin-sec-title" style="margin-top:28px">✨ موشن الخلفية الإسلامي</div>
+        <p style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:14px">اختار نوع الأنيميشن اللي هيتحرك فوق صورة الخلفية</p>
+        <div class="anim-selector-grid" id="anim-opt-grid">
+          <div class="anim-opt" data-anim="none"     onclick="ZZ.setIslamicAnim('none')">     <span class="anim-opt-icon">🚫</span>بدون موشن</div>
+          <div class="anim-opt" data-anim="stars"    onclick="ZZ.setIslamicAnim('stars')">    <span class="anim-opt-icon">✨</span>نجوم إسلامية</div>
+          <div class="anim-opt" data-anim="geo"      onclick="ZZ.setIslamicAnim('geo')">      <span class="anim-opt-icon">🔷</span>أشكال هندسية</div>
+          <div class="anim-opt" data-anim="crescent" onclick="ZZ.setIslamicAnim('crescent')"> <span class="anim-opt-icon">🌙</span>هلال وأضواء</div>
+          <div class="anim-opt" data-anim="particles"onclick="ZZ.setIslamicAnim('particles')"><span class="anim-opt-icon">🌟</span>جزيئات ذهبية</div>
+          <div class="anim-opt" data-anim="mandala"  onclick="ZZ.setIslamicAnim('mandala')">  <span class="anim-opt-icon">🌸</span>مندالا دوارة</div>
+        </div>
+        <div class="anim-speed-row">
+          <label>⚡ السرعة</label>
+          <input type="range" min="1" max="5" value="3" id="anim-speed-range" oninput="ZZ.setAnimSpeed(this.value)">
+          <label id="anim-speed-lbl">متوسطة</label>
+        </div>
+        <div class="anim-opacity-row" style="display:flex;align-items:center;gap:12px;margin-top:10px">
+          <label style="font-size:12px;color:rgba(255,255,255,.5);font-weight:700;white-space:nowrap">👁️ الشفافية</label>
+          <input type="range" min="1" max="10" value="5" id="anim-opacity-range" style="flex:1;accent-color:#f43f5e" oninput="ZZ.setAnimOpacity(this.value)">
+          <label id="anim-opacity-lbl" style="font-size:12px;color:rgba(255,255,255,.5);font-weight:700">50%</label>
+        </div>
+        <div class="admin-note" id="anim-save-note" style="margin-top:10px">✅ تم حفظ الموشن</div>
       </div><!-- end tab-herobg -->
 
       <!-- ══ TAB: BUTTON CONTROLS ══ -->
@@ -1412,6 +1449,7 @@ a{text-decoration:none;color:inherit}
   <!-- Image + overlays -->
   <div class="hero-bg" id="hero-bg-el"></div>
   <div class="hero-overlay"></div>
+  <canvas id="islamic-canvas"></canvas>
   <div class="hero-vignette"></div>
   <div class="hero-grade"></div>
 
@@ -2365,6 +2403,347 @@ ZZ.changePass = async function() {
 };
 
 /* Change PIN in Firebase */
+/* ════════════════════════════════════════════════════
+   ISLAMIC BACKGROUND ANIMATION ENGINE
+════════════════════════════════════════════════════ */
+ZZ._animState = {
+  type: 'none',
+  speed: 3,
+  opacity: 0.5,
+  raf: null,
+  particles: []
+};
+
+ZZ.setIslamicAnim = function(type) {
+  ZZ._animState.type = type;
+  /* تحديث الـ UI */
+  document.querySelectorAll('.anim-opt').forEach(function(el) {
+    el.classList.toggle('on', el.dataset.anim === type);
+  });
+  /* حفظ في Firebase */
+  if (window.zzdb && window.ZZ_AUTH_READY) {
+    zzdb.ref('landing/settings/bgAnim').set({
+      type: type,
+      speed: ZZ._animState.speed,
+      opacity: ZZ._animState.opacity
+    }).then(function() {
+      var n = document.getElementById('anim-save-note');
+      if (n) { n.classList.add('show'); setTimeout(function(){ n.classList.remove('show'); }, 2000); }
+    });
+  }
+  ZZ._startAnim();
+};
+
+ZZ.setAnimSpeed = function(v) {
+  ZZ._animState.speed = parseInt(v);
+  var labels = ['', 'بطيئة جداً', 'بطيئة', 'متوسطة', 'سريعة', 'سريعة جداً'];
+  var lbl = document.getElementById('anim-speed-lbl');
+  if (lbl) lbl.textContent = labels[v] || 'متوسطة';
+  if (window.zzdb && window.ZZ_AUTH_READY) {
+    zzdb.ref('landing/settings/bgAnim/speed').set(parseInt(v));
+  }
+};
+
+ZZ.setAnimOpacity = function(v) {
+  ZZ._animState.opacity = v / 10;
+  var lbl = document.getElementById('anim-opacity-lbl');
+  if (lbl) lbl.textContent = (v * 10) + '%';
+  var cvs = document.getElementById('islamic-canvas');
+  if (cvs) cvs.style.opacity = ZZ._animState.opacity;
+  if (window.zzdb && window.ZZ_AUTH_READY) {
+    zzdb.ref('landing/settings/bgAnim/opacity').set(v / 10);
+  }
+};
+
+ZZ._startAnim = function() {
+  var cvs = document.getElementById('islamic-canvas');
+  if (!cvs) return;
+  var ctx = cvs.getContext('2d');
+  var s = ZZ._animState;
+
+  /* إيقاف الـ loop القديمة */
+  if (s.raf) { cancelAnimationFrame(s.raf); s.raf = null; }
+
+  if (s.type === 'none') {
+    cvs.classList.remove('visible');
+    return;
+  }
+
+  /* ضبط حجم الـ canvas */
+  function resize() {
+    cvs.width  = cvs.offsetWidth  || window.innerWidth;
+    cvs.height = cvs.offsetHeight || window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  cvs.style.opacity = s.opacity;
+  cvs.classList.add('visible');
+
+  var t = 0;
+  var speedMul = [0, 0.2, 0.5, 1, 1.8, 3][s.speed] || 1;
+
+  /* ══ particles pool مشترك ══ */
+  s.particles = [];
+
+  if (s.type === 'stars') {
+    /* نجوم إسلامية (8 رؤوس) */
+    for (var i = 0; i < 28; i++) {
+      s.particles.push({
+        x: Math.random() * cvs.width,
+        y: Math.random() * cvs.height,
+        size: 6 + Math.random() * 18,
+        rot: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.008 * speedMul,
+        alpha: 0.15 + Math.random() * 0.5,
+        color: Math.random() > 0.5 ? '#f5c842' : '#fff',
+        vy: -0.08 * speedMul * (0.5 + Math.random())
+      });
+    }
+    function drawStar8(cx, cy, outerR, innerR, rot) {
+      ctx.beginPath();
+      for (var p = 0; p < 16; p++) {
+        var r = p % 2 === 0 ? outerR : innerR;
+        var a = (p * Math.PI / 8) + rot;
+        p === 0 ? ctx.moveTo(cx + r * Math.cos(a), cy + r * Math.sin(a))
+                : ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
+      }
+      ctx.closePath();
+    }
+    s.loop = function() {
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+      t += 0.016;
+      s.particles.forEach(function(p) {
+        p.y += p.vy;
+        p.rot += p.rotSpeed;
+        if (p.y < -p.size * 2) { p.y = cvs.height + p.size; p.x = Math.random() * cvs.width; }
+        ctx.save();
+        ctx.globalAlpha = p.alpha * (0.7 + 0.3 * Math.sin(t * 1.2 + p.x));
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 10;
+        drawStar8(p.x, p.y, p.size, p.size * 0.45, p.rot);
+        ctx.fill();
+        ctx.restore();
+      });
+      s.raf = requestAnimationFrame(s.loop);
+    };
+
+  } else if (s.type === 'geo') {
+    /* أشكال هندسية إسلامية */
+    for (var i = 0; i < 15; i++) {
+      s.particles.push({
+        x: Math.random() * cvs.width,
+        y: Math.random() * cvs.height,
+        size: 20 + Math.random() * 50,
+        rot: Math.random() * Math.PI,
+        rotSpeed: (Math.random() - 0.5) * 0.005 * speedMul,
+        sides: [6, 8, 12][Math.floor(Math.random() * 3)],
+        alpha: 0.05 + Math.random() * 0.2,
+        color: Math.random() > 0.5 ? '#f5c842' : '#f43f5e',
+        vy: -0.06 * speedMul
+      });
+    }
+    function drawPoly(cx, cy, r, sides, rot) {
+      ctx.beginPath();
+      for (var p = 0; p <= sides; p++) {
+        var a = (p / sides) * Math.PI * 2 + rot;
+        p === 0 ? ctx.moveTo(cx + r * Math.cos(a), cy + r * Math.sin(a))
+                : ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
+      }
+      ctx.closePath();
+    }
+    s.loop = function() {
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+      t += 0.016;
+      s.particles.forEach(function(p) {
+        p.y += p.vy;
+        p.rot += p.rotSpeed;
+        if (p.y < -p.size * 2) { p.y = cvs.height + p.size; p.x = Math.random() * cvs.width; }
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = 1.5;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 8;
+        drawPoly(p.x, p.y, p.size, p.sides, p.rot);
+        ctx.stroke();
+        /* مربع داخلي */
+        drawPoly(p.x, p.y, p.size * 0.6, p.sides, p.rot + Math.PI / p.sides);
+        ctx.stroke();
+        ctx.restore();
+      });
+      s.raf = requestAnimationFrame(s.loop);
+    };
+
+  } else if (s.type === 'crescent') {
+    /* هلال وأضواء */
+    var crescents = [];
+    for (var i = 0; i < 8; i++) {
+      crescents.push({
+        x: Math.random() * cvs.width,
+        y: Math.random() * cvs.height,
+        size: 15 + Math.random() * 35,
+        alpha: 0.15 + Math.random() * 0.4,
+        rot: Math.random() * Math.PI * 2,
+        vy: -0.07 * speedMul,
+        vx: (Math.random() - 0.5) * 0.15 * speedMul,
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+    /* نجوم صغيرة */
+    var smallStars = [];
+    for (var i = 0; i < 40; i++) {
+      smallStars.push({
+        x: Math.random() * cvs.width,
+        y: Math.random() * cvs.height,
+        r: 0.8 + Math.random() * 2.5,
+        alpha: 0.2 + Math.random() * 0.6,
+        phase: Math.random() * Math.PI * 2,
+        vy: -0.04 * speedMul * Math.random()
+      });
+    }
+    s.loop = function() {
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+      t += 0.016;
+      /* نجوم صغيرة */
+      smallStars.forEach(function(p) {
+        p.y += p.vy;
+        if (p.y < 0) { p.y = cvs.height; p.x = Math.random() * cvs.width; }
+        ctx.save();
+        ctx.globalAlpha = p.alpha * (0.5 + 0.5 * Math.sin(t * 2 + p.phase));
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+      /* هلال */
+      crescents.forEach(function(p) {
+        p.x += p.vx; p.y += p.vy;
+        if (p.y < -p.size * 3) { p.y = cvs.height + p.size; p.x = Math.random() * cvs.width; }
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.globalAlpha = p.alpha * (0.7 + 0.3 * Math.sin(t + p.phase));
+        ctx.fillStyle = '#f5c842';
+        ctx.shadowColor = '#f5c842';
+        ctx.shadowBlur = 15;
+        ctx.beginPath();
+        ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(0,0,0,0)';
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(p.size * 0.4, 0, p.size * 0.78, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+      s.raf = requestAnimationFrame(s.loop);
+    };
+
+  } else if (s.type === 'particles') {
+    /* جزيئات ذهبية متطايرة */
+    for (var i = 0; i < 60; i++) {
+      s.particles.push({
+        x: Math.random() * cvs.width,
+        y: Math.random() * cvs.height,
+        r: 0.5 + Math.random() * 3,
+        vx: (Math.random() - 0.5) * 0.5 * speedMul,
+        vy: -(0.3 + Math.random() * 0.7) * speedMul,
+        alpha: 0.3 + Math.random() * 0.7,
+        color: Math.random() > 0.3 ? '#f5c842' : '#fff',
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+    s.loop = function() {
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+      t += 0.016;
+      s.particles.forEach(function(p) {
+        p.x += p.vx + Math.sin(t + p.phase) * 0.3;
+        p.y += p.vy;
+        if (p.y < -5) { p.y = cvs.height + 5; p.x = Math.random() * cvs.width; }
+        if (p.x < 0) p.x = cvs.width;
+        if (p.x > cvs.width) p.x = 0;
+        var flicker = 0.6 + 0.4 * Math.sin(t * 3 + p.phase);
+        ctx.save();
+        ctx.globalAlpha = p.alpha * flicker;
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = p.r * 4;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+      s.raf = requestAnimationFrame(s.loop);
+    };
+
+  } else if (s.type === 'mandala') {
+    /* مندالا دوارة إسلامية */
+    s.loop = function() {
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+      t += 0.008 * speedMul;
+      var cx = cvs.width / 2, cy = cvs.height / 2;
+      var maxR = Math.min(cvs.width, cvs.height) * 0.42;
+      [1, 0.72, 0.5, 0.32].forEach(function(scale, ri) {
+        var r = maxR * scale;
+        var petals = [12, 8, 6, 4][ri];
+        var dir = ri % 2 === 0 ? 1 : -1;
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(t * dir * (0.5 + ri * 0.3));
+        ctx.globalAlpha = 0.06 + ri * 0.03;
+        ctx.strokeStyle = ri % 2 === 0 ? '#f5c842' : '#f43f5e';
+        ctx.lineWidth = 1.2;
+        ctx.shadowColor = ctx.strokeStyle;
+        ctx.shadowBlur = 8;
+        for (var p = 0; p < petals; p++) {
+          var a = (p / petals) * Math.PI * 2;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.quadraticCurveTo(
+            r * 0.8 * Math.cos(a + Math.PI / petals),
+            r * 0.8 * Math.sin(a + Math.PI / petals),
+            r * Math.cos(a), r * Math.sin(a)
+          );
+          ctx.stroke();
+        }
+        /* دائرة */
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      });
+      s.raf = requestAnimationFrame(s.loop);
+    };
+  }
+
+  if (s.loop) s.loop();
+};
+
+/* ══ تحميل الأنيميشن من Firebase عند فتح الصفحة ══ */
+ZZ._loadBgAnim = function() {
+  if (!window.zzdb) return;
+  zzdb.ref('landing/settings/bgAnim').once('value').then(function(snap) {
+    var d = snap.val();
+    if (!d) return;
+    ZZ._animState.type    = d.type    || 'none';
+    ZZ._animState.speed   = d.speed   || 3;
+    ZZ._animState.opacity = d.opacity !== undefined ? d.opacity : 0.5;
+    /* تحديث الـ UI في الأدمن لو مفتوح */
+    document.querySelectorAll('.anim-opt').forEach(function(el) {
+      el.classList.toggle('on', el.dataset.anim === ZZ._animState.type);
+    });
+    var sr = document.getElementById('anim-speed-range');
+    if (sr) sr.value = ZZ._animState.speed;
+    var or = document.getElementById('anim-opacity-range');
+    if (or) or.value = Math.round(ZZ._animState.opacity * 10);
+    var ol = document.getElementById('anim-opacity-lbl');
+    if (ol) ol.textContent = Math.round(ZZ._animState.opacity * 100) + '%';
+    ZZ._startAnim();
+  });
+};
+
 ZZ.changePin = async function() {
   const p = document.getElementById('new-pin').value.trim();
   const st = document.getElementById('pin-status');
@@ -4192,6 +4571,8 @@ ZZ._extraInit = function() {
   if (window.location.hash && window.location.hash.indexOf('#menu/') === 0) {
     ZZ._handleMenuHash();
   }
+  /* تحميل الأنيميشن الإسلامي */
+  ZZ._loadBgAnim();
 };
 
 /* ════ EXTEND adminTab ════ */
@@ -4284,6 +4665,10 @@ ZZ._loadHeroBgPreview = function() {
 /* ── حفظ الصورة الجديدة ── */
 ZZ.saveHeroBg = function() {
   if (!window.zzdb) { alert('⚠️ الفايربيز مش متصل'); return; }
+  if (!window.ZZ_AUTH_READY || !window.ZZ_USER) {
+    alert('⏳ جاري تجهيز الاتصال — انتظر ثانية وحاول مرة تانية');
+    return;
+  }
 
   function _doSave(imgUrl) {
     zzdb.ref('landing/settings/heroBg').set(imgUrl)
