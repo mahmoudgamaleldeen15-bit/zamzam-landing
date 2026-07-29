@@ -1043,6 +1043,24 @@ a{text-decoration:none;color:inherit}
 
       <!-- ══ TAB: MAWLED MENU ══ -->
       <div id="admin-tab-mawled-menu" class="admin-panel-sec">
+
+        <!-- ══ رقم الواتساب ══ -->
+        <div class="admin-sec-title">📱 رقم واتساب استقبال طلبات المولد</div>
+        <div class="admin-form-grid" style="margin-bottom:16px">
+          <div>
+            <label class="admin-lbl">رقم الواتساب (بالكود الدولي بدون + )</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="ml-wa-num" class="admin-inp" placeholder="مثال: 201XXXXXXXXX" dir="ltr" style="flex:1;letter-spacing:.05em">
+              <button onclick="ZZ.saveMawledWa()" style="padding:0 18px;height:44px;background:linear-gradient(135deg,#f5c842,#e8a020);color:#000;border:none;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif;white-space:nowrap">💾 حفظ</button>
+            </div>
+            <div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:6px">
+              ⚠️ الرقم ده هو اللي هتيجي عليه طلبات العملاء على واتساب
+            </div>
+            <div id="ml-wa-note" style="font-size:12px;color:#4ade80;margin-top:6px;min-height:16px"></div>
+          </div>
+        </div>
+        <div class="admin-sec-divider"></div>
+
         <div class="admin-sec-title">🎉 إضافة صنف حلويات مولد جديد</div>
         <div class="admin-form-grid">
           <div>
@@ -5187,6 +5205,30 @@ ZZ.setMawledHeroAnim = function(btn, type) {
   if (btn) btn.classList.add('on');
 };
 
+/* ── حفظ رقم واتساب المولد ── */
+ZZ.saveMawledWa = function() {
+  var inp = document.getElementById('ml-wa-num');
+  var num = (inp ? inp.value.trim() : '').replace(/\D/g,'');
+  if (!num) { alert('من فضلك أدخل رقم الواتساب'); return; }
+  if (!window.zzdb || !window.ZZ_AUTH_READY) { alert('⏳ جاري الاتصال — انتظر ثانيتين'); return; }
+  zzdb.ref('landing/mawled/settings/waNum').set(num)
+    .then(function() {
+      var n = document.getElementById('ml-wa-note');
+      if (n) { n.textContent = '✅ تم الحفظ — ' + num; setTimeout(function(){ n.textContent=''; }, 3000); }
+    })
+    .catch(function(e) { alert('❌ ' + e.message); });
+};
+
+/* ── تحميل رقم الواتساب في الأدمن ── */
+ZZ._loadMawledWa = function() {
+  if (!window.zzdb) return;
+  zzdb.ref('landing/mawled/settings/waNum').once('value').then(function(snap) {
+    var num = snap.val() || '';
+    var inp = document.getElementById('ml-wa-num');
+    if (inp && num) inp.value = num;
+  });
+};
+
 ZZ.saveMawledHero = function() {
   if (!window.zzdb || !window.ZZ_AUTH_READY) { alert('⏳ جاري الاتصال — انتظر ثانيتين'); return; }
 
@@ -5326,6 +5368,7 @@ ZZ.adminTab = function(tab) {
   if (tab === 'mawled-menu') {
     ZZ._renderAdminMawledList();
     ZZ._renderMawledCatList();
+    ZZ._loadMawledWa();
   }
 };
 

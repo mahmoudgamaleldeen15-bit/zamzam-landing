@@ -812,7 +812,7 @@ ML.loadData = function() {
   /* ── إعدادات (واتساب + ترحيب + Hero) ── */
   db.ref('landing/mawled/settings').on('value', function(snap) {
     var d = snap.val() || {};
-    ML.waNum   = d.waNum   || d.waPhone || '';
+    ML.waNum   = (d.waNum || d.waPhone || '').replace(/\D/g,'');
     ML.welcome = d.welcome || '';
     /* Hero Background */
     var bgEl = document.getElementById('hero-bg-el');
@@ -1052,8 +1052,12 @@ ML.sendOrder = function() {
   if (ML.db) ML.db.ref('mawled/orders/' + orderId).set(orderData).catch(function(){});
 
   /* فتح الواتساب */
-  var waTarget = ML.waNum || '201000000000';
-  window.open('https://wa.me/' + waTarget.replace(/\D/g,'') + '?text=' + encodeURIComponent(waMsg), '_blank');
+  var waTarget = ML.waNum;
+  if (!waTarget) {
+    ML.toast('❌ رقم الواتساب مش متحدد — تواصل مع الإدارة');
+    return;
+  }
+  window.open('https://wa.me/' + waTarget + '?text=' + encodeURIComponent(waMsg), '_blank');
 
   /* عرض شاشة النجاح */
   document.getElementById('success-screen').classList.add('show');
@@ -1139,7 +1143,12 @@ ML.saveAdminData = function() {
       prods[key] = { name: p.name, img: p.img || '', price: Number(p.price), priceType: p.priceType || 'piece', available: true, createdAt: Date.now() };
     }
   });
-  ML.db.ref('mawled/config').set({ waNum: waNum, welcome: welcome, products: prods })
+  /* حفظ في المسارين — القديم والجديد */
+  var saves = [
+    ML.db.ref('landing/mawled/settings').update({ waNum: waNum.replace(/\D/g,''), welcome: welcome }),
+    ML.db.ref('mawled/config').set({ waNum: waNum, welcome: welcome, products: prods })
+  ];
+  Promise.all(saves)
     .then(function() {
       var n = document.getElementById('admin-save-note');
       if (n) n.textContent = '✅ تم الحفظ — الزبائن شايفين التحديث دلوقتي';
