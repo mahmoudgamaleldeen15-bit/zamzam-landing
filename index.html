@@ -1272,6 +1272,17 @@ a{text-decoration:none;color:inherit}
           </label>
         </div>
 
+        <div class="btn-toggle-row">
+          <div class="btn-toggle-info">
+            🎉 زرار "اطلب حلويات المولد"
+            <small>يظهر في الصفحة الرئيسية — فعّله في مواسم المولد فقط</small>
+          </div>
+          <label class="toggle-sw">
+            <input type="checkbox" id="tog-mawled" onchange="ZZ.saveBtnSetting('mawled', this.checked)">
+            <span class="slider"></span>
+          </label>
+        </div>
+
         <div class="admin-sec-divider"></div>
         <div style="font-size:11px;color:rgba(255,255,255,.3);text-align:center">الإعدادات محفوظة في Firebase وتنعكس فوراً على كل الأجهزة</div>
       </div>
@@ -1492,6 +1503,12 @@ a{text-decoration:none;color:inherit}
       <button class="btn-menu-nav" onclick="document.getElementById('menus-section').scrollIntoView({behavior:'smooth'})" style="flex:1;min-width:140px;justify-content:center">
         🍽️ تصفح القوائم
       </button>
+    </div>
+    <!-- زرار المولد النبوي — يظهر لو الأدمن فعّله -->
+    <div class="reveal" data-delay="560" id="mawled-btn-wrap" style="display:none;margin-top:10px">
+      <a href="mawled-order.html" style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#f5c842,#e8a020);color:#000;font-weight:900;font-size:clamp(13px,3vw,15px);padding:14px 32px;border-radius:9999px;text-decoration:none;width:100%;justify-content:center;box-shadow:0 4px 20px rgba(245,200,66,.35);transition:all .3s" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">
+        🎉 اطلب حلويات المولد
+      </a>
     </div>
 
     <div class="stats-row reveal" data-delay="560">
@@ -3723,7 +3740,7 @@ ZZ.buildCarousel = function() {
 /* ════════════════════════════════════════════════════════
    BUTTON CONTROLS (Admin + Public)
 ════════════════════════════════════════════════════════ */
-ZZ._btnSettings = { cake: true, restaurant: true, jobs: false };
+ZZ._btnSettings = { cake: true, restaurant: true, jobs: false, mawled: false };
 
 ZZ.loadBtnSettings = function() {
   if (!window.zzdb) return;
@@ -4559,6 +4576,11 @@ ZZ._applyBtnSettings = function() {
   if (jobsSec) jobsSec.classList.toggle('active', ZZ._btnSettings.jobs);
   var navJobs = document.getElementById('nav-jobs-link');
   if (navJobs) navJobs.style.display = ZZ._btnSettings.jobs ? '' : 'none';
+  /* زرار المولد */
+  var mawledWrap = document.getElementById('mawled-btn-wrap');
+  if (mawledWrap) mawledWrap.style.display = ZZ._btnSettings.mawled ? 'block' : 'none';
+  var tm = document.getElementById('tog-mawled');
+  if (tm) tm.checked = !!ZZ._btnSettings.mawled;
 };
 
 /* ════ EXTEND _extraInit ════ */
