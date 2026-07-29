@@ -933,6 +933,7 @@ a{text-decoration:none;color:inherit}
         <button class="ant on" onclick="ZZ.adminTab('offers')">🏷️ العروض</button>
         <button class="ant" onclick="ZZ.adminTab('cake-menu')">🎂 منيو الحلويات</button>
         <button class="ant" onclick="ZZ.adminTab('resto-menu')">🍔 منيو المطعم</button>
+        <button class="ant" onclick="ZZ.adminTab('mawled-menu')">🎉 منيو المولد</button>
         <button class="ant" onclick="ZZ.adminTab('categories')">📂 الأقسام</button>
         <button class="ant" onclick="ZZ.adminTab('jobs')">💼 التوظيف</button>
         <button class="ant" onclick="ZZ.adminTab('btns')">🎛️ الأزرار</button>
@@ -1039,6 +1040,88 @@ a{text-decoration:none;color:inherit}
           <div id="admin-cake-menu-list"><div style="text-align:center;color:rgba(255,255,255,.3);padding:20px;font-size:13px">لا توجد منتجات بعد</div></div>
         </div>
       </div><!-- end tab-cake-menu -->
+
+      <!-- ══ TAB: MAWLED MENU ══ -->
+      <div id="admin-tab-mawled-menu" class="admin-panel-sec">
+        <div class="admin-sec-title">🎉 إضافة صنف حلويات مولد جديد</div>
+        <div class="admin-form-grid">
+          <div>
+            <label class="admin-lbl">القسم الرئيسي</label>
+            <select id="ml-category" class="admin-inp">
+              <option value="">— بدون قسم —</option>
+            </select>
+          </div>
+          <div>
+            <label class="admin-lbl">اسم الصنف *</label>
+            <input id="ml-name" class="admin-inp" placeholder="مثال: عسل نحل طبيعي — حلوى عجمية" type="text">
+          </div>
+          <div>
+            <label class="admin-lbl">الوصف / المواصفات</label>
+            <textarea id="ml-desc" class="admin-inp" placeholder="مثال: حلوى تقليدية بالسمن والعسل الطبيعي..." rows="3"></textarea>
+          </div>
+          <div>
+            <label class="admin-lbl">نوع السعر</label>
+            <div class="delivery-opts">
+              <button type="button" class="dopt on" id="ml-ptype-piece" onclick="ZZ.setMawledPriceType('piece')">🔢 سعر القطعة</button>
+              <button type="button" class="dopt" id="ml-ptype-kilo" onclick="ZZ.setMawledPriceType('kilo')">⚖️ سعر الكيلو</button>
+            </div>
+          </div>
+          <div>
+            <label class="admin-lbl" id="ml-price-lbl">السعر بالجنيه المصري</label>
+            <input id="ml-price" class="admin-inp" placeholder="مثال: 45 جنيه" type="text">
+          </div>
+          <div>
+            <label class="admin-lbl">صورة الصنف</label>
+            <div class="img-tabs">
+              <button class="img-tab on" id="ml-imgbtn-url" onclick="ZZ.setMawledImgMode('url')">🔗 رابط</button>
+              <button class="img-tab" id="ml-imgbtn-file" onclick="ZZ.setMawledImgMode('file')">📁 رفع</button>
+            </div>
+            <div id="ml-url-row"><input id="ml-imgurl" class="admin-inp" placeholder="https://..." type="url"></div>
+            <div id="ml-file-row" style="display:none"><input id="ml-imgfile" class="admin-inp" type="file" accept="image/*" style="padding:10px;cursor:pointer"></div>
+          </div>
+        </div>
+        <button class="btn-admin-add" style="background:linear-gradient(135deg,#f5c842,#e8a020);color:#000" onclick="ZZ.addMawledItem()">➕ إضافة للمنيو</button>
+        <div class="admin-note" id="mawled-menu-note">✅ تم الحفظ</div>
+        <div style="margin-top:28px">
+          <div class="admin-sec-title">🎉 منيو المولد الحالي</div>
+          <!-- أقسام المولد في الأدمن -->
+          <div style="margin-bottom:14px">
+            <div class="admin-sec-title" style="font-size:10px">📂 أقسام المولد <span id="ml-cat-count" style="opacity:.4;font-weight:400"></span></div>
+            <div style="display:flex;gap:8px;margin-bottom:10px">
+              <input id="ml-new-cat-name" class="admin-inp" placeholder="اسم القسم (مثال: حلوى بالمكسرات)" style="flex:1">
+              <input id="ml-new-cat-icon" class="admin-inp" placeholder="🎉" style="width:60px;text-align:center" maxlength="4">
+              <button onclick="ZZ.addMawledCategory()" style="padding:0 14px;background:rgba(245,200,66,.15);border:1px solid rgba(245,200,66,.3);color:#f5c842;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700">+</button>
+            </div>
+            <div id="ml-cat-list"><div style="text-align:center;color:rgba(255,255,255,.3);padding:12px;font-size:13px">لا توجد أقسام بعد</div></div>
+          </div>
+          <div id="admin-mawled-menu-list"><div style="text-align:center;color:rgba(255,255,255,.3);padding:20px;font-size:13px">لا توجد أصناف بعد</div></div>
+        </div>
+
+        <!-- تغيير صورة Hero المولد -->
+        <div class="admin-sec-divider"></div>
+        <div class="admin-sec-title">🖼️ صورة Hero صفحة المولد</div>
+        <p style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:14px">غيّر صورة الهيرو في صفحة حلويات المولد</p>
+        <div class="img-tabs">
+          <button class="img-tab on" id="mlhbg-btn-url" onclick="ZZ.setMawledHeroBgMode('url')">🔗 رابط</button>
+          <button class="img-tab" id="mlhbg-btn-file" onclick="ZZ.setMawledHeroBgMode('file')">📁 رفع</button>
+        </div>
+        <div id="mlhbg-url-row"><input id="mlhbg-imgurl" class="admin-inp" placeholder="https://..." type="url"></div>
+        <div id="mlhbg-file-row" style="display:none"><input id="mlhbg-imgfile" class="admin-inp" type="file" accept="image/*" style="padding:10px;cursor:pointer" onchange="ZZ.previewMawledHeroBgFile(this)"></div>
+        <div id="mlhbg-preview" style="display:none;width:100%;aspect-ratio:16/9;background-size:cover;background-position:center;border-radius:12px;margin:10px 0;border:1px solid rgba(255,255,255,.1)"></div>
+
+        <!-- أنيميشن Hero المولد -->
+        <div class="admin-sec-title" style="margin-top:16px">✨ مؤثر Hero المولد</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+          <button class="anim-opt on" data-anim="none"     onclick="ZZ.setMawledHeroAnim(this,'none')">⬜ بدون</button>
+          <button class="anim-opt"    data-anim="stars"    onclick="ZZ.setMawledHeroAnim(this,'stars')">⭐ نجوم</button>
+          <button class="anim-opt"    data-anim="lanterns" onclick="ZZ.setMawledHeroAnim(this,'lanterns')">🏮 فوانيس</button>
+          <button class="anim-opt"    data-anim="petals"   onclick="ZZ.setMawledHeroAnim(this,'petals')">🌸 بتلات</button>
+          <button class="anim-opt"    data-anim="confetti" onclick="ZZ.setMawledHeroAnim(this,'confetti')">🎊 كونفيتي</button>
+          <button class="anim-opt"    data-anim="sparkle"  onclick="ZZ.setMawledHeroAnim(this,'sparkle')">💫 بريق</button>
+        </div>
+        <button onclick="ZZ.saveMawledHero()" class="btn-admin-add" style="background:linear-gradient(135deg,#f5c842,#e8a020);color:#000">💾 حفظ إعدادات Hero المولد</button>
+        <div class="admin-note" id="mawled-hero-note">✅ تم الحفظ</div>
+      </div><!-- end tab-mawled-menu -->
 
       <!-- ══ TAB: RESTAURANT MENU ══ -->
       <div id="admin-tab-resto-menu" class="admin-panel-sec">
@@ -1701,6 +1784,7 @@ a{text-decoration:none;color:inherit}
       <div class="menu-type-tabs">
         <button class="mtype on" onclick="ZZ.switchMenuDisplay('cake')">🎂 الحلويات والتورتات</button>
         <button class="mtype" onclick="ZZ.switchMenuDisplay('restaurant')">🍔 المطعم</button>
+        <button class="mtype" id="mawled-menu-tab" onclick="ZZ.switchMenuDisplay('mawled')" style="display:none">🎉 حلويات المولد</button>
       </div>
     </div>
 
@@ -1717,6 +1801,14 @@ a{text-decoration:none;color:inherit}
       <div class="no-menu-msg">
         <div class="ni">🍔</div>
         <p>جاري تحميل القائمة...</p>
+      </div>
+    </div>
+
+    <!-- Mawled Menu Grid -->
+    <div id="mawled-menu-display" style="display:none">
+      <div class="no-menu-msg">
+        <div class="ni">🎉</div>
+        <p>جاري تحميل قائمة المولد...</p>
       </div>
     </div>
   </div>
@@ -3496,14 +3588,19 @@ ZZ.renderMenuDisplay = function(type) {
 };
 
 ZZ.switchMenuDisplay = function(type, catId, noHash) {
-  document.getElementById('cake-menu-display').style.display  = type==='cake'       ? 'block' : 'none';
-  document.getElementById('resto-menu-display').style.display = type==='restaurant' ? 'block' : 'none';
+  document.getElementById('cake-menu-display').style.display   = type==='cake'       ? 'block' : 'none';
+  document.getElementById('resto-menu-display').style.display  = type==='restaurant' ? 'block' : 'none';
+  var mawledEl = document.getElementById('mawled-menu-display');
+  if (mawledEl) mawledEl.style.display = type==='mawled' ? 'block' : 'none';
   document.querySelectorAll('.mtype').forEach(function(b){ b.classList.remove('on'); });
   document.querySelectorAll('.mtype').forEach(function(b){
-    if ((type==='cake' && b.textContent.indexOf('حلويات')!==-1) ||
-        (type==='restaurant' && b.textContent.indexOf('مطعم')!==-1))
+    if ((type==='cake'       && b.textContent.indexOf('حلويات والتورتات')!==-1) ||
+        (type==='restaurant' && b.textContent.indexOf('مطعم')!==-1) ||
+        (type==='mawled'     && b.textContent.indexOf('المولد')!==-1))
       b.classList.add('on');
   });
+  /* لو مولد — اشترك في البيانات لو لسه مش مشترك */
+  if (type==='mawled') ZZ._subscribeMawledPublic();
   /* تحديث الـ URL hash */
   if (!noHash) {
     var h = '#menu/' + type;
@@ -3513,7 +3610,6 @@ ZZ.switchMenuDisplay = function(type, catId, noHash) {
   /* Scroll للـ section */
   var sec = document.getElementById('menus-section');
   if (sec) sec.scrollIntoView({behavior:'smooth'});
-  /* Scroll للقسم المحدد بعد ما الـ render يخلص */
   if (catId) {
     setTimeout(function(){
       var el = document.getElementById('menu-cat-' + catId);
@@ -4549,7 +4645,8 @@ ZZ.loadBtnSettings = function() {
       restaurant: v.restaurant !== false,
       offers:     v.offers     !== false,
       menus:      v.menus      !== false,
-      jobs:       v.jobs       === true
+      jobs:       v.jobs       === true,
+      mawled:     v.mawled     === true
     };
     ZZ._applyBtnSettings();
     var tc = document.getElementById('tog-cake');
@@ -4557,11 +4654,13 @@ ZZ.loadBtnSettings = function() {
     var to = document.getElementById('tog-offers');
     var tm = document.getElementById('tog-menus');
     var tj = document.getElementById('tog-jobs');
-    if (tc) tc.checked = ZZ._btnSettings.cake;
-    if (tr) tr.checked = ZZ._btnSettings.restaurant;
-    if (to) to.checked = ZZ._btnSettings.offers;
-    if (tm) tm.checked = ZZ._btnSettings.menus;
-    if (tj) tj.checked = ZZ._btnSettings.jobs;
+    var tmw= document.getElementById('tog-mawled');
+    if (tc)  tc.checked  = ZZ._btnSettings.cake;
+    if (tr)  tr.checked  = ZZ._btnSettings.restaurant;
+    if (to)  to.checked  = ZZ._btnSettings.offers;
+    if (tm)  tm.checked  = ZZ._btnSettings.menus;
+    if (tj)  tj.checked  = ZZ._btnSettings.jobs;
+    if (tmw) tmw.checked = ZZ._btnSettings.mawled;
   });
 };
 
@@ -4784,6 +4883,492 @@ ZZ._extraInit = function() {
 };
 
 </script>
+
+<script>
+/* ════════════════════════════════════════════════════════
+   MAWLED MENU SYSTEM — نظام منيو المولد النبوي
+   Firebase path: landing/mawled/
+════════════════════════════════════════════════════════ */
+
+ZZ._mawledMenuCache  = [];
+ZZ._mawledCatsCache  = [];
+ZZ._mawledMenuSubbed = false;
+ZZ._mawledCatsSubbed = false;
+ZZ._mawledImgMode    = 'url';
+ZZ._mawledPriceType  = 'piece';  /* 'piece' | 'kilo' */
+ZZ._mawledHeroBgMode = 'url';
+ZZ._mawledHeroAnim   = 'none';
+
+/* ── اشتراك بيانات المولد من Firebase ── */
+ZZ.subscribeMawled = function() {
+  if (!window.zzdb) return;
+
+  /* الأصناف */
+  if (!ZZ._mawledMenuSubbed) {
+    ZZ._mawledMenuSubbed = true;
+    zzdb.ref('landing/mawled/items').orderByChild('createdAt').on('value', function(snap) {
+      ZZ._mawledMenuCache = [];
+      snap.forEach(function(ch) { ZZ._mawledMenuCache.unshift(Object.assign({ id: ch.key }, ch.val())); });
+      ZZ._renderAdminMawledList();
+      ZZ._refreshMawledCatDropdown();
+    });
+  }
+
+  /* الأقسام */
+  if (!ZZ._mawledCatsSubbed) {
+    ZZ._mawledCatsSubbed = true;
+    zzdb.ref('landing/mawled/categories').orderByChild('order').on('value', function(snap) {
+      ZZ._mawledCatsCache = [];
+      snap.forEach(function(ch) { ZZ._mawledCatsCache.push(Object.assign({ id: ch.key }, ch.val())); });
+      ZZ._renderMawledCatList();
+      ZZ._refreshMawledCatDropdown();
+    });
+  }
+};
+
+/* ── نوع السعر ── */
+ZZ.setMawledPriceType = function(type) {
+  ZZ._mawledPriceType = type;
+  document.getElementById('ml-ptype-piece').classList.toggle('on', type === 'piece');
+  document.getElementById('ml-ptype-kilo' ).classList.toggle('on', type === 'kilo');
+  var lbl = document.getElementById('ml-price-lbl');
+  if (lbl) lbl.textContent = type === 'kilo' ? 'سعر الكيلو بالجنيه' : 'سعر القطعة بالجنيه';
+};
+
+/* ── وضع الصورة ── */
+ZZ.setMawledImgMode = function(m) {
+  ZZ._mawledImgMode = m;
+  document.getElementById('ml-url-row').style.display  = m === 'url'  ? 'block' : 'none';
+  document.getElementById('ml-file-row').style.display = m === 'file' ? 'block' : 'none';
+  document.getElementById('ml-imgbtn-url').classList.toggle('on',  m === 'url');
+  document.getElementById('ml-imgbtn-file').classList.toggle('on', m === 'file');
+};
+
+/* ── إضافة صنف مولد ── */
+ZZ.addMawledItem = function() {
+  var name = (document.getElementById('ml-name')  || {}).value || '';
+  var desc = (document.getElementById('ml-desc')  || {}).value || '';
+  var price= (document.getElementById('ml-price') || {}).value || '';
+  var catEl= document.getElementById('ml-category');
+  var catId= catEl ? catEl.value : '';
+
+  if (!name.trim()) { alert('من فضلك أدخل اسم الصنف'); return; }
+  if (!window.zzdb || !window.ZZ_AUTH_READY) { alert('⏳ جاري الاتصال — انتظر ثانيتين'); return; }
+
+  var item = {
+    name: name.trim(),
+    desc: desc.trim(),
+    price: price.trim(),
+    priceType: ZZ._mawledPriceType,
+    categoryId: catId,
+    available: true,
+    createdAt: Date.now()
+  };
+
+  function _save(img) {
+    item.img = img || '';
+    zzdb.ref('landing/mawled/items').push(item)
+      .then(function() {
+        ['ml-name','ml-desc','ml-price','ml-imgurl'].forEach(function(id){ var el=document.getElementById(id);if(el)el.value=''; });
+        if (catEl) catEl.value = '';
+        var n = document.getElementById('mawled-menu-note');
+        if (n) { n.classList.add('show'); setTimeout(function(){ n.classList.remove('show'); }, 2500); }
+      })
+      .catch(function(err) { alert('❌ ' + err.message); });
+  }
+
+  if (ZZ._mawledImgMode === 'file') {
+    var fe = document.getElementById('ml-imgfile');
+    var f  = fe && fe.files && fe.files[0];
+    if (!f) { alert('من فضلك اختار صورة'); return; }
+    _zzReadFile(f)
+      .then(function(raw) { return _zzCompress(raw, 900, 0.7); })
+      .then(function(img) { if (img.length > 900000) return _zzCompress(img, 600, 0.5); return img; })
+      .then(_save)
+      .catch(function(e) { alert('❌ ' + e.message); });
+  } else {
+    var urlEl = document.getElementById('ml-imgurl');
+    _save(urlEl ? urlEl.value.trim() : '');
+  }
+};
+
+/* ── حذف صنف مولد ── */
+ZZ.deleteMawledItem = function(id) {
+  if (!confirm('حذف هذا الصنف؟')) return;
+  if (!window.zzdb) return;
+  zzdb.ref('landing/mawled/items/' + id).remove();
+};
+
+/* ── تفعيل/تعطيل صنف ── */
+ZZ.toggleMawledAvail = function(id, avail) {
+  if (!window.zzdb) return;
+  zzdb.ref('landing/mawled/items/' + id + '/available').set(avail);
+};
+
+/* ── تعديل صنف مولد ── */
+ZZ.openEditMawled = function(id) {
+  var it = ZZ._mawledMenuCache.find(function(x){ return x.id === id; });
+  if (!it) return;
+  ZZ._editMawledId = id;
+  ZZ._editMawledImg = it.img;
+  var box = document.getElementById('modal-edit-mawled');
+  if (!box) return;
+  document.getElementById('emw-name').value  = it.name  || '';
+  document.getElementById('emw-desc').value  = it.desc  || '';
+  document.getElementById('emw-price').value = it.price || '';
+  /* price type */
+  ZZ._editMawledPriceType = it.priceType || 'piece';
+  document.getElementById('emw-ptype-piece').classList.toggle('on', ZZ._editMawledPriceType === 'piece');
+  document.getElementById('emw-ptype-kilo' ).classList.toggle('on', ZZ._editMawledPriceType === 'kilo');
+  /* category */
+  ZZ._refreshMawledCatDropdown();
+  setTimeout(function(){
+    var sel = document.getElementById('emw-category');
+    if (sel) sel.value = it.categoryId || '';
+  }, 80);
+  /* image preview */
+  var prev = document.getElementById('emw-preview');
+  if (prev) { prev.style.display = it.img ? 'block' : 'none'; if (it.img) prev.style.backgroundImage = 'url("'+it.img+'")'; }
+  /* reset file inputs */
+  var eu = document.getElementById('emw-imgurl');  if (eu) eu.value = '';
+  var ef = document.getElementById('emw-imgfile'); if (ef) ef.value = '';
+  box.style.display = 'flex';
+};
+
+ZZ.closeEditMawled = function() {
+  var box = document.getElementById('modal-edit-mawled');
+  if (box) box.style.display = 'none';
+};
+
+ZZ.setEditMawledImgMode = function(m) {
+  ZZ._editMawledImgMode = m;
+  document.getElementById('emw-url-row').style.display  = m === 'url'  ? 'block' : 'none';
+  document.getElementById('emw-file-row').style.display = m === 'file' ? 'block' : 'none';
+  document.getElementById('emw-imgbtn-url').classList.toggle('on',  m === 'url');
+  document.getElementById('emw-imgbtn-file').classList.toggle('on', m === 'file');
+};
+
+ZZ.saveEditMawled = function() {
+  var id   = ZZ._editMawledId;
+  var name = ((document.getElementById('emw-name') ||{}).value||'').trim();
+  if (!name) { alert('أدخل اسم الصنف'); return; }
+  if (!window.zzdb) return;
+  var catEl = document.getElementById('emw-category');
+  var updates = {
+    name:       name,
+    desc:       ((document.getElementById('emw-desc') ||{}).value||'').trim(),
+    price:      ((document.getElementById('emw-price')||{}).value||'').trim(),
+    priceType:  ZZ._editMawledPriceType || 'piece',
+    categoryId: catEl ? catEl.value : ''
+  };
+
+  function _doUpdate(img) {
+    updates.img = img || ZZ._editMawledImg || '';
+    zzdb.ref('landing/mawled/items/' + id).update(updates)
+      .then(function() { ZZ.closeEditMawled(); })
+      .catch(function(e) { alert('❌ ' + e.message); });
+  }
+
+  var mode = ZZ._editMawledImgMode || 'url';
+  if (mode === 'file') {
+    var fe = document.getElementById('emw-imgfile');
+    var f  = fe && fe.files && fe.files[0];
+    if (f) {
+      _zzReadFile(f).then(function(r){ return _zzCompress(r,900,0.7); }).then(_doUpdate).catch(function(e){ alert('❌ '+e.message); });
+    } else { _doUpdate(null); }
+  } else {
+    var eu = document.getElementById('emw-imgurl');
+    _doUpdate(eu && eu.value.trim() ? eu.value.trim() : null);
+  }
+};
+
+/* ── قائمة الأصناف في الأدمن ── */
+ZZ._renderAdminMawledList = function() {
+  var el = document.getElementById('admin-mawled-menu-list');
+  if (!el) return;
+  var items = ZZ._mawledMenuCache;
+  if (!items.length) {
+    el.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.3);padding:20px;font-size:13px">لا توجد أصناف بعد — أضف من أعلاه</div>';
+    return;
+  }
+  el.innerHTML = items.map(function(it) {
+    var ptLbl = it.priceType === 'kilo' ? '⚖️ كيلو' : '🔢 قطعة';
+    return '<div class="menu-admin-item">'
+      + '<div class="mai-thumb" id="mlmt_' + it.id + '" style="background-color:#1a1020"></div>'
+      + '<div class="mai-info">'
+      +   '<div class="mai-info-name">' + (it.name||'') + '</div>'
+      +   '<div class="mai-price">' + (it.price ? it.price + ' جنيه' : '—') + ' <span style="font-size:10px;color:rgba(245,200,66,.6)">(' + ptLbl + ')</span></div>'
+      + '</div>'
+      + '<div class="mai-actions">'
+      + '<button class="mai-btn mai-btn-tog ' + (it.available?'on':'off') + '" onclick="ZZ.toggleMawledAvail(\'' + it.id + '\',' + (!it.available) + ')">' + (it.available?'✅':'🔴') + '</button>'
+      + '<button class="mai-btn mai-btn-edit" onclick="ZZ.openEditMawled(\'' + it.id + '\')">✏️</button>'
+      + '<button class="mai-btn mai-btn-del"  onclick="ZZ.deleteMawledItem(\'' + it.id + '\')">🗑</button>'
+      + '</div></div>';
+  }).join('');
+  items.forEach(function(it) {
+    var t = document.getElementById('mlmt_' + it.id);
+    if (t && it.img) t.style.backgroundImage = 'url("' + it.img + '")';
+  });
+};
+
+/* ── أقسام المولد ── */
+ZZ.addMawledCategory = function() {
+  var name = (document.getElementById('ml-new-cat-name')||{}).value||'';
+  var icon = (document.getElementById('ml-new-cat-icon')||{}).value||'';
+  if (!name.trim()) { alert('أدخل اسم القسم'); return; }
+  if (!window.zzdb) return;
+  var cat = { name: name.trim(), icon: icon.trim()||'🎉', order: ZZ._mawledCatsCache.length, createdAt: Date.now() };
+  zzdb.ref('landing/mawled/categories').push(cat)
+    .then(function(){
+      var n = document.getElementById('ml-new-cat-name'); if(n) n.value='';
+      var i = document.getElementById('ml-new-cat-icon'); if(i) i.value='';
+    })
+    .catch(function(e){ alert('❌ '+e.message); });
+};
+
+ZZ.deleteMawledCategory = function(id) {
+  if (!confirm('حذف هذا القسم؟ الأصناف لن تُحذف')) return;
+  if (!window.zzdb) return;
+  zzdb.ref('landing/mawled/categories/' + id).remove();
+};
+
+ZZ._renderMawledCatList = function() {
+  var el = document.getElementById('ml-cat-list');
+  var cnt= document.getElementById('ml-cat-count');
+  if (!el) return;
+  var cats = ZZ._mawledCatsCache;
+  if (cnt) cnt.textContent = cats.length ? '(' + cats.length + ')' : '';
+  if (!cats.length) {
+    el.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.3);padding:12px;font-size:13px">لا توجد أقسام بعد</div>';
+    return;
+  }
+  el.innerHTML = cats.map(function(c) {
+    return '<div class="cat-item">'
+      + '<span style="font-size:18px">' + (c.icon||'🎉') + '</span>'
+      + '<span class="cat-name-lbl">' + (c.name||'') + '</span>'
+      + '<button onclick="ZZ.deleteMawledCategory(\'' + c.id + '\')" class="btn-del" title="حذف">🗑</button>'
+      + '</div>';
+  }).join('');
+};
+
+ZZ._refreshMawledCatDropdown = function() {
+  var cats = ZZ._mawledCatsCache;
+  var opts = '<option value="">— بدون قسم —</option>'
+    + cats.map(function(c){ return '<option value="' + c.id + '">' + (c.icon||'🎉') + ' ' + (c.name||'') + '</option>'; }).join('');
+  var addSel  = document.getElementById('ml-category');
+  var editSel = document.getElementById('emw-category');
+  if (addSel)  { var sv=addSel.value;  addSel.innerHTML =opts; addSel.value =sv; }
+  if (editSel) { var sv=editSel.value; editSel.innerHTML=opts; editSel.value=sv; }
+};
+
+/* ── Hero صفحة المولد ── */
+ZZ.setMawledHeroBgMode = function(m) {
+  ZZ._mawledHeroBgMode = m;
+  document.getElementById('mlhbg-url-row').style.display  = m==='url'  ? 'block':'none';
+  document.getElementById('mlhbg-file-row').style.display = m==='file' ? 'block':'none';
+  document.getElementById('mlhbg-btn-url').classList.toggle('on',  m==='url');
+  document.getElementById('mlhbg-btn-file').classList.toggle('on', m==='file');
+};
+
+ZZ.previewMawledHeroBgFile = function(inp) {
+  var f = inp && inp.files && inp.files[0];
+  if (!f) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var prev = document.getElementById('mlhbg-preview');
+    if (prev) { prev.style.display='block'; prev.style.backgroundImage = 'url("' + e.target.result + '")'; }
+  };
+  reader.readAsDataURL(f);
+};
+
+ZZ.setMawledHeroAnim = function(btn, type) {
+  ZZ._mawledHeroAnim = type;
+  document.querySelectorAll('.anim-opt').forEach(function(b){ b.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+};
+
+ZZ.saveMawledHero = function() {
+  if (!window.zzdb || !window.ZZ_AUTH_READY) { alert('⏳ جاري الاتصال — انتظر ثانيتين'); return; }
+
+  function _doSave(imgUrl) {
+    var saves = {};
+    if (imgUrl) saves.heroBg = imgUrl;
+    saves.heroAnim = ZZ._mawledHeroAnim;
+    zzdb.ref('landing/mawled/settings').update(saves)
+      .then(function() {
+        var n = document.getElementById('mawled-hero-note');
+        if (n) { n.classList.add('show'); setTimeout(function(){ n.classList.remove('show'); }, 2500); }
+      })
+      .catch(function(e) { alert('❌ ' + e.message); });
+  }
+
+  if (ZZ._mawledHeroBgMode === 'file') {
+    var fe = document.getElementById('mlhbg-imgfile');
+    var f  = fe && fe.files && fe.files[0];
+    if (!f) { _doSave(null); return; }
+    _zzReadFile(f)
+      .then(function(raw) { return _zzCompress(raw, 1200, 0.75); })
+      .then(function(img) { if (img.length > 900000) return _zzCompress(img, 900, 0.6); return img; })
+      .then(_doSave)
+      .catch(function(e) { alert('❌ ' + e.message); });
+  } else {
+    var url = (document.getElementById('mlhbg-imgurl')||{}).value||'';
+    _doSave(url.trim() || null);
+  }
+};
+
+/* ── تمديد _extraInit لاشتراك بيانات المولد ── */
+var _prevExtraInit3 = ZZ._extraInit;
+ZZ._extraInit = function() {
+  _prevExtraInit3();
+  ZZ.subscribeMawled();
+  ZZ._subscribeMawledPublic();
+};
+
+/* ── عرض منيو المولد للعميل في صفحة index ── */
+ZZ._mawledPublicSubbed = false;
+ZZ._subscribeMawledPublic = function() {
+  if (ZZ._mawledPublicSubbed || !window.zzdb) return;
+  ZZ._mawledPublicSubbed = true;
+
+  /* الأصناف */
+  zzdb.ref('landing/mawled/items').orderByChild('createdAt').on('value', function(snap) {
+    var items = [];
+    snap.forEach(function(ch) { items.unshift(Object.assign({ id: ch.key }, ch.val())); });
+    ZZ._mawledPublicItems = items.filter(function(it){ return it.available !== false; });
+
+    /* إظهار/إخفاء التاب حسب وجود أصناف */
+    var tab = document.getElementById('mawled-menu-tab');
+    if (tab) tab.style.display = ZZ._mawledPublicItems.length ? '' : 'none';
+
+    ZZ._renderMawledPublic();
+  });
+
+  /* الأقسام */
+  zzdb.ref('landing/mawled/categories').orderByChild('order').on('value', function(snap) {
+    ZZ._mawledPublicCats = [];
+    snap.forEach(function(ch) { ZZ._mawledPublicCats.push(Object.assign({ id: ch.key }, ch.val())); });
+    ZZ._renderMawledPublic();
+  });
+};
+
+ZZ._mawledPublicItems = [];
+ZZ._mawledPublicCats  = [];
+
+ZZ._renderMawledPublic = function() {
+  var el = document.getElementById('mawled-menu-display');
+  if (!el) return;
+  var allItems = ZZ._mawledPublicItems;
+  var cats     = ZZ._mawledPublicCats || [];
+
+  if (!allItems.length) {
+    el.innerHTML = '<div class="no-menu-msg"><div class="ni">🎉</div><p>لا توجد منتجات حالياً</p></div>';
+    return;
+  }
+
+  function renderCard(it) {
+    var ptLbl = it.priceType === 'kilo' ? '⚖️ الكيلو' : '🔢 القطعة';
+    return '<div class="prod-card">'
+      + '<div class="prod-img" id="mpi_' + it.id + '"><div class="prod-badges"><span class="pbadge pbadge-avail">✅ متاح</span></div></div>'
+      + '<div class="prod-body">'
+      + '<div class="prod-name">' + (it.name||'') + '</div>'
+      + (it.desc ? '<div class="prod-desc">' + it.desc + '</div>' : '')
+      + (it.price ? '<div class="prod-price" style="display:flex;align-items:center;gap:8px">'
+          + '<span style="font-size:10px;background:rgba(245,200,66,.15);border:1px solid rgba(245,200,66,.3);color:#f5c842;border-radius:9999px;padding:2px 8px;font-weight:800">' + ptLbl + '</span>'
+          + '<span style="color:#f5c842;font-weight:900">' + it.price + ' جنيه</span>'
+          + '</div>' : '')
+      + '<a href="mawled-order.html" target="_blank" class="btn-prod-order" style="background:linear-gradient(135deg,#c8920a,#e8a820);color:#000">اطلب الآن ←</a>'
+      + '</div></div>';
+  }
+
+  var html = '';
+  if (!cats.length) {
+    html = '<div class="menu-grid">' + allItems.map(renderCard).join('') + '</div>';
+  } else {
+    /* مع أقسام */
+    var catsWithItems = [];
+    cats.forEach(function(cat) {
+      var its = allItems.filter(function(it){ return it.categoryId === cat.id; });
+      if (its.length) catsWithItems.push({ cat: cat, items: its });
+    });
+    var uncat = allItems.filter(function(it){
+      return !catsWithItems.some(function(g){ return g.items.some(function(x){ return x.id===it.id; }); });
+    });
+    if (uncat.length) catsWithItems.push({ cat: { id:'__mwother__', name:'متنوعات', icon:'🎉' }, items: uncat });
+
+    if (!catsWithItems.length) { el.innerHTML='<div class="no-menu-msg"><div class="ni">🎉</div><p>لا توجد منتجات</p></div>'; return; }
+
+    var firstId = catsWithItems[0].cat.id;
+    var tabsHtml = '<div class="cat-tabs-wrap" id="cat-tabs-mawled">'
+      + catsWithItems.map(function(g){
+          return '<button class="cat-tab' + (g.cat.id===firstId?' on':'') + '" onclick="ZZ.switchCatTab(\'mawled\',\'' + g.cat.id + '\')">'
+            + (g.cat.icon||'🎉') + ' ' + (g.cat.name||'') + '</button>';
+        }).join('') + '</div>';
+    var panelsHtml = '<div class="cat-panels-wrap" id="cat-panels-mawled">'
+      + catsWithItems.map(function(g){
+          return '<div class="cat-panel' + (g.cat.id===firstId?' on':'') + '" data-cat="' + g.cat.id + '">'
+            + '<div class="menu-grid">' + g.items.map(renderCard).join('') + '</div>'
+            + '</div>';
+        }).join('') + '</div>';
+    html = tabsHtml + panelsHtml;
+  }
+  el.innerHTML = html;
+  allItems.forEach(function(it){
+    var d = document.getElementById('mpi_' + it.id);
+    if (d && it.img) d.style.backgroundImage = 'url("' + it.img + '")';
+  });
+};
+
+/* ── تمديد adminTab لفتح تاب المولد ── */
+var _prevAdminTab3 = ZZ.adminTab;
+ZZ.adminTab = function(tab) {
+  _prevAdminTab3(tab);
+  if (tab === 'mawled-menu') {
+    ZZ._renderAdminMawledList();
+    ZZ._renderMawledCatList();
+  }
+};
+
+</script>
+
+<!-- ══ EDIT MAWLED ITEM MODAL ══ -->
+<div id="modal-edit-mawled" style="position:fixed;inset:0;z-index:1350;background:rgba(0,0,0,.92);backdrop-filter:blur(22px);display:none;align-items:center;justify-content:center;font-family:'Cairo',sans-serif;direction:rtl">
+  <div style="width:100%;max-width:520px;margin:16px;background:#0a0804;border:1px solid rgba(245,200,66,.25);border-radius:24px;overflow:hidden;max-height:92vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(245,200,66,.06);position:sticky;top:0;z-index:1">
+      <div style="font-weight:900;font-size:16px;color:#fff">✏️ تعديل صنف المولد</div>
+      <button onclick="ZZ.closeEditMawled()" style="width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:none;color:rgba(255,255,255,.6);font-size:15px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:20px 22px 26px">
+      <div class="admin-form-grid">
+        <div>
+          <label class="admin-lbl">القسم الرئيسي</label>
+          <select id="emw-category" class="admin-inp"><option value="">— بدون قسم —</option></select>
+        </div>
+        <div><label class="admin-lbl">اسم الصنف *</label><input id="emw-name" class="admin-inp" type="text"></div>
+        <div><label class="admin-lbl">الوصف</label><textarea id="emw-desc" class="admin-inp" rows="3"></textarea></div>
+        <div>
+          <label class="admin-lbl">نوع السعر</label>
+          <div class="delivery-opts">
+            <button type="button" class="dopt on" id="emw-ptype-piece" onclick="ZZ._editMawledPriceType='piece';this.classList.add('on');document.getElementById('emw-ptype-kilo').classList.remove('on')">🔢 قطعة</button>
+            <button type="button" class="dopt" id="emw-ptype-kilo" onclick="ZZ._editMawledPriceType='kilo';this.classList.add('on');document.getElementById('emw-ptype-piece').classList.remove('on')">⚖️ كيلو</button>
+          </div>
+        </div>
+        <div><label class="admin-lbl">السعر بالجنيه</label><input id="emw-price" class="admin-inp" type="text"></div>
+        <div>
+          <label class="admin-lbl">صورة جديدة (اختياري)</label>
+          <div class="img-tabs">
+            <button class="img-tab on" id="emw-imgbtn-url"  onclick="ZZ.setEditMawledImgMode('url')">🔗 رابط</button>
+            <button class="img-tab"    id="emw-imgbtn-file" onclick="ZZ.setEditMawledImgMode('file')">📁 رفع</button>
+          </div>
+          <div id="emw-url-row"><input id="emw-imgurl" class="admin-inp" placeholder="رابط صورة جديدة (اختياري)" type="url"></div>
+          <div id="emw-file-row" style="display:none"><input id="emw-imgfile" class="admin-inp" type="file" accept="image/*" style="padding:8px;cursor:pointer"></div>
+        </div>
+      </div>
+      <div id="emw-preview" style="display:none;width:100%;aspect-ratio:4/3;background-size:cover;background-position:center;border-radius:14px;margin:10px 0;border:1px solid rgba(255,255,255,.08)"></div>
+      <button onclick="ZZ.saveEditMawled()" style="width:100%;margin-top:10px;padding:13px;border-radius:12px;background:linear-gradient(135deg,#f5c842,#e8a020);color:#000;font-weight:900;font-size:15px;border:none;cursor:pointer;font-family:'Cairo',sans-serif">💾 حفظ التعديلات</button>
+    </div>
+  </div>
+</div>
 
 
 <!-- ══ EDIT OFFER MODAL ══ -->
