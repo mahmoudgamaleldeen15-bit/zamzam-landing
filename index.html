@@ -934,6 +934,7 @@ a{text-decoration:none;color:inherit}
         <button class="ant" onclick="ZZ.adminTab('cake-menu')">🎂 منيو الحلويات</button>
         <button class="ant" onclick="ZZ.adminTab('resto-menu')">🍔 منيو المطعم</button>
         <button class="ant" onclick="ZZ.adminTab('mawled-menu')">🎉 منيو المولد</button>
+        <button class="ant" onclick="ZZ.adminTab('mawled-zones')">🛵 مناطق التوصيل</button>
         <button class="ant" onclick="ZZ.adminTab('categories')">📂 الأقسام</button>
         <button class="ant" onclick="ZZ.adminTab('jobs')">💼 التوظيف</button>
         <button class="ant" onclick="ZZ.adminTab('btns')">🎛️ الأزرار</button>
@@ -1140,6 +1141,52 @@ a{text-decoration:none;color:inherit}
         <button onclick="ZZ.saveMawledHero()" class="btn-admin-add" style="background:linear-gradient(135deg,#f5c842,#e8a020);color:#000">💾 حفظ إعدادات Hero المولد</button>
         <div class="admin-note" id="mawled-hero-note">✅ تم الحفظ</div>
       </div><!-- end tab-mawled-menu -->
+
+      <!-- ══ TAB: MAWLED DELIVERY ZONES ══ -->
+      <div id="admin-tab-mawled-zones" class="admin-panel-sec">
+        <div class="admin-sec-title">🛵 إضافة منطقة توصيل جديدة</div>
+        <p style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:14px">
+          أضف المناطق اللي بتوصل فيها مع مصاريف التوصيل لكل منطقة — العميل هيختار منطقته والسعر هيتضاف تلقائياً للإجمالي
+        </p>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin-bottom:8px">
+          <div>
+            <label class="admin-lbl">اسم المنطقة *</label>
+            <input id="mz-name" class="admin-inp" placeholder="مثال: طنطا — المحلة — السنطة">
+          </div>
+          <div>
+            <label class="admin-lbl">مصاريف التوصيل (جنيه)</label>
+            <input id="mz-fee" class="admin-inp" type="number" min="0" placeholder="مثال: 15" style="width:120px;text-align:center">
+          </div>
+        </div>
+        <button class="btn-admin-add" style="background:linear-gradient(135deg,#f5c842,#e8a020);color:#000" onclick="ZZ.addMawledZone()">➕ إضافة المنطقة</button>
+        <div class="admin-note" id="mz-save-note">✅ تم الحفظ</div>
+
+        <div style="margin-top:24px">
+          <div class="admin-sec-title">المناطق الحالية <span id="mz-count" style="opacity:.4;font-weight:400"></span></div>
+          <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:10px">⠿ اسحب لتغيير ترتيب المناطق في القائمة</div>
+          <div id="mz-list"><div style="text-align:center;color:rgba(255,255,255,.3);padding:20px;font-size:13px">لا توجد مناطق بعد — أضف من أعلاه</div></div>
+        </div>
+
+        <!-- Modal تعديل منطقة -->
+        <div id="mz-edit-box" style="display:none;margin-top:16px;background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.2);border-radius:14px;padding:16px">
+          <div style="font-weight:900;font-size:14px;color:#fff;margin-bottom:12px">✏️ تعديل المنطقة</div>
+          <input type="hidden" id="mz-edit-id">
+          <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin-bottom:10px">
+            <div>
+              <label class="admin-lbl">اسم المنطقة</label>
+              <input id="mz-edit-name" class="admin-inp" placeholder="اسم المنطقة">
+            </div>
+            <div>
+              <label class="admin-lbl">مصاريف التوصيل</label>
+              <input id="mz-edit-fee" class="admin-inp" type="number" min="0" style="width:120px;text-align:center">
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button onclick="ZZ.saveMawledZoneEdit()" style="flex:1;padding:11px;border-radius:10px;background:linear-gradient(135deg,#f5c842,#e8a020);color:#000;font-weight:900;font-size:13px;border:none;cursor:pointer;font-family:'Cairo',sans-serif">💾 حفظ</button>
+            <button onclick="ZZ.closeMawledZoneEdit()" style="padding:11px 18px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);font-size:13px;cursor:pointer">إلغاء</button>
+          </div>
+        </div>
+      </div><!-- end tab-mawled-zones -->
 
       <!-- ══ TAB: RESTAURANT MENU ══ -->
       <div id="admin-tab-resto-menu" class="admin-panel-sec">
@@ -5227,6 +5274,139 @@ ZZ._loadMawledWa = function() {
     var inp = document.getElementById('ml-wa-num');
     if (inp && num) inp.value = num;
   });
+};
+
+/* ════════════════════════════════════════════════════════
+   MAWLED DELIVERY ZONES — نظام مناطق التوصيل
+   Firebase: landing/mawled/zones/
+════════════════════════════════════════════════════════ */
+ZZ._mawledZonesCache  = [];
+ZZ._mawledZonesSubbed = false;
+ZZ._mawledDragSrcIdx  = null;
+
+ZZ.subscribeMawledZones = function() {
+  if (ZZ._mawledZonesSubbed || !window.zzdb) return;
+  ZZ._mawledZonesSubbed = true;
+  zzdb.ref('landing/mawled/zones').orderByChild('order').on('value', function(snap) {
+    ZZ._mawledZonesCache = [];
+    snap.forEach(function(ch) { ZZ._mawledZonesCache.push(Object.assign({ id: ch.key }, ch.val())); });
+    ZZ._renderMawledZoneList();
+  });
+};
+
+/* إضافة منطقة */
+ZZ.addMawledZone = function() {
+  var name = (document.getElementById('mz-name') || {}).value || '';
+  var fee  = (document.getElementById('mz-fee')  || {}).value || '0';
+  if (!name.trim()) { alert('من فضلك أدخل اسم المنطقة'); return; }
+  if (!window.zzdb || !window.ZZ_AUTH_READY) { alert('⏳ جاري الاتصال'); return; }
+  var zone = { name: name.trim(), fee: parseFloat(fee) || 0, order: ZZ._mawledZonesCache.length, createdAt: Date.now() };
+  zzdb.ref('landing/mawled/zones').push(zone)
+    .then(function() {
+      document.getElementById('mz-name').value = '';
+      document.getElementById('mz-fee').value  = '';
+      var n = document.getElementById('mz-save-note');
+      if (n) { n.classList.add('show'); setTimeout(function(){ n.classList.remove('show'); }, 2500); }
+    })
+    .catch(function(e) { alert('❌ ' + e.message); });
+};
+
+/* حذف منطقة */
+ZZ.deleteMawledZone = function(id) {
+  if (!confirm('حذف هذه المنطقة؟')) return;
+  if (!window.zzdb) return;
+  zzdb.ref('landing/mawled/zones/' + id).remove();
+};
+
+/* فتح تعديل منطقة */
+ZZ.openMawledZoneEdit = function(id) {
+  var z = ZZ._mawledZonesCache.find(function(x){ return x.id === id; });
+  if (!z) return;
+  document.getElementById('mz-edit-id').value   = id;
+  document.getElementById('mz-edit-name').value = z.name || '';
+  document.getElementById('mz-edit-fee').value  = z.fee  || 0;
+  document.getElementById('mz-edit-box').style.display = 'block';
+  document.getElementById('mz-edit-box').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+};
+
+ZZ.closeMawledZoneEdit = function() {
+  document.getElementById('mz-edit-box').style.display = 'none';
+};
+
+ZZ.saveMawledZoneEdit = function() {
+  var id   = document.getElementById('mz-edit-id').value;
+  var name = (document.getElementById('mz-edit-name').value || '').trim();
+  var fee  = parseFloat(document.getElementById('mz-edit-fee').value) || 0;
+  if (!name) { alert('أدخل اسم المنطقة'); return; }
+  if (!window.zzdb) return;
+  zzdb.ref('landing/mawled/zones/' + id).update({ name: name, fee: fee })
+    .then(function() { ZZ.closeMawledZoneEdit(); })
+    .catch(function(e) { alert('❌ ' + e.message); });
+};
+
+/* رسم قائمة المناطق مع drag & drop */
+ZZ._renderMawledZoneList = function() {
+  var el  = document.getElementById('mz-list');
+  var cnt = document.getElementById('mz-count');
+  if (!el) return;
+  var zones = ZZ._mawledZonesCache;
+  if (cnt) cnt.textContent = zones.length ? '(' + zones.length + ')' : '';
+  if (!zones.length) {
+    el.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.3);padding:20px;font-size:13px">لا توجد مناطق بعد — أضف من أعلاه</div>';
+    return;
+  }
+  el.innerHTML = zones.map(function(z, i) {
+    return '<div class="cat-item" draggable="true" data-idx="' + i + '" data-id="' + z.id + '" style="justify-content:space-between">'
+      + '<span class="cat-drag-handle" title="اسحب لتغيير الترتيب">⠿</span>'
+      + '<span style="font-size:17px">🛵</span>'
+      + '<span class="cat-name-lbl" style="flex:1">' + (z.name || '') + '</span>'
+      + '<span style="font-size:12px;font-weight:900;color:#f5c842;background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.2);border-radius:9999px;padding:3px 12px;flex-shrink:0">'
+      + (z.fee > 0 ? z.fee + ' جنيه' : 'مجاني') + '</span>'
+      + '<button onclick="ZZ.openMawledZoneEdit(\'' + z.id + '\')" class="btn-edit" title="تعديل">✏️</button>'
+      + '<button onclick="ZZ.deleteMawledZone(\'' + z.id + '\')" class="btn-del" title="حذف">🗑</button>'
+      + '</div>';
+  }).join('');
+  /* Drag & Drop لإعادة الترتيب */
+  var items = el.querySelectorAll('.cat-item');
+  items.forEach(function(item) {
+    item.addEventListener('dragstart', function(e) {
+      ZZ._mawledDragSrcIdx = parseInt(item.getAttribute('data-idx'));
+      e.dataTransfer.effectAllowed = 'move';
+      item.style.opacity = '.4';
+    });
+    item.addEventListener('dragend', function() { item.style.opacity = ''; });
+    item.addEventListener('dragover', function(e) { e.preventDefault(); item.style.background = 'rgba(245,200,66,.08)'; });
+    item.addEventListener('dragleave', function() { item.style.background = ''; });
+    item.addEventListener('drop', function(e) {
+      e.preventDefault(); item.style.background = '';
+      var targetIdx = parseInt(item.getAttribute('data-idx'));
+      if (ZZ._mawledDragSrcIdx === null || ZZ._mawledDragSrcIdx === targetIdx) return;
+      var arr = ZZ._mawledZonesCache.slice();
+      var moved = arr.splice(ZZ._mawledDragSrcIdx, 1)[0];
+      arr.splice(targetIdx, 0, moved);
+      var updates = {};
+      arr.forEach(function(z, i) { updates['landing/mawled/zones/' + z.id + '/order'] = i; });
+      if (window.zzdb) zzdb.ref().update(updates);
+      ZZ._mawledDragSrcIdx = null;
+    });
+  });
+};
+
+/* تمديد adminTab لتشغيل تاب المناطق */
+var _prevAdminTabZones = ZZ.adminTab;
+ZZ.adminTab = function(tab) {
+  _prevAdminTabZones(tab);
+  if (tab === 'mawled-zones') {
+    ZZ.subscribeMawledZones();
+    ZZ._renderMawledZoneList();
+  }
+};
+
+/* تمديد extraInit */
+var _prevExtraInitZones = ZZ._extraInit;
+ZZ._extraInit = function() {
+  _prevExtraInitZones();
+  ZZ.subscribeMawledZones();
 };
 
 ZZ.saveMawledHero = function() {
