@@ -430,6 +430,21 @@ a{text-decoration:none;color:inherit}
 .btn-del:hover{background:rgba(239,68,68,.28)}
 .admin-note{margin-top:14px;padding:11px 16px;border-radius:10px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:rgba(34,197,94,.9);font-size:12px;text-align:center;display:none;font-weight:700}
 .admin-note.show{display:block}
+/* ── KPI cards ── */
+.mkpi-card{background:rgba(255,255,255,.05);border:1px solid rgba(245,200,66,.15);border-radius:14px;padding:14px 12px;text-align:center}
+.mkpi-icon{font-size:1.5rem;margin-bottom:6px}
+.mkpi-val{font-size:1.3rem;font-weight:900;color:#f5c842;line-height:1}
+.mkpi-lbl{font-size:10px;color:rgba(255,255,255,.4);margin-top:4px;font-weight:600}
+/* ── orders table ── */
+.mord-th{padding:10px 12px;text-align:right;font-weight:800;font-size:11px;color:rgba(245,200,66,.8);white-space:nowrap}
+.mord-td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top;color:rgba(255,255,255,.8);font-size:11.5px}
+.mord-tr:hover td{background:rgba(255,255,255,.03)}
+.mord-phone-btn{display:inline-flex;align-items:center;gap:4px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.25);color:#4ade80;border-radius:9999px;padding:3px 10px;font-size:10px;font-weight:800;cursor:pointer;text-decoration:none;font-family:'Cairo',sans-serif;transition:.2s;white-space:nowrap}
+.mord-phone-btn:hover{background:rgba(37,211,102,.2)}
+.mord-badge{display:inline-block;border-radius:9999px;padding:2px 9px;font-size:10px;font-weight:800}
+.mord-badge-delivery{background:rgba(245,200,66,.12);color:#f5c842;border:1px solid rgba(245,200,66,.25)}
+.mord-badge-pickup{background:rgba(255,255,255,.07);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.12)}
+.mord-items-list{font-size:10.5px;color:rgba(255,255,255,.5);line-height:1.5}
 
 /* ══ CONTACT MODAL ══ */
 #modal-contact{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.85);backdrop-filter:blur(22px);display:none;align-items:center;justify-content:center;font-family:'Cairo',sans-serif;direction:rtl}
@@ -935,6 +950,7 @@ a{text-decoration:none;color:inherit}
         <button class="ant" onclick="ZZ.adminTab('resto-menu')">🍔 منيو المطعم</button>
         <button class="ant" onclick="ZZ.adminTab('mawled-menu')">🎉 منيو المولد</button>
         <button class="ant" onclick="ZZ.adminTab('mawled-zones')">🛵 مناطق التوصيل</button>
+        <button class="ant" onclick="ZZ.adminTab('mawled-orders')">📊 تقرير المولد</button>
         <button class="ant" onclick="ZZ.adminTab('categories')">📂 الأقسام</button>
         <button class="ant" onclick="ZZ.adminTab('jobs')">💼 التوظيف</button>
         <button class="ant" onclick="ZZ.adminTab('btns')">🎛️ الأزرار</button>
@@ -1187,6 +1203,95 @@ a{text-decoration:none;color:inherit}
           </div>
         </div>
       </div><!-- end tab-mawled-zones -->
+
+      <!-- ══ TAB: MAWLED ORDERS REPORT ══ -->
+      <div id="admin-tab-mawled-orders" class="admin-panel-sec">
+
+        <!-- Header + KPIs -->
+        <div class="admin-sec-title">📊 تقرير مبيعات حلاوة المولد</div>
+
+        <!-- KPI Cards -->
+        <div id="mawled-kpi-wrap" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px">
+          <div class="mkpi-card">
+            <div class="mkpi-icon">📦</div>
+            <div class="mkpi-val" id="kpi-count">—</div>
+            <div class="mkpi-lbl">إجمالي الطلبات</div>
+          </div>
+          <div class="mkpi-card">
+            <div class="mkpi-icon">💰</div>
+            <div class="mkpi-val" id="kpi-revenue">—</div>
+            <div class="mkpi-lbl">إجمالي المبيعات</div>
+          </div>
+          <div class="mkpi-card">
+            <div class="mkpi-icon">🛵</div>
+            <div class="mkpi-val" id="kpi-delivery">—</div>
+            <div class="mkpi-lbl">طلبات ديليفري</div>
+          </div>
+          <div class="mkpi-card">
+            <div class="mkpi-icon">🏪</div>
+            <div class="mkpi-val" id="kpi-pickup">—</div>
+            <div class="mkpi-lbl">استلام من المحل</div>
+          </div>
+        </div>
+
+        <!-- فلاتر البحث -->
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:14px;align-items:end">
+          <div>
+            <label class="admin-lbl">🔍 بحث (اسم أو تليفون)</label>
+            <input id="mord-search" class="admin-inp" placeholder="ابحث بالاسم أو رقم التليفون..." oninput="ZZ.filterMawledOrders()">
+          </div>
+          <div>
+            <label class="admin-lbl">📅 فلتر بالتاريخ</label>
+            <input id="mord-date" class="admin-inp" type="date" onchange="ZZ.filterMawledOrders()">
+          </div>
+          <div style="display:flex;gap:6px">
+            <button onclick="ZZ.clearMawledFilters()" style="padding:0 14px;height:44px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);border-radius:10px;cursor:pointer;font-size:12px;font-family:'Cairo',sans-serif;white-space:nowrap">مسح الفلتر</button>
+          </div>
+        </div>
+
+        <!-- أزرار التصدير -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <button onclick="ZZ.exportMawledExcel()" style="display:flex;align-items:center;gap:6px;padding:10px 18px;background:linear-gradient(135deg,#15803d,#16a34a);color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:800;font-size:13px;font-family:'Cairo',sans-serif;box-shadow:0 3px 12px rgba(21,128,61,.3)">
+            📥 تصدير Excel
+          </button>
+          <button onclick="ZZ.printMawledOrders()" style="display:flex;align-items:center;gap:6px;padding:10px 18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;border-radius:10px;cursor:pointer;font-weight:800;font-size:13px;font-family:'Cairo',sans-serif">
+            🖨️ طباعة
+          </button>
+          <div id="mord-export-count" style="margin-right:auto;font-size:12px;color:rgba(255,255,255,.4);align-self:center"></div>
+        </div>
+
+        <!-- جدول الطلبات -->
+        <div id="mawled-orders-table-wrap" style="overflow-x:auto;border-radius:14px;border:1px solid rgba(255,255,255,.08)">
+          <div style="text-align:center;color:rgba(255,255,255,.3);padding:40px;font-size:13px" id="mord-loading">
+            <div style="font-size:28px;margin-bottom:10px">⏳</div>
+            جاري تحميل الطلبات...
+          </div>
+          <table id="mawled-orders-table" style="display:none;width:100%;border-collapse:collapse;font-size:12px;direction:rtl">
+            <thead>
+              <tr style="background:rgba(245,200,66,.08);border-bottom:1px solid rgba(245,200,66,.2)">
+                <th class="mord-th">رقم الطلب</th>
+                <th class="mord-th">التاريخ والوقت</th>
+                <th class="mord-th">اسم العميل</th>
+                <th class="mord-th">التليفون</th>
+                <th class="mord-th">واتساب</th>
+                <th class="mord-th">النوع</th>
+                <th class="mord-th">المنطقة</th>
+                <th class="mord-th">المنتجات</th>
+                <th class="mord-th">إجمالي المنتجات</th>
+                <th class="mord-th">توصيل</th>
+                <th class="mord-th" style="color:#f5c842">الإجمالي</th>
+              </tr>
+            </thead>
+            <tbody id="mawled-orders-tbody"></tbody>
+          </table>
+        </div>
+
+        <div id="mord-empty" style="display:none;text-align:center;padding:40px;color:rgba(255,255,255,.3)">
+          <div style="font-size:36px;margin-bottom:10px">📭</div>
+          <div>لا توجد طلبات بعد</div>
+        </div>
+
+      </div><!-- end tab-mawled-orders -->
 
       <!-- ══ TAB: RESTAURANT MENU ══ -->
       <div id="admin-tab-resto-menu" class="admin-panel-sec">
@@ -5412,6 +5517,9 @@ ZZ.adminTab = function(tab) {
     ZZ.subscribeMawledZones();
     ZZ._renderMawledZoneList();
   }
+  if (tab === 'mawled-orders') {
+    ZZ.subscribeMawledOrders();
+  }
 };
 
 /* تمديد extraInit */
@@ -5419,6 +5527,243 @@ var _prevExtraInitZones = ZZ._extraInit;
 ZZ._extraInit = function() {
   _prevExtraInitZones();
   ZZ.subscribeMawledZones();
+};
+
+/* ════════════════════════════════════════════════════════
+   MAWLED ORDERS REPORT — تقرير طلبات المولد
+   Firebase: mawled/orders/
+════════════════════════════════════════════════════════ */
+ZZ._mawledOrdersCache  = [];
+ZZ._mawledOrdersFiltered = [];
+ZZ._mawledOrdersSubbed = false;
+
+ZZ.subscribeMawledOrders = function() {
+  if (ZZ._mawledOrdersSubbed || !window.zzdb) return;
+  ZZ._mawledOrdersSubbed = true;
+  document.getElementById('mord-loading').style.display = 'block';
+
+  zzdb.ref('mawled/orders').orderByChild('createdAt').on('value', function(snap) {
+    ZZ._mawledOrdersCache = [];
+    snap.forEach(function(ch) {
+      ZZ._mawledOrdersCache.unshift(Object.assign({ _key: ch.key }, ch.val()));
+    });
+    ZZ.filterMawledOrders();
+  }, function(err) {
+    document.getElementById('mord-loading').innerHTML = '<div style="color:#ef4444">❌ خطأ في التحميل: ' + err.message + '</div>';
+  });
+};
+
+/* ── فلترة الطلبات ── */
+ZZ.filterMawledOrders = function() {
+  var q    = (document.getElementById('mord-search').value || '').trim().toLowerCase();
+  var date = (document.getElementById('mord-date').value || '').trim();
+
+  ZZ._mawledOrdersFiltered = ZZ._mawledOrdersCache.filter(function(o) {
+    /* بحث بالاسم أو التليفون */
+    var matchText = !q
+      || (o.name  || '').toLowerCase().indexOf(q) !== -1
+      || (o.phone || '').indexOf(q) !== -1
+      || (o.whatsapp || '').indexOf(q) !== -1;
+
+    /* فلتر بالتاريخ */
+    var matchDate = true;
+    if (date && o.createdAt) {
+      var d = new Date(o.createdAt);
+      var dStr = d.getFullYear() + '-'
+        + String(d.getMonth()+1).padStart(2,'0') + '-'
+        + String(d.getDate()).padStart(2,'0');
+      matchDate = dStr === date;
+    }
+    return matchText && matchDate;
+  });
+
+  ZZ._renderMawledOrdersTable();
+  ZZ._renderMawledKPIs();
+};
+
+ZZ.clearMawledFilters = function() {
+  document.getElementById('mord-search').value = '';
+  document.getElementById('mord-date').value   = '';
+  ZZ.filterMawledOrders();
+};
+
+/* ── رسم الـ KPIs ── */
+ZZ._renderMawledKPIs = function() {
+  var orders   = ZZ._mawledOrdersFiltered;
+  var count    = orders.length;
+  var revenue  = orders.reduce(function(s,o){ return s + (o.total||0); }, 0);
+  var delivery = orders.filter(function(o){ return o.orderType === 'delivery'; }).length;
+  var pickup   = orders.filter(function(o){ return o.orderType !== 'delivery'; }).length;
+
+  var kc = document.getElementById('kpi-count');
+  var kr = document.getElementById('kpi-revenue');
+  var kd = document.getElementById('kpi-delivery');
+  var kp = document.getElementById('kpi-pickup');
+  if (kc) kc.textContent = count;
+  if (kr) kr.textContent = revenue.toLocaleString() + ' ج';
+  if (kd) kd.textContent = delivery;
+  if (kp) kp.textContent = pickup;
+};
+
+/* ── رسم الجدول ── */
+ZZ._renderMawledOrdersTable = function() {
+  var loading = document.getElementById('mord-loading');
+  var table   = document.getElementById('mawled-orders-table');
+  var tbody   = document.getElementById('mawled-orders-tbody');
+  var empty   = document.getElementById('mord-empty');
+  var expCnt  = document.getElementById('mord-export-count');
+
+  if (loading) loading.style.display = 'none';
+
+  var orders = ZZ._mawledOrdersFiltered;
+  if (expCnt) expCnt.textContent = orders.length + ' طلب';
+
+  if (!orders.length) {
+    if (table)  table.style.display  = 'none';
+    if (empty)  empty.style.display  = 'block';
+    return;
+  }
+  if (table)  table.style.display  = 'table';
+  if (empty)  empty.style.display  = 'none';
+
+  tbody.innerHTML = orders.map(function(o) {
+    var d   = o.createdAt ? new Date(o.createdAt) : null;
+    var dt  = d ? d.toLocaleDateString('ar-EG') + ' ' + d.toLocaleTimeString('ar-EG', {hour:'2-digit',minute:'2-digit'}) : '—';
+    var typeBadge = o.orderType === 'delivery'
+      ? '<span class="mord-badge mord-badge-delivery">🛵 ديليفري</span>'
+      : '<span class="mord-badge mord-badge-pickup">🏪 استلام</span>';
+    var itemsList = (o.items||[]).map(function(it){
+      return it.name + ' ×' + it.qty + (it.priceType==='kilo'?' ك':' ق');
+    }).join('<br>');
+    var waLink  = (o.whatsapp||o.phone||'').replace(/\D/g,'');
+    /* إضافة كود مصر لو الرقم بيبدأ بـ 0 */
+    if (waLink && waLink.charAt(0) === '0') waLink = '20' + waLink.slice(1);
+    var waBtn   = waLink
+      ? '<a href="https://wa.me/' + waLink + '" target="_blank" class="mord-phone-btn">💬 واتساب</a>'
+      : '—';
+    return '<tr class="mord-tr">'
+      + '<td class="mord-td" style="font-family:monospace;font-size:10px;color:rgba(255,255,255,.4)">' + (o.id||o._key||'—') + '</td>'
+      + '<td class="mord-td" style="white-space:nowrap">' + dt + '</td>'
+      + '<td class="mord-td" style="font-weight:700;color:#fff">' + (o.name||'—') + '</td>'
+      + '<td class="mord-td" style="direction:ltr;text-align:left">' + (o.phone||'—') + '</td>'
+      + '<td class="mord-td">' + waBtn + '</td>'
+      + '<td class="mord-td">' + typeBadge + '</td>'
+      + '<td class="mord-td">' + (o.zone||'—') + '</td>'
+      + '<td class="mord-td"><div class="mord-items-list">' + (itemsList||'—') + '</div></td>'
+      + '<td class="mord-td" style="text-align:center">' + (o.prodTotal||o.total||0) + ' ج</td>'
+      + '<td class="mord-td" style="text-align:center">' + (o.deliveryFee > 0 ? o.deliveryFee + ' ج' : 'مجاني') + '</td>'
+      + '<td class="mord-td" style="font-weight:900;color:#f5c842;font-size:13px;text-align:center">' + (o.total||0) + ' ج</td>'
+      + '</tr>';
+  }).join('');
+};
+
+/* ── تصدير Excel ── */
+ZZ.exportMawledExcel = function() {
+  var orders = ZZ._mawledOrdersFiltered;
+  if (!orders.length) { alert('لا توجد طلبات للتصدير'); return; }
+
+  /* CSV بدل Excel — يفتح في Excel مباشرةً */
+  var BOM  = '\uFEFF'; /* BOM للعربي */
+  var rows = [
+    ['رقم الطلب','التاريخ','الوقت','اسم العميل','التليفون','الواتساب',
+     'نوع الاستلام','المنطقة','المنتجات','إجمالي المنتجات','مصاريف التوصيل','الإجمالي النهائي','الملاحظات']
+  ];
+  orders.forEach(function(o) {
+    var d   = o.createdAt ? new Date(o.createdAt) : null;
+    var dt  = d ? d.toLocaleDateString('ar-EG') : '';
+    var tm  = d ? d.toLocaleTimeString('ar-EG', {hour:'2-digit',minute:'2-digit'}) : '';
+    var items = (o.items||[]).map(function(it){
+      return it.name + ' x' + it.qty + (it.priceType==='kilo'?' كيلو':' قطعة') + ' = ' + it.subtotal + ' ج';
+    }).join(' | ');
+    rows.push([
+      o.id||o._key||'',
+      dt, tm,
+      o.name||'',
+      o.phone||'',
+      o.whatsapp||o.phone||'',
+      o.orderType === 'delivery' ? 'ديليفري' : 'استلام',
+      o.zone||'',
+      items,
+      o.prodTotal||o.total||0,
+      o.deliveryFee||0,
+      o.total||0,
+      o.notes||''
+    ]);
+  });
+
+  var csv = BOM + rows.map(function(r) {
+    return r.map(function(c) {
+      var s = String(c).replace(/"/g,'""');
+      return '"' + s + '"';
+    }).join(',');
+  }).join('\r\n');
+
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  var now  = new Date();
+  a.href     = url;
+  a.download = 'طلبات-المولد-' + now.toLocaleDateString('en-GB').replace(/\//g,'-') + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+/* ── طباعة ── */
+ZZ.printMawledOrders = function() {
+  var orders = ZZ._mawledOrdersFiltered;
+  if (!orders.length) { alert('لا توجد طلبات للطباعة'); return; }
+
+  var totalRevenue = orders.reduce(function(s,o){ return s + (o.total||0); }, 0);
+  var now = new Date().toLocaleString('ar-EG');
+
+  var rows = orders.map(function(o, i) {
+    var d  = o.createdAt ? new Date(o.createdAt).toLocaleString('ar-EG') : '—';
+    var items = (o.items||[]).map(function(it){
+      return it.name + ' ×' + it.qty + (it.priceType==='kilo'?' كيلو':' قطعة');
+    }).join('، ');
+    return '<tr style="border-bottom:1px solid #eee">'
+      + '<td style="padding:6px 8px;text-align:center;color:#666">' + (i+1) + '</td>'
+      + '<td style="padding:6px 8px">' + d + '</td>'
+      + '<td style="padding:6px 8px;font-weight:700">' + (o.name||'—') + '</td>'
+      + '<td style="padding:6px 8px;direction:ltr">' + (o.phone||'—') + '</td>'
+      + '<td style="padding:6px 8px">' + (o.orderType==='delivery'?'🛵 ديليفري':'🏪 استلام') + '</td>'
+      + '<td style="padding:6px 8px">' + (o.zone||'—') + '</td>'
+      + '<td style="padding:6px 8px;font-size:11px;color:#666">' + items + '</td>'
+      + '<td style="padding:6px 8px;text-align:center">' + (o.deliveryFee>0?o.deliveryFee+' ج':'مجاني') + '</td>'
+      + '<td style="padding:6px 8px;font-weight:900;color:#b45309;text-align:center">' + (o.total||0) + ' ج</td>'
+      + '</tr>';
+  }).join('');
+
+  var win = window.open('', '_blank', 'width=1100,height=800');
+  win.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">'
+    + '<title>تقرير طلبات حلاوة المولد</title>'
+    + '<style>body{font-family:Arial,sans-serif;padding:20px;color:#111}'
+    + 'h2{color:#b45309;margin-bottom:4px}'
+    + '.meta{color:#666;font-size:12px;margin-bottom:16px}'
+    + 'table{width:100%;border-collapse:collapse;font-size:12px}'
+    + 'th{background:#b45309;color:#fff;padding:8px;text-align:right}'
+    + 'tr:nth-child(even){background:#fef9ec}'
+    + '.summary{margin-top:16px;background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:12px;display:flex;gap:30px}'
+    + '.sum-item{text-align:center} .sum-val{font-size:1.3rem;font-weight:900;color:#b45309}'
+    + '@media print{button{display:none}}'
+    + '</style></head><body>'
+    + '<h2>📊 تقرير طلبات حلاوة المولد — زمزم ديزيرت</h2>'
+    + '<div class="meta">تاريخ التقرير: ' + now + ' | عدد الطلبات: ' + orders.length + '</div>'
+    + '<div class="summary">'
+    + '<div class="sum-item"><div class="sum-val">' + orders.length + '</div><div>إجمالي الطلبات</div></div>'
+    + '<div class="sum-item"><div class="sum-val">' + totalRevenue.toLocaleString() + ' ج</div><div>إجمالي المبيعات</div></div>'
+    + '<div class="sum-item"><div class="sum-val">' + orders.filter(function(o){return o.orderType==='delivery'}).length + '</div><div>ديليفري</div></div>'
+    + '<div class="sum-item"><div class="sum-val">' + orders.filter(function(o){return o.orderType!=='delivery'}).length + '</div><div>استلام</div></div>'
+    + '</div>'
+    + '<br><table><thead><tr>'
+    + '<th>#</th><th>التاريخ</th><th>العميل</th><th>التليفون</th>'
+    + '<th>النوع</th><th>المنطقة</th><th>المنتجات</th><th>توصيل</th><th>الإجمالي</th>'
+    + '</tr></thead><tbody>' + rows + '</tbody></table>'
+    + '<br><button onclick="window.print()" style="background:#b45309;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;cursor:pointer">🖨️ اطبع الآن</button>'
+    + '</body></html>');
+  win.document.close();
 };
 
 ZZ.saveMawledHero = function() {

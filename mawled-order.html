@@ -1752,9 +1752,14 @@ ML.sendOrder = function() {
     + (notes ? '• ملاحظات: ' + notes + '\n' : '')
     + '━━━━━━━━━━━━━━━';
 
-  /* حفظ في Firebase */
+  /* تطبيع رقم الواتساب — إضافة كود مصر */
+  function _normalizePhone(num) {
+    var n = (num || '').replace(/\D/g, '');
+    if (n.charAt(0) === '0') n = '20' + n.slice(1);
+    return n;
+  }
   var orderData = {
-    id: orderId, name: name, phone: phone, whatsapp: wa,
+    id: orderId, name: name, phone: phone, whatsapp: _normalizePhone(wa),
     orderType: ML.orderType,
     zone: ML.orderType === 'delivery' && ML.selectedZone ? ML.selectedZone.name : null,
     deliveryFee: deliveryFee,
