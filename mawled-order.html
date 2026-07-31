@@ -254,8 +254,40 @@ html,body{
 }
 .prod-desc-small{
   font-size:11.5px;color:var(--text3);
-  margin-top:3px;line-height:1.4;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  margin-top:3px;line-height:1.5;
+  /* الوضع الافتراضي — سطرين بس */
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  transition:max-height .35s cubic-bezier(.22,1,.36,1);
+}
+/* لما الوصف يتفتح */
+.prod-desc-small.expanded{
+  display:block;
+  overflow:visible;
+  -webkit-line-clamp:unset;
+}
+/* زرار اقرأ المزيد */
+.desc-toggle-btn{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:11px;font-weight:800;
+  color:var(--gold);
+  background:none;border:none;cursor:pointer;
+  padding:2px 0;margin-top:2px;
+  font-family:'Cairo',sans-serif;
+  transition:opacity .2s;
+  text-decoration:underline;
+  text-underline-offset:2px;
+}
+.desc-toggle-btn:hover{opacity:.7}
+.desc-toggle-arrow{
+  display:inline-block;
+  transition:transform .3s cubic-bezier(.22,1,.36,1);
+  font-style:normal;
+}
+.desc-toggle-btn.open .desc-toggle-arrow{
+  transform:rotate(180deg);
 }
 .prod-price-row{margin-top:6px;display:flex;align-items:center;gap:8px}
 .prod-price-type{
@@ -1442,6 +1474,35 @@ ML.switchCat = function(catId) {
 /* ════════════════════════════════════════════
    RENDER PRODUCTS
 ════════════════════════════════════════════ */
+/* ─── وصف قابل للتوسيع ─── */
+function _zzDescHtml(id, desc) {
+  /* لو الوصف أقل من 60 حرف — اعرضه كامل بدون زرار */
+  if (!desc || desc.length <= 55) {
+    return '<div class="prod-desc-small expanded">' + desc + '</div>';
+  }
+  return '<div class="prod-desc-small" id="desc_' + id + '">' + desc + '</div>'
+    + '<button class="desc-toggle-btn" id="dtb_' + id + '" onclick="ML.toggleDesc(\'' + id + '\')">'
+    + '<span>اقرأ المزيد</span>'
+    + '<i class="desc-toggle-arrow">↓</i>'
+    + '</button>';
+}
+
+ML.toggleDesc = function(id) {
+  var descEl = document.getElementById('desc_' + id);
+  var btnEl  = document.getElementById('dtb_'  + id);
+  if (!descEl || !btnEl) return;
+  var isOpen = descEl.classList.contains('expanded');
+  if (isOpen) {
+    descEl.classList.remove('expanded');
+    btnEl.classList.remove('open');
+    btnEl.querySelector('span').textContent = 'اقرأ المزيد';
+  } else {
+    descEl.classList.add('expanded');
+    btnEl.classList.add('open');
+    btnEl.querySelector('span').textContent = 'اقرأ أقل';
+  }
+};
+
 ML.renderProducts = function() {
   var wrap = document.getElementById('products-wrap');
   /* filter by category */
@@ -1468,7 +1529,7 @@ ML.renderProducts = function() {
       + imgHtml
       + '<div class="prod-info">'
       +   '<div class="prod-name">' + (p.name || '') + '</div>'
-      +   (p.desc ? '<div class="prod-desc-small">' + p.desc + '</div>' : '')
+      +   (p.desc ? _zzDescHtml(p.id, p.desc) : '')
       +   '<div class="prod-price-row">'
       +     '<span class="prod-price-type">' + ptLabel + '</span>'
       +     '<span class="prod-price-val">' + (p.price || '—') + ' جنيه</span>'
