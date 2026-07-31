@@ -1566,6 +1566,7 @@ a{text-decoration:none;color:inherit}
     <a href="#restaurant">مطعم زمزم</a>
     <a href="#about">من نحن</a>
     <a href="#" onclick="ZZ.openContact();return false">تواصل معنا</a>
+    <a href="#" onclick="ZZ.scrollToJobs();return false" id="nav-jobs-link" style="color:#f43f5e;font-weight:800">💼 انضم لفريقنا</a>
   </div>
   <a href="tel:0404671500" class="nav-cta">📞 0404671500</a>
   <button class="hamburger" onclick="toggleMenu()" aria-label="القائمة">
@@ -1593,6 +1594,7 @@ a{text-decoration:none;color:inherit}
     <a href="#about"       onclick="toggleMenu()">من نحن</a>
     <a href="#menus-section" onclick="toggleMenu();setTimeout(function(){document.getElementById('menus-section').scrollIntoView({behavior:'smooth'})},300);return false">قوائمنا</a>
     <a href="#" onclick="toggleMenu();ZZ.openContact();return false">تواصل معنا</a>
+    <a href="#" onclick="toggleMenu();ZZ.scrollToJobs();return false" style="color:#f43f5e;font-weight:900;font-size:16px">💼 انضم لفريقنا</a>
     <div class="mob-cta-wrap">
       <a href="https://mahmoudgamaleldeen15-bit.github.io/zamzam-cake/" target="_blank" class="btn-cake" onclick="toggleMenu()" style="font-size:15px;padding:14px 32px">
         🎂 صمم تورتتك بنفسك
@@ -4727,6 +4729,16 @@ ZZ.loadBtnSettings = function() {
     if (tj)  tj.checked  = ZZ._btnSettings.jobs;
     if (tmw) tmw.checked = ZZ._btnSettings.mawled;
   });
+};
+
+/* ════ SCROLL TO JOBS ════ */
+ZZ.scrollToJobs = function() {
+  var sec = document.getElementById('jobs-section');
+  if (!sec) return;
+  sec.classList.add('active');
+  setTimeout(function() {
+    sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 80);
 };
 
 /* تطبيق إعدادات الأزرار بما فيها offers وmenus */
