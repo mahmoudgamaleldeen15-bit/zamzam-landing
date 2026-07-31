@@ -93,6 +93,8 @@ a{text-decoration:none;color:inherit}
 #mob-menu.open .mob-links a:nth-child(2){opacity:1;transform:translateY(0);transition-delay:160ms}
 #mob-menu.open .mob-links a:nth-child(3){opacity:1;transform:translateY(0);transition-delay:240ms}
 #mob-menu.open .mob-links a:nth-child(4){opacity:1;transform:translateY(0);transition-delay:320ms}
+#mob-menu.open .mob-links a:nth-child(5){opacity:1;transform:translateY(0);transition-delay:400ms}
+#mob-menu.open .mob-links a:nth-child(6){opacity:1;transform:translateY(0);transition-delay:480ms}
 .mob-cta-wrap{opacity:0;transition:opacity .5s ease 420ms;margin-top:8px}
 #mob-menu.open .mob-cta-wrap{opacity:1}
 
@@ -4849,7 +4851,12 @@ ZZ.scrollToJobs = function() {
 /* تطبيق إعدادات الأزرار بما فيها offers وmenus */
 ZZ._applyBtnSettings = function() {
   /* querySelectorAll — بيطبق على كل أزرار الـ class مش الأول بس */
-  document.querySelectorAll('.btn-cake').forEach(function(b){ b.style.display = ZZ._btnSettings.cake ? '' : 'none'; });
+  document.querySelectorAll('.btn-cake').forEach(function(b){
+    b.style.display = ZZ._btnSettings.cake ? '' : 'none';
+    /* لو الزرار جوا mob-cta-wrap، نخفي الـ wrapper كمان */
+    var wrap = b.closest ? b.closest('.mob-cta-wrap') : null;
+    if (wrap) wrap.style.display = ZZ._btnSettings.cake ? '' : 'none';
+  });
   document.querySelectorAll('.btn-fire2').forEach(function(b){ b.style.display = ZZ._btnSettings.restaurant ? '' : 'none'; });
   document.querySelectorAll('.btn-offers-hero').forEach(function(b){ b.style.display = ZZ._btnSettings.offers !== false ? '' : 'none'; });
   document.querySelectorAll('.btn-menu-nav').forEach(function(b){ b.style.display = ZZ._btnSettings.menus !== false ? '' : 'none'; });
@@ -4863,8 +4870,6 @@ ZZ._applyBtnSettings = function() {
   var tm = document.getElementById('tog-mawled');
   if (tm) tm.checked = !!ZZ._btnSettings.mawled;
 };
-
-/* ════ EXTEND _extraInit ════ */
 var _prevExtraInit = ZZ._extraInit;
 ZZ._extraInit = function() {
   _prevExtraInit();
