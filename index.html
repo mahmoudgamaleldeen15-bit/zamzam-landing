@@ -4070,7 +4070,16 @@ ZZ.switchMenuDisplay = function(type, catId, noHash) {
 /* ── قراءة الـ hash عند فتح الصفحة ── */
 ZZ._handleMenuHash = function() {
   var hash = window.location.hash;
-  if (!hash || hash.indexOf('#menu/') !== 0) return;
+  if (!hash) return;
+
+  /* #jobs — الانتقال لقسم الوظائف */
+  if (hash === '#jobs') {
+    setTimeout(function(){ ZZ.scrollToJobs(); }, 800);
+    return;
+  }
+
+  /* #menu/type/catId */
+  if (hash.indexOf('#menu/') !== 0) return;
   var parts = hash.replace('#menu/','').split('/');
   var type  = parts[0];
   var catId = parts[1] || null;
