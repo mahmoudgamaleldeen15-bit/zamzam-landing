@@ -5256,7 +5256,7 @@ ZZ._extraInit = function() {
   ZZ.subscribeCategories('cake');
   ZZ.subscribeCategories('restaurant');
   /* قراءة الـ hash لو فيه deep link */
-  if (window.location.hash && window.location.hash.indexOf('#menu/') === 0) {
+  if (window.location.hash) {
     ZZ._handleMenuHash();
   }
   /* تحميل الأنيميشن الإسلامي */
