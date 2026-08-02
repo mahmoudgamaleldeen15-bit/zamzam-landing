@@ -1415,7 +1415,7 @@ ML.loadData = function() {
   });
 
   /* ── مناطق التوصيل ── */
-  db.ref('landing/kahk/zones').orderByChild('order').on('value', function(snap) {
+  db.ref('landing/mawled/zones').orderByChild('order').on('value', function(snap) {
     ML.zones = [];
     snap.forEach(function(ch) { ML.zones.push(Object.assign({ id: ch.key }, ch.val())); });
     ML._renderZoneSelect();
