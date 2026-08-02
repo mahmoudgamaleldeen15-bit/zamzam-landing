@@ -4074,16 +4074,18 @@ ZZ._handleMenuHash = function() {
 
   /* #jobs — الانتقال لقسم الوظائف */
   if (hash === '#jobs') {
-    /* ننتظر Firebase يتحمل + _applyBtnSettings يشتغل */
+    ZZ._jobsHashRequested = true; /* منع _applyBtnSettings من إخفاء السيكشن */
+    /* نضيف active فوراً قبل Firebase */
+    var sec = document.getElementById('jobs-section');
+    if (sec) sec.classList.add('active');
+    /* وبعد ما Firebase يتحمل — نتأكد ونسكرول */
     setTimeout(function(){
       var sec = document.getElementById('jobs-section');
       if (sec) {
-        sec.classList.add('active'); /* اجبر الظهور بغض النظر عن الـ toggle */
-        setTimeout(function(){
-          sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
+        sec.classList.add('active');
+        sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    }, 1500);
+    }, 1200);
     return;
   }
 
@@ -4331,7 +4333,7 @@ ZZ._applyBtnSettings = function() {
   document.querySelectorAll('.btn-fire2').forEach(function(b){ b.style.display = ZZ._btnSettings.restaurant ? '' : 'none'; });
   /* Jobs section */
   var jobsSec = document.getElementById('jobs-section');
-  if (jobsSec) jobsSec.classList.toggle('active', ZZ._btnSettings.jobs);
+  if (jobsSec && !ZZ._jobsHashRequested) jobsSec.classList.toggle('active', ZZ._btnSettings.jobs);
   var navJobs = document.getElementById('nav-jobs-link');
   if (navJobs) navJobs.style.display = ZZ._btnSettings.jobs ? '' : 'none';
 };
@@ -5239,7 +5241,7 @@ ZZ._applyBtnSettings = function() {
   document.querySelectorAll('.btn-offers-hero').forEach(function(b){ b.style.display = ZZ._btnSettings.offers !== false ? '' : 'none'; });
   document.querySelectorAll('.btn-menu-nav').forEach(function(b){ b.style.display = ZZ._btnSettings.menus !== false ? '' : 'none'; });
   var jobsSec = document.getElementById('jobs-section');
-  if (jobsSec) jobsSec.classList.toggle('active', ZZ._btnSettings.jobs);
+  if (jobsSec && !ZZ._jobsHashRequested) jobsSec.classList.toggle('active', ZZ._btnSettings.jobs);
   var navJobs = document.getElementById('nav-jobs-link');
   if (navJobs) navJobs.style.display = ZZ._btnSettings.jobs ? '' : 'none';
   /* زرار المولد */
