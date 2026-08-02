@@ -2211,6 +2211,8 @@ a{text-decoration:none;color:inherit}
         <button class="mtype on" onclick="ZZ.switchMenuDisplay('cake')">🎂 الحلويات والتورتات</button>
         <button class="mtype" onclick="ZZ.switchMenuDisplay('restaurant')">🍔 المطعم</button>
         <button class="mtype" id="mawled-menu-tab" onclick="ZZ.switchMenuDisplay('mawled')" style="display:none">🎉 حلويات المولد</button>
+        <button class="mtype" id="kahk-menu-tab"   onclick="ZZ.switchMenuDisplay('kahk')"   style="display:none">🍪 كحك العيد</button>
+        <button class="mtype" id="choco-menu-tab"  onclick="ZZ.switchMenuDisplay('choco')"  style="display:none">🍫 شيكولاتة العيد</button>
       </div>
     </div>
 
@@ -2235,6 +2237,20 @@ a{text-decoration:none;color:inherit}
       <div class="no-menu-msg">
         <div class="ni">🎉</div>
         <p>جاري تحميل قائمة المولد...</p>
+      </div>
+    </div>
+    <!-- Kahk Menu Grid -->
+    <div id="kahk-menu-display" style="display:none">
+      <div class="no-menu-msg">
+        <div class="ni">🍪</div>
+        <p>جاري تحميل قائمة الكحك...</p>
+      </div>
+    </div>
+    <!-- Choco Menu Grid -->
+    <div id="choco-menu-display" style="display:none">
+      <div class="no-menu-msg">
+        <div class="ni">🍫</div>
+        <p>جاري تحميل قائمة الشيكولاتة...</p>
       </div>
     </div>
   </div>
@@ -4014,19 +4030,26 @@ ZZ.renderMenuDisplay = function(type) {
 };
 
 ZZ.switchMenuDisplay = function(type, catId, noHash) {
-  document.getElementById('cake-menu-display').style.display   = type==='cake'       ? 'block' : 'none';
-  document.getElementById('resto-menu-display').style.display  = type==='restaurant' ? 'block' : 'none';
-  var mawledEl = document.getElementById('mawled-menu-display');
-  if (mawledEl) mawledEl.style.display = type==='mawled' ? 'block' : 'none';
+  var displays = {
+    'cake':'cake-menu-display','restaurant':'resto-menu-display',
+    'mawled':'mawled-menu-display','kahk':'kahk-menu-display','choco':'choco-menu-display'
+  };
+  Object.keys(displays).forEach(function(k){
+    var el=document.getElementById(displays[k]);
+    if(el) el.style.display = k===type ? 'block' : 'none';
+  });
   document.querySelectorAll('.mtype').forEach(function(b){ b.classList.remove('on'); });
   document.querySelectorAll('.mtype').forEach(function(b){
     if ((type==='cake'       && b.textContent.indexOf('حلويات والتورتات')!==-1) ||
         (type==='restaurant' && b.textContent.indexOf('مطعم')!==-1) ||
-        (type==='mawled'     && b.textContent.indexOf('المولد')!==-1))
+        (type==='mawled'     && b.textContent.indexOf('المولد')!==-1) ||
+        (type==='kahk'       && b.textContent.indexOf('كحك')!==-1) ||
+        (type==='choco'      && b.textContent.indexOf('شيكولاتة')!==-1))
       b.classList.add('on');
   });
-  /* لو مولد — اشترك في البيانات لو لسه مش مشترك */
   if (type==='mawled') ZZ._subscribeMawledPublic();
+  if (type==='kahk')   ZZ._subscribeKahkPublic();
+  if (type==='choco')  ZZ._subscribeChocoPublic();
   /* تحديث الـ URL hash */
   if (!noHash) {
     var h = '#menu/' + type;
@@ -5044,6 +5067,87 @@ ZZ.renderMenuDisplay = function(type, activeCatId) {
 };
 
 /* ── تبديل قسم داخل المنيو ── */
+/* ── عرض منيو الكحك للعميل ── */
+ZZ._kahkPublicItems = [];
+ZZ._kahkPublicCats  = [];
+ZZ._kahkPublicSubbed = false;
+ZZ._subscribeKahkPublic = function() {
+  if (ZZ._kahkPublicSubbed || !window.zzdb) return;
+  ZZ._kahkPublicSubbed = true;
+  zzdb.ref('landing/kahk/items').orderByChild('createdAt').on('value', function(snap) {
+    ZZ._kahkPublicItems = [];
+    snap.forEach(function(ch) { ZZ._kahkPublicItems.unshift(Object.assign({ id: ch.key }, ch.val())); });
+    ZZ._kahkPublicItems = ZZ._kahkPublicItems.filter(function(it){ return it.available !== false; });
+    var tab = document.getElementById('kahk-menu-tab');
+    if (tab) tab.style.display = (ZZ._kahkPublicItems.length && ZZ._btnSettings.kahk) ? '' : 'none';
+    ZZ._renderKahkPublic();
+  });
+  zzdb.ref('landing/kahk/categories').orderByChild('order').on('value', function(snap) {
+    ZZ._kahkPublicCats = [];
+    snap.forEach(function(ch) { ZZ._kahkPublicCats.push(Object.assign({ id: ch.key }, ch.val())); });
+    ZZ._renderKahkPublic();
+  });
+};
+ZZ._renderKahkPublic = function() {
+  var el = document.getElementById('kahk-menu-display'); if (!el) return;
+  ZZ._renderSeasonPublic(el, ZZ._kahkPublicItems, ZZ._kahkPublicCats, '🍪', 'kahk', 'kahk-order.html', '#d97706');
+};
+
+/* ── عرض منيو الشيكولاتة للعميل ── */
+ZZ._chocoPublicItems = [];
+ZZ._chocoPublicCats  = [];
+ZZ._chocoPublicSubbed = false;
+ZZ._subscribeChocoPublic = function() {
+  if (ZZ._chocoPublicSubbed || !window.zzdb) return;
+  ZZ._chocoPublicSubbed = true;
+  zzdb.ref('landing/choco/items').orderByChild('createdAt').on('value', function(snap) {
+    ZZ._chocoPublicItems = [];
+    snap.forEach(function(ch) { ZZ._chocoPublicItems.unshift(Object.assign({ id: ch.key }, ch.val())); });
+    ZZ._chocoPublicItems = ZZ._chocoPublicItems.filter(function(it){ return it.available !== false; });
+    var tab = document.getElementById('choco-menu-tab');
+    if (tab) tab.style.display = (ZZ._chocoPublicItems.length && ZZ._btnSettings.choco) ? '' : 'none';
+    ZZ._renderChocoPublic();
+  });
+  zzdb.ref('landing/choco/categories').orderByChild('order').on('value', function(snap) {
+    ZZ._chocoPublicCats = [];
+    snap.forEach(function(ch) { ZZ._chocoPublicCats.push(Object.assign({ id: ch.key }, ch.val())); });
+    ZZ._renderChocoPublic();
+  });
+};
+ZZ._renderChocoPublic = function() {
+  var el = document.getElementById('choco-menu-display'); if (!el) return;
+  ZZ._renderSeasonPublic(el, ZZ._chocoPublicItems, ZZ._chocoPublicCats, '🍫', 'choco', 'choco-order.html', '#7c3aed');
+};
+
+/* ── shared renderer للمواسم (مولد + كحك + شيكولاتة) ── */
+ZZ._renderSeasonPublic = function(el, allItems, cats, icon, key, orderPage, accentColor) {
+  var ptLabels = { piece: '🔢 القطعة', kilo: '⚖️ الكيلو', plate: '🍽️ الطبق' };
+  if (!allItems.length) {
+    el.innerHTML = '<div class="no-menu-msg"><div class="ni">'+icon+'</div><p>لا توجد منتجات حالياً</p></div>';
+    return;
+  }
+  function renderCard(it) {
+    var ptLbl = ptLabels[it.priceType] || ptLabels.piece;
+    return '<div class="prod-card">'
+      + '<div class="prod-img" id="spi_'+key+'_'+it.id+'"><div class="prod-badges"><span class="pbadge pbadge-avail">✅ متاح</span></div></div>'
+      + '<div class="prod-body">'
+      + '<div class="prod-name">'+(it.name||'')+'</div>'
+      + (it.desc ? '<div class="prod-desc">'+(it.desc)+'</div>' : '')
+      + (it.price ? '<div class="prod-price" style="display:flex;align-items:center;gap:8px">'
+          + '<span style="font-size:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.6);border-radius:9999px;padding:2px 8px;font-weight:800">'+ptLbl+'</span>'
+          + '<span style="color:'+accentColor+';font-weight:900">'+it.price+' جنيه</span>'
+          + '</div>' : '')
+      + '<a href="'+orderPage+'" target="_blank" class="btn-prod-order" style="background:linear-gradient(135deg,'+accentColor+','+accentColor+'cc);color:#fff">اطلب الآن ←</a>'
+      + '</div></div>';
+  }
+  var html = '<div class="menu-grid">'+allItems.map(renderCard).join('')+'</div>';
+  el.innerHTML = html;
+  allItems.forEach(function(it){
+    var d = document.getElementById('spi_'+key+'_'+it.id);
+    if (d && it.img) d.style.backgroundImage = 'url("'+it.img+'")';
+  });
+};
+
 ZZ.switchCatTab = function(type, catId) {
   var tabsWrap   = document.getElementById('cat-tabs-'   + type);
   var panelsWrap = document.getElementById('cat-panels-' + type);
@@ -6077,7 +6181,8 @@ ZZ._subscribeMawledPublic = function() {
 
     /* إظهار/إخفاء التاب حسب وجود أصناف */
     var tab = document.getElementById('mawled-menu-tab');
-    if (tab) tab.style.display = ZZ._mawledPublicItems.length ? '' : 'none';
+    /* يظهر التاب فقط لو: فيه أصناف + الزرار مفعّل */
+    if (tab) tab.style.display = (ZZ._mawledPublicItems.length && ZZ._btnSettings.mawled) ? '' : 'none';
 
     ZZ._renderMawledPublic();
   });
@@ -6520,6 +6625,13 @@ ZZ._applyBtnSettings = function(){
   var tk=document.getElementById('tog-kahk');      if(tk) tk.checked=!!ZZ._btnSettings.kahk;
   var cw=document.getElementById('choco-btn-wrap');if(cw) cw.style.display=ZZ._btnSettings.choco?'block':'none';
   var tc=document.getElementById('tog-choco');     if(tc) tc.checked=!!ZZ._btnSettings.choco;
+  /* تابات قوائمنا — تظهر/تختفي مع الـ toggle */
+  var mtMawled = document.getElementById('mawled-menu-tab');
+  if (mtMawled) mtMawled.style.display = (ZZ._btnSettings.mawled && ZZ._mawledPublicItems && ZZ._mawledPublicItems.length) ? '' : 'none';
+  var mtKahk   = document.getElementById('kahk-menu-tab');
+  if (mtKahk)   mtKahk.style.display   = (ZZ._btnSettings.kahk   && ZZ._kahkPublicItems   && ZZ._kahkPublicItems.length)   ? '' : 'none';
+  var mtChoco  = document.getElementById('choco-menu-tab');
+  if (mtChoco)  mtChoco.style.display  = (ZZ._btnSettings.choco  && ZZ._chocoPublicItems  && ZZ._chocoPublicItems.length)  ? '' : 'none';
 };
 
 </script>
