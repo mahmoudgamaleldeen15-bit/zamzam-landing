@@ -4074,7 +4074,16 @@ ZZ._handleMenuHash = function() {
 
   /* #jobs — الانتقال لقسم الوظائف */
   if (hash === '#jobs') {
-    setTimeout(function(){ ZZ.scrollToJobs(); }, 800);
+    /* ننتظر Firebase يتحمل + _applyBtnSettings يشتغل */
+    setTimeout(function(){
+      var sec = document.getElementById('jobs-section');
+      if (sec) {
+        sec.classList.add('active'); /* اجبر الظهور بغض النظر عن الـ toggle */
+        setTimeout(function(){
+          sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
+    }, 1500);
     return;
   }
 
@@ -5206,13 +5215,15 @@ ZZ.loadBtnSettings = function() {
 };
 
 /* ════ SCROLL TO JOBS ════ */
-ZZ.scrollToJobs = function() {
+ZZ.scrollToJobs = function(forceShow) {
   var sec = document.getElementById('jobs-section');
   if (!sec) return;
+  /* لو جاي من hash link — اظهر السيكشن حتى لو الأدمن موقّفه */
   sec.classList.add('active');
+  /* انتظر شوية عشان الـ CSS يتطبق */
   setTimeout(function() {
     sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 80);
+  }, 150);
 };
 
 /* تطبيق إعدادات الأزرار بما فيها offers وmenus */
