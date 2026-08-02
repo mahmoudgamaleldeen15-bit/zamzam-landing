@@ -953,6 +953,10 @@ a{text-decoration:none;color:inherit}
         <button class="ant" onclick="ZZ.adminTab('mawled-menu')">🎉 منيو المولد</button>
         <button class="ant" onclick="ZZ.adminTab('mawled-zones')">🛵 مناطق التوصيل</button>
         <button class="ant" onclick="ZZ.adminTab('mawled-orders')">📊 تقرير المولد</button>
+        <button class="ant" onclick="ZZ.adminTab('kahk-menu')">🍪 كحك العيد</button>
+        <button class="ant" onclick="ZZ.adminTab('kahk-orders')">📊 تقرير الكحك</button>
+        <button class="ant" onclick="ZZ.adminTab('choco-menu')">🍫 شيكولاتة العيد</button>
+        <button class="ant" onclick="ZZ.adminTab('choco-orders')">📊 تقرير الشيكولاتة</button>
         <button class="ant" onclick="ZZ.adminTab('categories')">📂 الأقسام</button>
         <button class="ant" onclick="ZZ.adminTab('jobs')">💼 التوظيف</button>
         <button class="ant" onclick="ZZ.adminTab('btns')">🎛️ الأزرار</button>
@@ -1294,6 +1298,220 @@ a{text-decoration:none;color:inherit}
         </div>
 
       </div><!-- end tab-mawled-orders -->
+      <!-- ══ TAB: KAHK MENU ══ -->
+      <div id="admin-tab-kahk-menu" class="admin-panel-sec">
+        <!-- رقم الواتساب -->
+        <div class="admin-sec-title">📱 رقم واتساب استقبال طلبات الكحك</div>
+        <div class="admin-form-grid" style="margin-bottom:16px">
+          <div>
+            <label class="admin-lbl">رقم الواتساب (بالكود الدولي بدون +)</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="kh-wa-num" class="admin-inp" placeholder="مثال: 201XXXXXXXXX" dir="ltr" style="flex:1">
+              <button onclick="ZZ.saveKahkWa()" style="padding:0 18px;height:44px;background:linear-gradient(135deg,#d97706,#b45309);color:#fff;border:none;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif;white-space:nowrap">💾 حفظ</button>
+            </div>
+            <div id="kh-wa-note" style="font-size:12px;color:#4ade80;margin-top:6px;min-height:16px"></div>
+          </div>
+        </div>
+        <div class="admin-sec-divider"></div>
+
+        <div class="admin-sec-title">🍪 إضافة صنف كحك جديد</div>
+        <div class="admin-form-grid">
+          <div>
+            <label class="admin-lbl">القسم الرئيسي</label>
+            <select id="kh-category" class="admin-inp"><option value="">— بدون قسم —</option></select>
+          </div>
+          <div><label class="admin-lbl">اسم الصنف *</label><input id="kh-name" class="admin-inp" placeholder="مثال: كحك بالعجوة — كحك بالمكسرات" type="text"></div>
+          <div><label class="admin-lbl">الوصف / المواصفات</label><textarea id="kh-desc" class="admin-inp" placeholder="مثال: كحك طري بحشوة العجوة الطبيعية..." rows="3"></textarea></div>
+          <div>
+            <label class="admin-lbl">نوع السعر</label>
+            <div class="delivery-opts">
+              <button type="button" class="dopt on" id="kh-ptype-piece" onclick="ZZ.setKahkPriceType('piece')">🔢 سعر القطعة</button>
+              <button type="button" class="dopt" id="kh-ptype-kilo" onclick="ZZ.setKahkPriceType('kilo')">⚖️ سعر الكيلو</button>
+            </div>
+          </div>
+          <div><label class="admin-lbl" id="kh-price-lbl">السعر بالجنيه المصري</label><input id="kh-price" class="admin-inp" placeholder="مثال: 45 جنيه" type="text"></div>
+          <div>
+            <label class="admin-lbl">صورة الصنف</label>
+            <div class="img-tabs">
+              <button class="img-tab on" id="kh-imgbtn-url" onclick="ZZ.setKahkImgMode('url')">🔗 رابط</button>
+              <button class="img-tab" id="kh-imgbtn-file" onclick="ZZ.setKahkImgMode('file')">📁 رفع</button>
+            </div>
+            <div id="kh-url-row"><input id="kh-imgurl" class="admin-inp" placeholder="https://..." type="url"></div>
+            <div id="kh-file-row" style="display:none"><input id="kh-imgfile" class="admin-inp" type="file" accept="image/*" style="padding:10px;cursor:pointer"></div>
+          </div>
+        </div>
+        <button class="btn-admin-add" style="background:linear-gradient(135deg,#d97706,#b45309);color:#fff" onclick="ZZ.addKahkItem()">➕ إضافة للمنيو</button>
+        <div class="admin-note" id="kahk-menu-note">✅ تم الحفظ</div>
+
+        <div style="margin-top:28px">
+          <div class="admin-sec-title">🍪 منيو الكحك الحالي</div>
+          <div style="margin-bottom:14px">
+            <div class="admin-sec-title" style="font-size:10px">📂 أقسام الكحك <span id="kh-cat-count" style="opacity:.4;font-weight:400"></span></div>
+            <div style="display:flex;gap:8px;margin-bottom:10px">
+              <input id="kh-new-cat-name" class="admin-inp" placeholder="اسم القسم (مثال: كحك ملبس)" style="flex:1">
+              <input id="kh-new-cat-icon" class="admin-inp" placeholder="🍪" style="width:60px;text-align:center" maxlength="4">
+              <button onclick="ZZ.addKahkCategory()" style="padding:0 14px;background:rgba(217,119,6,.15);border:1px solid rgba(217,119,6,.3);color:#d97706;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700">+</button>
+            </div>
+            <div id="kh-cat-list"><div style="text-align:center;color:rgba(255,255,255,.3);padding:12px;font-size:13px">لا توجد أقسام بعد</div></div>
+          </div>
+          <div id="admin-kahk-menu-list"><div style="text-align:center;color:rgba(255,255,255,.3);padding:20px;font-size:13px">لا توجد أصناف بعد</div></div>
+        </div>
+
+        <!-- Hero صفحة الكحك -->
+        <div class="admin-sec-divider"></div>
+        <div class="admin-sec-title">🖼️ صورة Hero صفحة الكحك</div>
+        <div class="img-tabs">
+          <button class="img-tab on" id="khbg-btn-url" onclick="ZZ.setKahkHeroBgMode('url')">🔗 رابط</button>
+          <button class="img-tab" id="khbg-btn-file" onclick="ZZ.setKahkHeroBgMode('file')">📁 رفع</button>
+        </div>
+        <div id="khbg-url-row"><input id="khbg-imgurl" class="admin-inp" placeholder="https://..." type="url"></div>
+        <div id="khbg-file-row" style="display:none"><input id="khbg-imgfile" class="admin-inp" type="file" accept="image/*" style="padding:10px;cursor:pointer" onchange="ZZ.previewKahkHeroBgFile(this)"></div>
+        <div id="khbg-preview" style="display:none;width:100%;aspect-ratio:16/9;background-size:cover;background-position:center;border-radius:12px;margin:10px 0;border:1px solid rgba(255,255,255,.1)"></div>
+        <button onclick="ZZ.saveKahkHero()" class="btn-admin-add" style="background:linear-gradient(135deg,#d97706,#b45309);color:#fff">💾 حفظ إعدادات Hero الكحك</button>
+        <div class="admin-note" id="kahk-hero-note">✅ تم الحفظ</div>
+      </div><!-- end tab-kahk-menu -->
+
+      <!-- ══ TAB: KAHK ORDERS REPORT ══ -->
+      <div id="admin-tab-kahk-orders" class="admin-panel-sec">
+        <div class="admin-sec-title">📊 تقرير مبيعات كحك العيد</div>
+        <div id="kahk-kpi-wrap" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px">
+          <div class="mkpi-card"><div class="mkpi-icon">📦</div><div class="mkpi-val" id="kh-kpi-count">—</div><div class="mkpi-lbl">إجمالي الطلبات</div></div>
+          <div class="mkpi-card"><div class="mkpi-icon">💰</div><div class="mkpi-val" id="kh-kpi-revenue">—</div><div class="mkpi-lbl">إجمالي المبيعات</div></div>
+          <div class="mkpi-card"><div class="mkpi-icon">🛵</div><div class="mkpi-val" id="kh-kpi-delivery">—</div><div class="mkpi-lbl">ديليفري</div></div>
+          <div class="mkpi-card"><div class="mkpi-icon">🏪</div><div class="mkpi-val" id="kh-kpi-pickup">—</div><div class="mkpi-lbl">استلام</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:14px;align-items:end">
+          <div><label class="admin-lbl">🔍 بحث</label><input id="khord-search" class="admin-inp" placeholder="اسم أو تليفون..." oninput="ZZ.filterKahkOrders()"></div>
+          <div><label class="admin-lbl">📅 تاريخ</label><input id="khord-date" class="admin-inp" type="date" onchange="ZZ.filterKahkOrders()"></div>
+          <div><button onclick="ZZ.clearKahkFilters()" style="padding:0 14px;height:44px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);border-radius:10px;cursor:pointer;font-size:12px;font-family:'Cairo',sans-serif">مسح</button></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <button onclick="ZZ.exportKahkExcel()" style="display:flex;align-items:center;gap:6px;padding:10px 18px;background:linear-gradient(135deg,#15803d,#16a34a);color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:800;font-size:13px;font-family:'Cairo',sans-serif">📥 تصدير Excel</button>
+          <button onclick="ZZ.printKahkOrders()" style="display:flex;align-items:center;gap:6px;padding:10px 18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;border-radius:10px;cursor:pointer;font-weight:800;font-size:13px;font-family:'Cairo',sans-serif">🖨️ طباعة</button>
+        </div>
+        <div id="kahk-orders-table-wrap" style="overflow-x:auto;border-radius:14px;border:1px solid rgba(255,255,255,.08)">
+          <div style="text-align:center;color:rgba(255,255,255,.3);padding:40px;font-size:13px" id="khord-loading">⏳ جاري التحميل...</div>
+          <table id="kahk-orders-table" style="display:none;width:100%;border-collapse:collapse;font-size:12px;direction:rtl">
+            <thead><tr style="background:rgba(217,119,6,.08);border-bottom:1px solid rgba(217,119,6,.2)">
+              <th class="mord-th">رقم الطلب</th><th class="mord-th">التاريخ</th><th class="mord-th">العميل</th>
+              <th class="mord-th">التليفون</th><th class="mord-th">واتساب</th><th class="mord-th">النوع</th>
+              <th class="mord-th">المنطقة</th><th class="mord-th">المنتجات</th>
+              <th class="mord-th">إجمالي المنتجات</th><th class="mord-th">توصيل</th>
+              <th class="mord-th" style="color:#d97706">الإجمالي</th>
+            </tr></thead>
+            <tbody id="kahk-orders-tbody"></tbody>
+          </table>
+        </div>
+        <div id="khord-empty" style="display:none;text-align:center;padding:40px;color:rgba(255,255,255,.3)"><div style="font-size:36px;margin-bottom:10px">📭</div><div>لا توجد طلبات بعد</div></div>
+      </div><!-- end tab-kahk-orders -->
+
+      <!-- ══ TAB: CHOCO MENU ══ -->
+      <div id="admin-tab-choco-menu" class="admin-panel-sec">
+        <!-- رقم الواتساب -->
+        <div class="admin-sec-title">📱 رقم واتساب استقبال طلبات الشيكولاتة</div>
+        <div class="admin-form-grid" style="margin-bottom:16px">
+          <div>
+            <label class="admin-lbl">رقم الواتساب (بالكود الدولي بدون +)</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="ch-wa-num" class="admin-inp" placeholder="مثال: 201XXXXXXXXX" dir="ltr" style="flex:1">
+              <button onclick="ZZ.saveChocoWa()" style="padding:0 18px;height:44px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:none;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif;white-space:nowrap">💾 حفظ</button>
+            </div>
+            <div id="ch-wa-note" style="font-size:12px;color:#4ade80;margin-top:6px;min-height:16px"></div>
+          </div>
+        </div>
+        <div class="admin-sec-divider"></div>
+
+        <div class="admin-sec-title">🍫 إضافة صنف شيكولاتة جديد</div>
+        <div class="admin-form-grid">
+          <div>
+            <label class="admin-lbl">القسم الرئيسي</label>
+            <select id="ch-category" class="admin-inp"><option value="">— بدون قسم —</option></select>
+          </div>
+          <div><label class="admin-lbl">اسم الصنف *</label><input id="ch-name" class="admin-inp" placeholder="مثال: شيكولاتة بالمكسرات — تراف" type="text"></div>
+          <div><label class="admin-lbl">الوصف / المواصفات</label><textarea id="ch-desc" class="admin-inp" placeholder="مثال: شيكولاتة بلجيكية داكنة بحشوة..." rows="3"></textarea></div>
+          <div>
+            <label class="admin-lbl">نوع السعر / الوحدة</label>
+            <div class="delivery-opts" style="flex-wrap:wrap;gap:6px">
+              <button type="button" class="dopt on" id="ch-ptype-piece" onclick="ZZ.setChocoPriceType('piece')">🔢 القطعة</button>
+              <button type="button" class="dopt" id="ch-ptype-kilo" onclick="ZZ.setChocoPriceType('kilo')">⚖️ الكيلو</button>
+              <button type="button" class="dopt" id="ch-ptype-plate" onclick="ZZ.setChocoPriceType('plate')">🍽️ الطبق</button>
+            </div>
+          </div>
+          <div><label class="admin-lbl" id="ch-price-lbl">السعر بالجنيه المصري</label><input id="ch-price" class="admin-inp" placeholder="مثال: 120 جنيه" type="text"></div>
+          <div>
+            <label class="admin-lbl">صورة الصنف</label>
+            <div class="img-tabs">
+              <button class="img-tab on" id="ch-imgbtn-url" onclick="ZZ.setChocoImgMode('url')">🔗 رابط</button>
+              <button class="img-tab" id="ch-imgbtn-file" onclick="ZZ.setChocoImgMode('file')">📁 رفع</button>
+            </div>
+            <div id="ch-url-row"><input id="ch-imgurl" class="admin-inp" placeholder="https://..." type="url"></div>
+            <div id="ch-file-row" style="display:none"><input id="ch-imgfile" class="admin-inp" type="file" accept="image/*" style="padding:10px;cursor:pointer"></div>
+          </div>
+        </div>
+        <button class="btn-admin-add" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff" onclick="ZZ.addChocoItem()">➕ إضافة للمنيو</button>
+        <div class="admin-note" id="choco-menu-note">✅ تم الحفظ</div>
+
+        <div style="margin-top:28px">
+          <div class="admin-sec-title">🍫 منيو الشيكولاتة الحالي</div>
+          <div style="margin-bottom:14px">
+            <div class="admin-sec-title" style="font-size:10px">📂 أقسام الشيكولاتة <span id="ch-cat-count" style="opacity:.4;font-weight:400"></span></div>
+            <div style="display:flex;gap:8px;margin-bottom:10px">
+              <input id="ch-new-cat-name" class="admin-inp" placeholder="اسم القسم (مثال: شيكولاتة داكنة)" style="flex:1">
+              <input id="ch-new-cat-icon" class="admin-inp" placeholder="🍫" style="width:60px;text-align:center" maxlength="4">
+              <button onclick="ZZ.addChocoCategory()" style="padding:0 14px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#7c3aed;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700">+</button>
+            </div>
+            <div id="ch-cat-list"><div style="text-align:center;color:rgba(255,255,255,.3);padding:12px;font-size:13px">لا توجد أقسام بعد</div></div>
+          </div>
+          <div id="admin-choco-menu-list"><div style="text-align:center;color:rgba(255,255,255,.3);padding:20px;font-size:13px">لا توجد أصناف بعد</div></div>
+        </div>
+
+        <!-- Hero صفحة الشيكولاتة -->
+        <div class="admin-sec-divider"></div>
+        <div class="admin-sec-title">🖼️ صورة Hero صفحة الشيكولاتة</div>
+        <div class="img-tabs">
+          <button class="img-tab on" id="chbg-btn-url" onclick="ZZ.setChocoHeroBgMode('url')">🔗 رابط</button>
+          <button class="img-tab" id="chbg-btn-file" onclick="ZZ.setChocoHeroBgMode('file')">📁 رفع</button>
+        </div>
+        <div id="chbg-url-row"><input id="chbg-imgurl" class="admin-inp" placeholder="https://..." type="url"></div>
+        <div id="chbg-file-row" style="display:none"><input id="chbg-imgfile" class="admin-inp" type="file" accept="image/*" style="padding:10px;cursor:pointer" onchange="ZZ.previewChocoHeroBgFile(this)"></div>
+        <div id="chbg-preview" style="display:none;width:100%;aspect-ratio:16/9;background-size:cover;background-position:center;border-radius:12px;margin:10px 0;border:1px solid rgba(255,255,255,.1)"></div>
+        <button onclick="ZZ.saveChocoHero()" class="btn-admin-add" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff">💾 حفظ إعدادات Hero الشيكولاتة</button>
+        <div class="admin-note" id="choco-hero-note">✅ تم الحفظ</div>
+      </div><!-- end tab-choco-menu -->
+
+      <!-- ══ TAB: CHOCO ORDERS REPORT ══ -->
+      <div id="admin-tab-choco-orders" class="admin-panel-sec">
+        <div class="admin-sec-title">📊 تقرير مبيعات شيكولاتة العيد</div>
+        <div id="choco-kpi-wrap" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px">
+          <div class="mkpi-card"><div class="mkpi-icon">📦</div><div class="mkpi-val" id="ch-kpi-count">—</div><div class="mkpi-lbl">إجمالي الطلبات</div></div>
+          <div class="mkpi-card"><div class="mkpi-icon">💰</div><div class="mkpi-val" id="ch-kpi-revenue">—</div><div class="mkpi-lbl">إجمالي المبيعات</div></div>
+          <div class="mkpi-card"><div class="mkpi-icon">🛵</div><div class="mkpi-val" id="ch-kpi-delivery">—</div><div class="mkpi-lbl">ديليفري</div></div>
+          <div class="mkpi-card"><div class="mkpi-icon">🏪</div><div class="mkpi-val" id="ch-kpi-pickup">—</div><div class="mkpi-lbl">استلام</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:14px;align-items:end">
+          <div><label class="admin-lbl">🔍 بحث</label><input id="chord-search" class="admin-inp" placeholder="اسم أو تليفون..." oninput="ZZ.filterChocoOrders()"></div>
+          <div><label class="admin-lbl">📅 تاريخ</label><input id="chord-date" class="admin-inp" type="date" onchange="ZZ.filterChocoOrders()"></div>
+          <div><button onclick="ZZ.clearChocoFilters()" style="padding:0 14px;height:44px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);border-radius:10px;cursor:pointer;font-size:12px;font-family:'Cairo',sans-serif">مسح</button></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <button onclick="ZZ.exportChocoExcel()" style="display:flex;align-items:center;gap:6px;padding:10px 18px;background:linear-gradient(135deg,#15803d,#16a34a);color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:800;font-size:13px;font-family:'Cairo',sans-serif">📥 تصدير Excel</button>
+          <button onclick="ZZ.printChocoOrders()" style="display:flex;align-items:center;gap:6px;padding:10px 18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;border-radius:10px;cursor:pointer;font-weight:800;font-size:13px;font-family:'Cairo',sans-serif">🖨️ طباعة</button>
+        </div>
+        <div id="choco-orders-table-wrap" style="overflow-x:auto;border-radius:14px;border:1px solid rgba(255,255,255,.08)">
+          <div style="text-align:center;color:rgba(255,255,255,.3);padding:40px;font-size:13px" id="chord-loading">⏳ جاري التحميل...</div>
+          <table id="choco-orders-table" style="display:none;width:100%;border-collapse:collapse;font-size:12px;direction:rtl">
+            <thead><tr style="background:rgba(124,58,237,.08);border-bottom:1px solid rgba(124,58,237,.2)">
+              <th class="mord-th">رقم الطلب</th><th class="mord-th">التاريخ</th><th class="mord-th">العميل</th>
+              <th class="mord-th">التليفون</th><th class="mord-th">واتساب</th><th class="mord-th">النوع</th>
+              <th class="mord-th">المنطقة</th><th class="mord-th">المنتجات</th>
+              <th class="mord-th">إجمالي المنتجات</th><th class="mord-th">توصيل</th>
+              <th class="mord-th" style="color:#7c3aed">الإجمالي</th>
+            </tr></thead>
+            <tbody id="choco-orders-tbody"></tbody>
+          </table>
+        </div>
+        <div id="chord-empty" style="display:none;text-align:center;padding:40px;color:rgba(255,255,255,.3)"><div style="font-size:36px;margin-bottom:10px">📭</div><div>لا توجد طلبات بعد</div></div>
+      </div><!-- end tab-choco-orders -->
 
       <!-- ══ TAB: RESTAURANT MENU ══ -->
       <div id="admin-tab-resto-menu" class="admin-panel-sec">
@@ -1538,6 +1756,28 @@ a{text-decoration:none;color:inherit}
           </label>
         </div>
 
+        <div class="btn-toggle-row">
+          <div class="btn-toggle-info">
+            🍪 زرار "اطلب كحك العيد"
+            <small>يظهر في الصفحة الرئيسية — فعّله في موسم العيد فقط</small>
+          </div>
+          <label class="toggle-sw">
+            <input type="checkbox" id="tog-kahk" onchange="ZZ.saveBtnSetting('kahk', this.checked)">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="btn-toggle-row">
+          <div class="btn-toggle-info">
+            🍫 زرار "اطلب شيكولاتة العيد"
+            <small>يظهر في الصفحة الرئيسية — فعّله في موسم العيد فقط</small>
+          </div>
+          <label class="toggle-sw">
+            <input type="checkbox" id="tog-choco" onchange="ZZ.saveBtnSetting('choco', this.checked)">
+            <span class="slider"></span>
+          </label>
+        </div>
+
         <div class="admin-sec-divider"></div>
         <div style="font-size:11px;color:rgba(255,255,255,.3);text-align:center">الإعدادات محفوظة في Firebase وتنعكس فوراً على كل الأجهزة</div>
       </div>
@@ -1765,6 +2005,18 @@ a{text-decoration:none;color:inherit}
     <div class="reveal" data-delay="560" id="mawled-btn-wrap" style="display:none;margin-top:10px">
       <a href="mawled-order.html" style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#f5c842,#e8a020);color:#000;font-weight:900;font-size:clamp(13px,3vw,15px);padding:14px 32px;border-radius:9999px;text-decoration:none;width:100%;justify-content:center;box-shadow:0 4px 20px rgba(245,200,66,.35);transition:all .3s" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">
         🎉 اطلب حلويات المولد
+      </a>
+    </div>
+    <!-- زرار كحك العيد — يظهر لو الأدمن فعّله -->
+    <div class="reveal" data-delay="580" id="kahk-btn-wrap" style="display:none;margin-top:10px">
+      <a href="kahk-order.html" style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#d97706,#b45309);color:#fff;font-weight:900;font-size:clamp(13px,3vw,15px);padding:14px 32px;border-radius:9999px;text-decoration:none;width:100%;justify-content:center;box-shadow:0 4px 20px rgba(217,119,6,.35);transition:all .3s" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">
+        🍪 اطلب كحك العيد
+      </a>
+    </div>
+    <!-- زرار شيكولاتة العيد — يظهر لو الأدمن فعّله -->
+    <div class="reveal" data-delay="600" id="choco-btn-wrap" style="display:none;margin-top:10px">
+      <a href="choco-order.html" style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-weight:900;font-size:clamp(13px,3vw,15px);padding:14px 32px;border-radius:9999px;text-decoration:none;width:100%;justify-content:center;box-shadow:0 4px 20px rgba(124,58,237,.35);transition:all .3s" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">
+        🍫 اطلب شيكولاتة العيد
       </a>
     </div>
 
@@ -4010,7 +4262,7 @@ ZZ.buildCarousel = function() {
 /* ════════════════════════════════════════════════════════
    BUTTON CONTROLS (Admin + Public)
 ════════════════════════════════════════════════════════ */
-ZZ._btnSettings = { cake: true, restaurant: true, jobs: false, mawled: false };
+ZZ._btnSettings = { cake: true, restaurant: true, jobs: false, mawled: false, kahk: false, choco: false };
 
 ZZ.loadBtnSettings = function() {
   if (!window.zzdb) return;
@@ -4820,7 +5072,9 @@ ZZ.loadBtnSettings = function() {
       offers:     v.offers     !== false,
       menus:      v.menus      !== false,
       jobs:       v.jobs       === true,
-      mawled:     v.mawled     === true
+      mawled:     v.mawled     === true,
+      kahk:       v.kahk       === true,
+      choco:      v.choco      === true
     };
     ZZ._applyBtnSettings();
     var tc = document.getElementById('tog-cake');
@@ -5903,15 +6157,369 @@ ZZ._renderMawledPublic = function() {
   });
 };
 
-/* ── تمديد adminTab لفتح تاب المولد ── */
+/* ── تمديد adminTab لفتح تاب المولد + الكحك + الشيكولاتة ── */
 var _prevAdminTab3 = ZZ.adminTab;
 ZZ.adminTab = function(tab) {
   _prevAdminTab3(tab);
-  if (tab === 'mawled-menu') {
-    ZZ._renderAdminMawledList();
-    ZZ._renderMawledCatList();
-    ZZ._loadMawledWa();
+  if (tab === 'mawled-menu')  { ZZ._renderAdminMawledList(); ZZ._renderMawledCatList(); ZZ._loadMawledWa(); }
+  if (tab === 'mawled-orders'){ ZZ.subscribeMawledOrders(); }
+  if (tab === 'kahk-menu')    { ZZ.subscribeKahk();  ZZ._renderAdminKahkList();  ZZ._renderKahkCatList();  ZZ._loadKahkWa(); }
+  if (tab === 'kahk-orders')  { ZZ.subscribeKahkOrders(); }
+  if (tab === 'choco-menu')   { ZZ.subscribeChoco(); ZZ._renderAdminChocoList(); ZZ._renderChocoCatList(); ZZ._loadChocoWa(); }
+  if (tab === 'choco-orders') { ZZ.subscribeChocoOrders(); }
+};
+
+/* ══════════════════════════════════════════════════
+   KAHK SYSTEM — كحك العيد | Firebase: landing/kahk/
+══════════════════════════════════════════════════ */
+ZZ._kahkMenuCache=[]; ZZ._kahkCatsCache=[]; ZZ._kahkMenuSubbed=false; ZZ._kahkCatsSubbed=false;
+ZZ._kahkImgMode='url'; ZZ._kahkPriceType='piece'; ZZ._kahkHeroBgMode='url';
+
+ZZ.subscribeKahk = function() {
+  if (!window.zzdb) return;
+  if (!ZZ._kahkMenuSubbed) {
+    ZZ._kahkMenuSubbed = true;
+    zzdb.ref('landing/kahk/items').orderByChild('createdAt').on('value', function(snap) {
+      ZZ._kahkMenuCache = [];
+      snap.forEach(function(ch) { ZZ._kahkMenuCache.unshift(Object.assign({ id: ch.key }, ch.val())); });
+      ZZ._renderAdminKahkList(); ZZ._refreshKahkCatDropdown();
+    });
   }
+  if (!ZZ._kahkCatsSubbed) {
+    ZZ._kahkCatsSubbed = true;
+    zzdb.ref('landing/kahk/categories').orderByChild('order').on('value', function(snap) {
+      ZZ._kahkCatsCache = [];
+      snap.forEach(function(ch) { ZZ._kahkCatsCache.push(Object.assign({ id: ch.key }, ch.val())); });
+      ZZ._renderKahkCatList(); ZZ._refreshKahkCatDropdown();
+    });
+  }
+};
+ZZ.setKahkPriceType = function(t) {
+  ZZ._kahkPriceType = t;
+  document.getElementById('kh-ptype-piece').classList.toggle('on', t==='piece');
+  document.getElementById('kh-ptype-kilo').classList.toggle('on',  t==='kilo');
+  var l=document.getElementById('kh-price-lbl'); if(l) l.textContent=t==='kilo'?'سعر الكيلو':'سعر القطعة';
+};
+ZZ.setKahkImgMode = function(m) {
+  ZZ._kahkImgMode=m;
+  document.getElementById('kh-url-row').style.display=m==='url'?'block':'none';
+  document.getElementById('kh-file-row').style.display=m==='file'?'block':'none';
+  document.getElementById('kh-imgbtn-url').classList.toggle('on',m==='url');
+  document.getElementById('kh-imgbtn-file').classList.toggle('on',m==='file');
+};
+ZZ.addKahkItem = function() {
+  var name=((document.getElementById('kh-name')||{}).value||'').trim();
+  var desc=((document.getElementById('kh-desc')||{}).value||'').trim();
+  var price=((document.getElementById('kh-price')||{}).value||'').trim();
+  var catId=((document.getElementById('kh-category')||{}).value||'');
+  if (!name) { alert('أدخل اسم الصنف'); return; }
+  if (!window.zzdb||!window.ZZ_AUTH_READY) { alert('⏳ جاري الاتصال'); return; }
+  var item={name:name,desc:desc,price:price,priceType:ZZ._kahkPriceType,categoryId:catId,available:true,createdAt:Date.now()};
+  function _save(img) {
+    item.img=img||'';
+    zzdb.ref('landing/kahk/items').push(item).then(function(){
+      ['kh-name','kh-desc','kh-price','kh-imgurl'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+      var n=document.getElementById('kahk-menu-note');if(n){n.classList.add('show');setTimeout(function(){n.classList.remove('show');},2500);}
+    }).catch(function(e){alert('❌ '+e.message);});
+  }
+  if (ZZ._kahkImgMode==='file') {
+    var fe=document.getElementById('kh-imgfile'),f=fe&&fe.files&&fe.files[0];
+    if (!f){alert('اختار صورة');return;}
+    _zzReadFile(f).then(function(r){return _zzCompress(r,900,.7);}).then(_save).catch(function(e){alert('❌ '+e.message);});
+  } else { _save(((document.getElementById('kh-imgurl')||{}).value||'').trim()); }
+};
+ZZ.deleteKahkItem = function(id) { if(!confirm('حذف؟'))return; zzdb.ref('landing/kahk/items/'+id).remove(); };
+ZZ.toggleKahkAvail = function(id,v) { zzdb.ref('landing/kahk/items/'+id+'/available').set(v); };
+ZZ.addKahkCategory = function() {
+  var name=((document.getElementById('kh-new-cat-name')||{}).value||'').trim();
+  var icon=((document.getElementById('kh-new-cat-icon')||{}).value||'🍪').trim();
+  if(!name){alert('أدخل اسم القسم');return;}
+  zzdb.ref('landing/kahk/categories').push({name:name,icon:icon,order:ZZ._kahkCatsCache.length,createdAt:Date.now()}).then(function(){
+    var n=document.getElementById('kh-new-cat-name');if(n)n.value='';
+    var i=document.getElementById('kh-new-cat-icon');if(i)i.value='';
+  });
+};
+ZZ.deleteKahkCategory = function(id){if(!confirm('حذف هذا القسم؟'))return;zzdb.ref('landing/kahk/categories/'+id).remove();};
+ZZ._renderKahkCatList = function(){
+  var el=document.getElementById('kh-cat-list'),cnt=document.getElementById('kh-cat-count');if(!el)return;
+  if(cnt)cnt.textContent=ZZ._kahkCatsCache.length?'('+ZZ._kahkCatsCache.length+')':'';
+  if(!ZZ._kahkCatsCache.length){el.innerHTML='<div style="text-align:center;color:rgba(255,255,255,.3);padding:12px;font-size:13px">لا توجد أقسام</div>';return;}
+  el.innerHTML=ZZ._kahkCatsCache.map(function(c){return '<div class="cat-item"><span style="font-size:18px">'+(c.icon||'🍪')+'</span><span class="cat-name-lbl">'+(c.name||'')+'</span><button onclick="ZZ.deleteKahkCategory(\''+c.id+'\')" class="btn-del">🗑</button></div>';}).join('');
+};
+ZZ._refreshKahkCatDropdown = function(){
+  var opts='<option value="">— بدون قسم —</option>'+ZZ._kahkCatsCache.map(function(c){return '<option value="'+c.id+'">'+(c.icon||'🍪')+' '+(c.name||'')+'</option>';}).join('');
+  var s=document.getElementById('kh-category');if(s){var sv=s.value;s.innerHTML=opts;s.value=sv;}
+};
+ZZ._renderAdminKahkList = function(){
+  var el=document.getElementById('admin-kahk-menu-list');if(!el)return;
+  if(!ZZ._kahkMenuCache.length){el.innerHTML='<div style="text-align:center;color:rgba(255,255,255,.3);padding:20px;font-size:13px">لا توجد أصناف بعد</div>';return;}
+  el.innerHTML=ZZ._kahkMenuCache.map(function(it){
+    var ptLbl=it.priceType==='kilo'?'⚖️ كيلو':'🔢 قطعة';
+    return '<div class="menu-admin-item"><div class="mai-thumb" style="'+(it.img?'background-image:url(\''+it.img+'\');':'')+'background-color:#1a1020"></div>'
+      +'<div class="mai-info"><div class="mai-info-name">'+(it.name||'')+'</div><div class="mai-price">'+(it.price?it.price+' جنيه':'—')+' <span style="font-size:10px;color:rgba(217,119,6,.7)">('+ptLbl+')</span></div></div>'
+      +'<div class="mai-actions">'
+      +'<button class="mai-btn mai-btn-tog '+(it.available?'on':'off')+'" onclick="ZZ.toggleKahkAvail(\''+it.id+'\','+(!it.available)+')">'+(it.available?'✅':'🔴')+'</button>'
+      +'<button class="mai-btn mai-btn-del" onclick="ZZ.deleteKahkItem(\''+it.id+'\')">🗑</button>'
+      +'</div></div>';
+  }).join('');
+};
+ZZ.saveKahkWa = function(){
+  var num=((document.getElementById('kh-wa-num')||{}).value||'').replace(/\D/g,'');
+  if(!num){alert('أدخل الرقم');return;}if(!window.zzdb||!window.ZZ_AUTH_READY){alert('⏳');return;}
+  zzdb.ref('landing/kahk/settings/waNum').set(num).then(function(){
+    var n=document.getElementById('kh-wa-note');if(n){n.textContent='✅ تم الحفظ — '+num;setTimeout(function(){n.textContent='';},3000);}
+  }).catch(function(e){alert('❌ '+e.message);});
+};
+ZZ._loadKahkWa = function(){
+  if(!window.zzdb)return;
+  zzdb.ref('landing/kahk/settings/waNum').once('value').then(function(snap){var v=snap.val()||'';var el=document.getElementById('kh-wa-num');if(el&&v)el.value=v;});
+};
+ZZ.setKahkHeroBgMode = function(m){
+  ZZ._kahkHeroBgMode=m;
+  document.getElementById('khbg-url-row').style.display=m==='url'?'block':'none';
+  document.getElementById('khbg-file-row').style.display=m==='file'?'block':'none';
+  document.getElementById('khbg-btn-url').classList.toggle('on',m==='url');
+  document.getElementById('khbg-btn-file').classList.toggle('on',m==='file');
+};
+ZZ.previewKahkHeroBgFile = function(inp){
+  var f=inp&&inp.files&&inp.files[0];if(!f)return;
+  var r=new FileReader();r.onload=function(e){var p=document.getElementById('khbg-preview');if(p){p.style.display='block';p.style.backgroundImage='url("'+e.target.result+'")';};};r.readAsDataURL(f);
+};
+ZZ.saveKahkHero = function(){
+  if(!window.zzdb||!window.ZZ_AUTH_READY){alert('⏳');return;}
+  function _doSave(img){var s={};if(img)s.heroBg=img;
+    zzdb.ref('landing/kahk/settings').update(s).then(function(){var n=document.getElementById('kahk-hero-note');if(n){n.classList.add('show');setTimeout(function(){n.classList.remove('show');},2500);}}).catch(function(e){alert('❌ '+e.message);});}
+  if(ZZ._kahkHeroBgMode==='file'){var fe=document.getElementById('khbg-imgfile'),f=fe&&fe.files&&fe.files[0];
+    if(!f){_doSave(null);return;}_zzReadFile(f).then(function(r){return _zzCompress(r,1200,.75);}).then(_doSave).catch(function(e){alert('❌ '+e.message);});
+  }else{_doSave(((document.getElementById('khbg-imgurl')||{}).value||'').trim()||null);}
+};
+
+/* Kahk Orders */
+ZZ._kahkOrdersCache=[]; ZZ._kahkOrdersFiltered=[]; ZZ._kahkOrdersSubbed=false;
+ZZ.subscribeKahkOrders = function(){
+  if(ZZ._kahkOrdersSubbed||!window.zzdb)return;ZZ._kahkOrdersSubbed=true;
+  zzdb.ref('kahk/orders').orderByChild('createdAt').on('value',function(snap){
+    ZZ._kahkOrdersCache=[];snap.forEach(function(ch){ZZ._kahkOrdersCache.unshift(Object.assign({_key:ch.key},ch.val()));});ZZ.filterKahkOrders();
+  });
+};
+ZZ.filterKahkOrders = function(){
+  var q=((document.getElementById('khord-search')||{}).value||'').toLowerCase();
+  var date=((document.getElementById('khord-date')||{}).value||'');
+  ZZ._kahkOrdersFiltered=ZZ._kahkOrdersCache.filter(function(o){
+    var mt=!q||(o.name||'').toLowerCase().indexOf(q)!==-1||(o.phone||'').indexOf(q)!==-1;
+    var md=true;if(date&&o.createdAt){var d=new Date(o.createdAt),ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');md=ds===date;}
+    return mt&&md;
+  });
+  ZZ._renderKahkOrdersTable();
+  var c=ZZ._kahkOrdersFiltered,rev=c.reduce(function(s,o){return s+(o.total||0);},0);
+  var ids=['kh-kpi-count','kh-kpi-revenue','kh-kpi-delivery','kh-kpi-pickup'];
+  var vals=[c.length,rev.toLocaleString()+' ج',c.filter(function(o){return o.orderType==='delivery';}).length,c.filter(function(o){return o.orderType!=='delivery';}).length];
+  ids.forEach(function(id,i){var el=document.getElementById(id);if(el)el.textContent=vals[i];});
+};
+ZZ.clearKahkFilters=function(){['khord-search','khord-date'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});ZZ.filterKahkOrders();};
+ZZ._renderKahkOrdersTable = function(){
+  var tbl=document.getElementById('kahk-orders-table'),tb=document.getElementById('kahk-orders-tbody'),ld=document.getElementById('khord-loading'),em=document.getElementById('khord-empty');
+  if(ld)ld.style.display='none';
+  if(!ZZ._kahkOrdersFiltered.length){if(tbl)tbl.style.display='none';if(em)em.style.display='block';return;}
+  if(tbl)tbl.style.display='table';if(em)em.style.display='none';
+  tb.innerHTML=ZZ._kahkOrdersFiltered.map(function(o){
+    var d=o.createdAt?new Date(o.createdAt):null,dt=d?d.toLocaleDateString('ar-EG')+' '+d.toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}):'—';
+    var wl=(o.whatsapp||o.phone||'').replace(/\D/g,'');if(wl&&wl.charAt(0)==='0')wl='20'+wl.slice(1);
+    var waBtn=wl?'<a href="https://wa.me/'+wl+'" target="_blank" class="mord-phone-btn">💬</a>':'—';
+    var ptB=o.orderType==='delivery'?'<span class="mord-badge mord-badge-delivery">🛵</span>':'<span class="mord-badge mord-badge-pickup">🏪</span>';
+    var itms=(o.items||[]).map(function(it){return it.name+'×'+it.qty;}).join('<br>');
+    return '<tr class="mord-tr"><td class="mord-td" style="font-size:10px;color:rgba(255,255,255,.4)">'+(o.id||o._key||'—')+'</td><td class="mord-td">'+dt+'</td><td class="mord-td" style="font-weight:700;color:#fff">'+(o.name||'—')+'</td><td class="mord-td" dir="ltr">'+(o.phone||'—')+'</td><td class="mord-td">'+waBtn+'</td><td class="mord-td">'+ptB+'</td><td class="mord-td">'+(o.zone||'—')+'</td><td class="mord-td"><div class="mord-items-list">'+itms+'</div></td><td class="mord-td" style="text-align:center">'+(o.prodTotal||o.total||0)+' ج</td><td class="mord-td" style="text-align:center">'+(o.deliveryFee>0?o.deliveryFee+' ج':'مجاني')+'</td><td class="mord-td" style="font-weight:900;color:#d97706;text-align:center">'+(o.total||0)+' ج</td></tr>';
+  }).join('');
+};
+ZZ.exportKahkExcel  = function(){ZZ._exportGenCsv(ZZ._kahkOrdersFiltered,'طلبات-الكحك');};
+ZZ.printKahkOrders  = function(){ZZ._printGenReport(ZZ._kahkOrdersFiltered,'تقرير كحك العيد','#b45309');};
+
+/* ══════════════════════════════════════════════════
+   CHOCO SYSTEM — شيكولاتة العيد | Firebase: landing/choco/
+══════════════════════════════════════════════════ */
+ZZ._chocoMenuCache=[]; ZZ._chocoCatsCache=[]; ZZ._chocoMenuSubbed=false; ZZ._chocoCatsSubbed=false;
+ZZ._chocoImgMode='url'; ZZ._chocoPriceType='piece'; ZZ._chocoHeroBgMode='url';
+
+ZZ.subscribeChoco = function(){
+  if(!window.zzdb)return;
+  if(!ZZ._chocoMenuSubbed){ZZ._chocoMenuSubbed=true;
+    zzdb.ref('landing/choco/items').orderByChild('createdAt').on('value',function(snap){
+      ZZ._chocoMenuCache=[];snap.forEach(function(ch){ZZ._chocoMenuCache.unshift(Object.assign({id:ch.key},ch.val()));});
+      ZZ._renderAdminChocoList();ZZ._refreshChocoCatDropdown();
+    });}
+  if(!ZZ._chocoCatsSubbed){ZZ._chocoCatsSubbed=true;
+    zzdb.ref('landing/choco/categories').orderByChild('order').on('value',function(snap){
+      ZZ._chocoCatsCache=[];snap.forEach(function(ch){ZZ._chocoCatsCache.push(Object.assign({id:ch.key},ch.val()));});
+      ZZ._renderChocoCatList();ZZ._refreshChocoCatDropdown();
+    });}
+};
+ZZ.setChocoPriceType = function(t){
+  ZZ._chocoPriceType=t;
+  ['piece','kilo','plate'].forEach(function(x){var el=document.getElementById('ch-ptype-'+x);if(el)el.classList.toggle('on',t===x);});
+  var l=document.getElementById('ch-price-lbl');if(l)l.textContent={piece:'سعر القطعة',kilo:'سعر الكيلو',plate:'سعر الطبق'}[t]||'السعر';
+};
+ZZ.setChocoImgMode = function(m){
+  ZZ._chocoImgMode=m;
+  document.getElementById('ch-url-row').style.display=m==='url'?'block':'none';
+  document.getElementById('ch-file-row').style.display=m==='file'?'block':'none';
+  document.getElementById('ch-imgbtn-url').classList.toggle('on',m==='url');
+  document.getElementById('ch-imgbtn-file').classList.toggle('on',m==='file');
+};
+ZZ.addChocoItem = function(){
+  var name=((document.getElementById('ch-name')||{}).value||'').trim();
+  var desc=((document.getElementById('ch-desc')||{}).value||'').trim();
+  var price=((document.getElementById('ch-price')||{}).value||'').trim();
+  var catId=((document.getElementById('ch-category')||{}).value||'');
+  if(!name){alert('أدخل اسم الصنف');return;}if(!window.zzdb||!window.ZZ_AUTH_READY){alert('⏳');return;}
+  var item={name:name,desc:desc,price:price,priceType:ZZ._chocoPriceType,categoryId:catId,available:true,createdAt:Date.now()};
+  function _save(img){item.img=img||'';
+    zzdb.ref('landing/choco/items').push(item).then(function(){
+      ['ch-name','ch-desc','ch-price','ch-imgurl'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+      var n=document.getElementById('choco-menu-note');if(n){n.classList.add('show');setTimeout(function(){n.classList.remove('show');},2500);}
+    }).catch(function(e){alert('❌ '+e.message);});}
+  if(ZZ._chocoImgMode==='file'){var fe=document.getElementById('ch-imgfile'),f=fe&&fe.files&&fe.files[0];
+    if(!f){alert('اختار صورة');return;}_zzReadFile(f).then(function(r){return _zzCompress(r,900,.7);}).then(_save).catch(function(e){alert('❌ '+e.message);});
+  }else{_save(((document.getElementById('ch-imgurl')||{}).value||'').trim());}
+};
+ZZ.deleteChocoItem=function(id){if(!confirm('حذف؟'))return;zzdb.ref('landing/choco/items/'+id).remove();};
+ZZ.toggleChocoAvail=function(id,v){zzdb.ref('landing/choco/items/'+id+'/available').set(v);};
+ZZ.addChocoCategory=function(){
+  var name=((document.getElementById('ch-new-cat-name')||{}).value||'').trim();
+  var icon=((document.getElementById('ch-new-cat-icon')||{}).value||'🍫').trim();
+  if(!name){alert('أدخل اسم القسم');return;}
+  zzdb.ref('landing/choco/categories').push({name:name,icon:icon,order:ZZ._chocoCatsCache.length,createdAt:Date.now()}).then(function(){
+    var n=document.getElementById('ch-new-cat-name');if(n)n.value='';var i=document.getElementById('ch-new-cat-icon');if(i)i.value='';
+  });
+};
+ZZ.deleteChocoCategory=function(id){if(!confirm('حذف؟'))return;zzdb.ref('landing/choco/categories/'+id).remove();};
+ZZ._renderChocoCatList=function(){
+  var el=document.getElementById('ch-cat-list'),cnt=document.getElementById('ch-cat-count');if(!el)return;
+  if(cnt)cnt.textContent=ZZ._chocoCatsCache.length?'('+ZZ._chocoCatsCache.length+')':'';
+  if(!ZZ._chocoCatsCache.length){el.innerHTML='<div style="text-align:center;color:rgba(255,255,255,.3);padding:12px;font-size:13px">لا توجد أقسام</div>';return;}
+  el.innerHTML=ZZ._chocoCatsCache.map(function(c){return '<div class="cat-item"><span style="font-size:18px">'+(c.icon||'🍫')+'</span><span class="cat-name-lbl">'+(c.name||'')+'</span><button onclick="ZZ.deleteChocoCategory(\''+c.id+'\')" class="btn-del">🗑</button></div>';}).join('');
+};
+ZZ._refreshChocoCatDropdown=function(){
+  var opts='<option value="">— بدون قسم —</option>'+ZZ._chocoCatsCache.map(function(c){return '<option value="'+c.id+'">'+(c.icon||'🍫')+' '+(c.name||'')+'</option>';}).join('');
+  var s=document.getElementById('ch-category');if(s){var sv=s.value;s.innerHTML=opts;s.value=sv;}
+};
+ZZ._renderAdminChocoList=function(){
+  var el=document.getElementById('admin-choco-menu-list');if(!el)return;
+  if(!ZZ._chocoMenuCache.length){el.innerHTML='<div style="text-align:center;color:rgba(255,255,255,.3);padding:20px;font-size:13px">لا توجد أصناف بعد</div>';return;}
+  var ptL={piece:'🔢 قطعة',kilo:'⚖️ كيلو',plate:'🍽️ طبق'};
+  el.innerHTML=ZZ._chocoMenuCache.map(function(it){
+    return '<div class="menu-admin-item"><div class="mai-thumb" style="'+(it.img?'background-image:url(\''+it.img+'\');':'')+'background-color:#1a1020"></div>'
+      +'<div class="mai-info"><div class="mai-info-name">'+(it.name||'')+'</div><div class="mai-price">'+(it.price?it.price+' جنيه':'—')+' <span style="font-size:10px;color:rgba(124,58,237,.7)">'+(ptL[it.priceType]||'')+'</span></div></div>'
+      +'<div class="mai-actions"><button class="mai-btn mai-btn-tog '+(it.available?'on':'off')+'" onclick="ZZ.toggleChocoAvail(\''+it.id+'\','+(!it.available)+')">'+(it.available?'✅':'🔴')+'</button>'
+      +'<button class="mai-btn mai-btn-del" onclick="ZZ.deleteChocoItem(\''+it.id+'\')">🗑</button></div></div>';
+  }).join('');
+};
+ZZ.saveChocoWa=function(){
+  var num=((document.getElementById('ch-wa-num')||{}).value||'').replace(/\D/g,'');
+  if(!num){alert('أدخل الرقم');return;}if(!window.zzdb||!window.ZZ_AUTH_READY){alert('⏳');return;}
+  zzdb.ref('landing/choco/settings/waNum').set(num).then(function(){
+    var n=document.getElementById('ch-wa-note');if(n){n.textContent='✅ تم الحفظ — '+num;setTimeout(function(){n.textContent='';},3000);}
+  }).catch(function(e){alert('❌ '+e.message);});
+};
+ZZ._loadChocoWa=function(){
+  if(!window.zzdb)return;
+  zzdb.ref('landing/choco/settings/waNum').once('value').then(function(snap){var v=snap.val()||'';var el=document.getElementById('ch-wa-num');if(el&&v)el.value=v;});
+};
+ZZ.setChocoHeroBgMode=function(m){
+  ZZ._chocoHeroBgMode=m;
+  document.getElementById('chbg-url-row').style.display=m==='url'?'block':'none';
+  document.getElementById('chbg-file-row').style.display=m==='file'?'block':'none';
+  document.getElementById('chbg-btn-url').classList.toggle('on',m==='url');
+  document.getElementById('chbg-btn-file').classList.toggle('on',m==='file');
+};
+ZZ.previewChocoHeroBgFile=function(inp){
+  var f=inp&&inp.files&&inp.files[0];if(!f)return;
+  var r=new FileReader();r.onload=function(e){var p=document.getElementById('chbg-preview');if(p){p.style.display='block';p.style.backgroundImage='url("'+e.target.result+'")';}};r.readAsDataURL(f);
+};
+ZZ.saveChocoHero=function(){
+  if(!window.zzdb||!window.ZZ_AUTH_READY){alert('⏳');return;}
+  function _doSave(img){var s={};if(img)s.heroBg=img;
+    zzdb.ref('landing/choco/settings').update(s).then(function(){var n=document.getElementById('choco-hero-note');if(n){n.classList.add('show');setTimeout(function(){n.classList.remove('show');},2500);}}).catch(function(e){alert('❌ '+e.message);});}
+  if(ZZ._chocoHeroBgMode==='file'){var fe=document.getElementById('chbg-imgfile'),f=fe&&fe.files&&fe.files[0];
+    if(!f){_doSave(null);return;}_zzReadFile(f).then(function(r){return _zzCompress(r,1200,.75);}).then(_doSave).catch(function(e){alert('❌ '+e.message);});
+  }else{_doSave(((document.getElementById('chbg-imgurl')||{}).value||'').trim()||null);}
+};
+
+/* Choco Orders */
+ZZ._chocoOrdersCache=[]; ZZ._chocoOrdersFiltered=[]; ZZ._chocoOrdersSubbed=false;
+ZZ.subscribeChocoOrders=function(){
+  if(ZZ._chocoOrdersSubbed||!window.zzdb)return;ZZ._chocoOrdersSubbed=true;
+  zzdb.ref('choco/orders').orderByChild('createdAt').on('value',function(snap){
+    ZZ._chocoOrdersCache=[];snap.forEach(function(ch){ZZ._chocoOrdersCache.unshift(Object.assign({_key:ch.key},ch.val()));});ZZ.filterChocoOrders();
+  });
+};
+ZZ.filterChocoOrders=function(){
+  var q=((document.getElementById('chord-search')||{}).value||'').toLowerCase();
+  var date=((document.getElementById('chord-date')||{}).value||'');
+  ZZ._chocoOrdersFiltered=ZZ._chocoOrdersCache.filter(function(o){
+    var mt=!q||(o.name||'').toLowerCase().indexOf(q)!==-1||(o.phone||'').indexOf(q)!==-1;
+    var md=true;if(date&&o.createdAt){var d=new Date(o.createdAt),ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');md=ds===date;}
+    return mt&&md;
+  });
+  ZZ._renderChocoOrdersTable();
+  var c=ZZ._chocoOrdersFiltered,rev=c.reduce(function(s,o){return s+(o.total||0);},0);
+  var ids=['ch-kpi-count','ch-kpi-revenue','ch-kpi-delivery','ch-kpi-pickup'];
+  var vals=[c.length,rev.toLocaleString()+' ج',c.filter(function(o){return o.orderType==='delivery';}).length,c.filter(function(o){return o.orderType!=='delivery';}).length];
+  ids.forEach(function(id,i){var el=document.getElementById(id);if(el)el.textContent=vals[i];});
+};
+ZZ.clearChocoFilters=function(){['chord-search','chord-date'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});ZZ.filterChocoOrders();};
+ZZ._renderChocoOrdersTable=function(){
+  var tbl=document.getElementById('choco-orders-table'),tb=document.getElementById('choco-orders-tbody'),ld=document.getElementById('chord-loading'),em=document.getElementById('chord-empty');
+  if(ld)ld.style.display='none';
+  if(!ZZ._chocoOrdersFiltered.length){if(tbl)tbl.style.display='none';if(em)em.style.display='block';return;}
+  if(tbl)tbl.style.display='table';if(em)em.style.display='none';
+  var ptL={piece:'قطعة',kilo:'كيلو',plate:'طبق'};
+  tb.innerHTML=ZZ._chocoOrdersFiltered.map(function(o){
+    var d=o.createdAt?new Date(o.createdAt):null,dt=d?d.toLocaleDateString('ar-EG')+' '+d.toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}):'—';
+    var wl=(o.whatsapp||o.phone||'').replace(/\D/g,'');if(wl&&wl.charAt(0)==='0')wl='20'+wl.slice(1);
+    var waBtn=wl?'<a href="https://wa.me/'+wl+'" target="_blank" class="mord-phone-btn">💬</a>':'—';
+    var ptB=o.orderType==='delivery'?'<span class="mord-badge mord-badge-delivery">🛵</span>':'<span class="mord-badge mord-badge-pickup">🏪</span>';
+    var itms=(o.items||[]).map(function(it){return it.name+'×'+it.qty+(ptL[it.priceType]?' '+ptL[it.priceType]:'');}).join('<br>');
+    return '<tr class="mord-tr"><td class="mord-td" style="font-size:10px;color:rgba(255,255,255,.4)">'+(o.id||o._key||'—')+'</td><td class="mord-td">'+dt+'</td><td class="mord-td" style="font-weight:700;color:#fff">'+(o.name||'—')+'</td><td class="mord-td" dir="ltr">'+(o.phone||'—')+'</td><td class="mord-td">'+waBtn+'</td><td class="mord-td">'+ptB+'</td><td class="mord-td">'+(o.zone||'—')+'</td><td class="mord-td"><div class="mord-items-list">'+itms+'</div></td><td class="mord-td" style="text-align:center">'+(o.prodTotal||o.total||0)+' ج</td><td class="mord-td" style="text-align:center">'+(o.deliveryFee>0?o.deliveryFee+' ج':'مجاني')+'</td><td class="mord-td" style="font-weight:900;color:#7c3aed;text-align:center">'+(o.total||0)+' ج</td></tr>';
+  }).join('');
+};
+ZZ.exportChocoExcel=function(){ZZ._exportGenCsv(ZZ._chocoOrdersFiltered,'طلبات-الشيكولاتة');};
+ZZ.printChocoOrders=function(){ZZ._printGenReport(ZZ._chocoOrdersFiltered,'تقرير شيكولاتة العيد','#7c3aed');};
+
+/* ── shared CSV + Print helpers ── */
+ZZ._exportGenCsv=function(orders,filename){
+  if(!orders.length){alert('لا توجد طلبات');return;}
+  var BOM='\uFEFF',rows=[['رقم الطلب','التاريخ','الوقت','العميل','التليفون','الواتساب','نوع الاستلام','المنطقة','المنتجات','إجمالي المنتجات','توصيل','الإجمالي','ملاحظات']];
+  orders.forEach(function(o){
+    var d=o.createdAt?new Date(o.createdAt):null,dt=d?d.toLocaleDateString('ar-EG'):'',tm=d?d.toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}):'';
+    var itms=(o.items||[]).map(function(it){return it.name+' x'+it.qty+' = '+(it.subtotal||0)+' ج';}).join(' | ');
+    rows.push([o.id||o._key||'',dt,tm,o.name||'',o.phone||'',o.whatsapp||o.phone||'',o.orderType==='delivery'?'ديليفري':'استلام',o.zone||'',itms,o.prodTotal||o.total||0,o.deliveryFee||0,o.total||0,o.notes||'']);
+  });
+  var csv=BOM+rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\r\n');
+  var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=filename+'-'+new Date().toLocaleDateString('en-GB').replace(/\//g,'-')+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+};
+ZZ._printGenReport=function(orders,title,color){
+  if(!orders.length){alert('لا توجد طلبات');return;}
+  var total=orders.reduce(function(s,o){return s+(o.total||0);},0),now=new Date().toLocaleString('ar-EG');
+  var rows=orders.map(function(o,i){
+    var d=o.createdAt?new Date(o.createdAt).toLocaleString('ar-EG'):'—';
+    var itms=(o.items||[]).map(function(it){return it.name+' ×'+it.qty;}).join('، ');
+    return '<tr style="border-bottom:1px solid #eee"><td style="padding:6px;text-align:center;color:#666">'+(i+1)+'</td><td style="padding:6px">'+d+'</td><td style="padding:6px;font-weight:700">'+(o.name||'—')+'</td><td style="padding:6px;direction:ltr">'+(o.phone||'—')+'</td><td style="padding:6px">'+(o.orderType==='delivery'?'🛵 ديليفري':'🏪 استلام')+'</td><td style="padding:6px">'+(o.zone||'—')+'</td><td style="padding:6px;font-size:11px;color:#666">'+itms+'</td><td style="padding:6px;text-align:center">'+(o.deliveryFee>0?o.deliveryFee+' ج':'مجاني')+'</td><td style="padding:6px;font-weight:900;color:'+color+';text-align:center">'+(o.total||0)+' ج</td></tr>';
+  }).join('');
+  var win=window.open('','_blank','width=1100,height=800');
+  win.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>'+title+'</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#111}h2{color:'+color+'}table{width:100%;border-collapse:collapse;font-size:12px}th{background:'+color+';color:#fff;padding:8px;text-align:right}tr:nth-child(even){background:#f9f9f9}.s{display:flex;gap:24px;margin:12px 0;background:#f8f8f8;padding:12px;border-radius:8px}.sv{font-size:1.3rem;font-weight:900;color:'+color+'}@media print{button{display:none}}</style></head><body><h2>📊 '+title+' — زمزم ديزيرت</h2><div style="color:#666;font-size:12px;margin-bottom:8px">'+now+' | '+orders.length+' طلب</div><div class="s"><div><div class="sv">'+orders.length+'</div><div>الطلبات</div></div><div><div class="sv">'+total.toLocaleString()+' ج</div><div>المبيعات</div></div><div><div class="sv">'+orders.filter(function(o){return o.orderType==='delivery';}).length+'</div><div>ديليفري</div></div><div><div class="sv">'+orders.filter(function(o){return o.orderType!=='delivery';}).length+'</div><div>استلام</div></div></div><table><thead><tr><th>#</th><th>التاريخ</th><th>العميل</th><th>التليفون</th><th>النوع</th><th>المنطقة</th><th>المنتجات</th><th>توصيل</th><th>الإجمالي</th></tr></thead><tbody>'+rows+'</tbody></table><br><button onclick="window.print()" style="background:'+color+';color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;cursor:pointer">🖨️ اطبع</button></body></html>');
+  win.document.close();
+};
+
+/* ── Update _applyBtnSettings for kahk + choco ── */
+var _zzPrevApplyFinal = ZZ._applyBtnSettings;
+ZZ._applyBtnSettings = function(){
+  _zzPrevApplyFinal();
+  var kw=document.getElementById('kahk-btn-wrap'); if(kw) kw.style.display=ZZ._btnSettings.kahk?'block':'none';
+  var tk=document.getElementById('tog-kahk');      if(tk) tk.checked=!!ZZ._btnSettings.kahk;
+  var cw=document.getElementById('choco-btn-wrap');if(cw) cw.style.display=ZZ._btnSettings.choco?'block':'none';
+  var tc=document.getElementById('tog-choco');     if(tc) tc.checked=!!ZZ._btnSettings.choco;
 };
 
 </script>
