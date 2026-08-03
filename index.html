@@ -1955,7 +1955,7 @@ a{text-decoration:none;color:inherit}
 ═══════════════════════════════════════ -->
 <section id="hero">
   <!-- Image + overlays -->
-  <div class="hero-bg" id="hero-bg-el" style="opacity:0;transition:opacity .4s ease"></div>
+  <div class="hero-bg" id="hero-bg-el"></div>
   <div class="hero-overlay"></div>
   <canvas id="islamic-canvas"></canvas>
   <div class="hero-vignette"></div>
@@ -5429,14 +5429,28 @@ ZZ._applyHeroBg = function(imgUrl) {
   var el = document.getElementById('hero-bg-el');
   if (!el) return;
   if (imgUrl) {
-    el.style.backgroundImage    = 'url("' + imgUrl + '")';
-    el.style.backgroundSize     = 'cover';
-    el.style.backgroundPosition = 'center center';
+    /* فيه صورة مخصصة في Firebase — حمّلها الأول وبعدين بدّلها بـ fade */
+    var img = new Image();
+    img.onload = function() {
+      el.style.transition = 'opacity .35s ease';
+      el.style.opacity    = '0';
+      setTimeout(function() {
+        el.style.backgroundImage    = 'url("' + imgUrl + '")';
+        el.style.backgroundSize     = 'cover';
+        el.style.backgroundPosition = 'center center';
+        el.style.opacity            = '1';
+      }, 360);
+    };
+    img.onerror = function() {
+      /* لو الصورة فشلت — ابقى على الصورة الأصلية */
+      el.style.backgroundImage = '';
+    };
+    img.src = imgUrl;
   } else {
+    /* مفيش صورة مخصصة — استخدم الصورة الأصلية من CSS */
     el.style.backgroundImage = '';
+    el.style.opacity         = '1';
   }
-  /* ✅ أظهر الخلفية بعد ما تتحدد قيمتها من Firebase */
-  el.style.opacity = '1';
 };
 
 /* ── الاشتراك في تغييرات صورة الخلفية ── */
