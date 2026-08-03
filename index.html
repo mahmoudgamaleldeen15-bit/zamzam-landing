@@ -99,7 +99,7 @@ a{text-decoration:none;color:inherit}
 #mob-menu.open .mob-cta-wrap{opacity:1}
 
 /* ── BUTTONS ── */
-.btn-cake{display:inline-flex;align-items:center;gap:9px;background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;font-weight:800;border-radius:9999px;animation:pulseRing 3s ease-in-out infinite;transition:transform .3s ease,filter .3s ease;font-family:'Cairo',sans-serif;font-size:clamp(12px,3vw,15px);padding:14px 28px}
+.btn-cake{display:none;align-items:center;gap:9px;background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;font-weight:800;border-radius:9999px;animation:pulseRing 3s ease-in-out infinite;transition:transform .3s ease,filter .3s ease;font-family:'Cairo',sans-serif;font-size:clamp(12px,3vw,15px);padding:14px 28px}
 .btn-cake:hover{transform:translateY(-4px) scale(1.03);filter:brightness(1.1)}
 .btn-food{display:inline-flex;align-items:center;gap:9px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-weight:800;border-radius:9999px;animation:pulseOrange 3s ease-in-out infinite;transition:transform .3s ease,filter .3s ease;font-family:'Cairo',sans-serif}
 .btn-food:hover{transform:translateY(-4px) scale(1.03);filter:brightness(1.1)}
@@ -1955,7 +1955,7 @@ a{text-decoration:none;color:inherit}
 ═══════════════════════════════════════ -->
 <section id="hero">
   <!-- Image + overlays -->
-  <div class="hero-bg" id="hero-bg-el"></div>
+  <div class="hero-bg" id="hero-bg-el" style="opacity:0;transition:opacity .4s ease"></div>
   <div class="hero-overlay"></div>
   <canvas id="islamic-canvas"></canvas>
   <div class="hero-vignette"></div>
@@ -4305,7 +4305,7 @@ ZZ.buildCarousel = function() {
 /* ════════════════════════════════════════════════════════
    BUTTON CONTROLS (Admin + Public)
 ════════════════════════════════════════════════════════ */
-ZZ._btnSettings = { cake: true, restaurant: true, jobs: false, mawled: false, kahk: false, choco: false };
+ZZ._btnSettings = { cake: false, restaurant: false, offers: false, menus: false, jobs: false, mawled: false, kahk: false, choco: false };
 
 ZZ.loadBtnSettings = function() {
   if (!window.zzdb) return;
@@ -4329,8 +4329,12 @@ ZZ.loadBtnSettings = function() {
 
 ZZ._applyBtnSettings = function() {
   /* CTA buttons — querySelectorAll to cover ALL instances */
-  document.querySelectorAll('.btn-cake').forEach(function(b){ b.style.display = ZZ._btnSettings.cake ? '' : 'none'; });
-  document.querySelectorAll('.btn-fire2').forEach(function(b){ b.style.display = ZZ._btnSettings.restaurant ? '' : 'none'; });
+  document.querySelectorAll('.btn-cake').forEach(function(b){
+    b.style.display = ZZ._btnSettings.cake ? 'inline-flex' : 'none';
+    var wrap = b.closest ? b.closest('.mob-cta-wrap') : null;
+    if (wrap) wrap.style.display = ZZ._btnSettings.cake ? '' : 'none';
+  });
+  document.querySelectorAll('.btn-fire2').forEach(function(b){ b.style.display = ZZ._btnSettings.restaurant ? 'inline-flex' : 'none'; });
   /* Jobs section */
   var jobsSec = document.getElementById('jobs-section');
   if (jobsSec && !ZZ._jobsHashRequested) jobsSec.classList.toggle('active', ZZ._btnSettings.jobs);
@@ -5232,12 +5236,12 @@ ZZ.scrollToJobs = function(forceShow) {
 ZZ._applyBtnSettings = function() {
   /* querySelectorAll — بيطبق على كل أزرار الـ class مش الأول بس */
   document.querySelectorAll('.btn-cake').forEach(function(b){
-    b.style.display = ZZ._btnSettings.cake ? '' : 'none';
+    b.style.display = ZZ._btnSettings.cake ? 'inline-flex' : 'none';
     /* لو الزرار جوا mob-cta-wrap، نخفي الـ wrapper كمان */
     var wrap = b.closest ? b.closest('.mob-cta-wrap') : null;
     if (wrap) wrap.style.display = ZZ._btnSettings.cake ? '' : 'none';
   });
-  document.querySelectorAll('.btn-fire2').forEach(function(b){ b.style.display = ZZ._btnSettings.restaurant ? '' : 'none'; });
+  document.querySelectorAll('.btn-fire2').forEach(function(b){ b.style.display = ZZ._btnSettings.restaurant ? 'inline-flex' : 'none'; });
   document.querySelectorAll('.btn-offers-hero').forEach(function(b){ b.style.display = ZZ._btnSettings.offers !== false ? '' : 'none'; });
   document.querySelectorAll('.btn-menu-nav').forEach(function(b){ b.style.display = ZZ._btnSettings.menus !== false ? '' : 'none'; });
   var jobsSec = document.getElementById('jobs-section');
@@ -5425,12 +5429,14 @@ ZZ._applyHeroBg = function(imgUrl) {
   var el = document.getElementById('hero-bg-el');
   if (!el) return;
   if (imgUrl) {
-    el.style.backgroundImage = 'url("' + imgUrl + '")';
-    el.style.backgroundSize  = 'cover';
+    el.style.backgroundImage    = 'url("' + imgUrl + '")';
+    el.style.backgroundSize     = 'cover';
     el.style.backgroundPosition = 'center center';
   } else {
     el.style.backgroundImage = '';
   }
+  /* ✅ أظهر الخلفية بعد ما تتحدد قيمتها من Firebase */
+  el.style.opacity = '1';
 };
 
 /* ── الاشتراك في تغييرات صورة الخلفية ── */
