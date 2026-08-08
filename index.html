@@ -797,6 +797,22 @@ a{text-decoration:none;color:inherit}
 .toggle-sw input:checked+.slider{background:#f43f5e}
 .toggle-sw input:checked+.slider::before{transform:translateX(20px)}
 
+
+/* cashier login modal */
+#cashier-login-modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.92);backdrop-filter:blur(22px);align-items:center;justify-content:center;padding:24px;font-family:'Cairo',sans-serif;direction:rtl}
+#cashier-login-modal.open{display:flex}
+.cl-box{background:linear-gradient(160deg,#0d0d1a,#0a0a14);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:36px 28px;width:100%;max-width:380px;animation:fadeInUp .35s ease}
+.cl-logo{text-align:center;font-size:32px;margin-bottom:6px}
+.cl-title{text-align:center;font-weight:900;font-size:1.2rem;color:#fff;margin-bottom:4px}
+.cl-sub{text-align:center;font-size:12px;color:rgba(255,255,255,.3);margin-bottom:24px;letter-spacing:.05em}
+.cl-inp{width:100%;padding:13px 16px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#fff;font-size:15px;font-family:'Cairo',sans-serif;margin-bottom:12px;outline:none;transition:border .2s;direction:rtl}
+.cl-inp:focus{border-color:rgba(245,200,66,.5)}
+.cl-inp::placeholder{color:rgba(255,255,255,.25)}
+.cl-btn{width:100%;padding:14px;border:none;border-radius:13px;background:linear-gradient(135deg,#f5c842,#e8a020);color:#000;font-weight:900;font-size:15px;cursor:pointer;font-family:'Cairo',sans-serif;margin-top:4px;transition:filter .2s,transform .2s}
+.cl-btn:hover{filter:brightness(1.08);transform:translateY(-2px)}
+.cl-err{color:#f87171;font-size:12px;text-align:center;min-height:18px;margin-top:8px}
+.cl-cancel{width:100%;padding:10px;border:none;border-radius:12px;background:transparent;color:rgba(255,255,255,.3);font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif;margin-top:6px;transition:color .2s}
+.cl-cancel:hover{color:rgba(255,255,255,.6)}
 </style>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -962,6 +978,8 @@ a{text-decoration:none;color:inherit}
         <button class="ant" onclick="ZZ.adminTab('btns')">🎛️ الأزرار</button>
         <button class="ant" onclick="ZZ.adminTab('herobg')">🖼️ الخلفية</button>
         <button class="ant" onclick="ZZ.adminTab('security')">🔐 الأمان</button>
+        <button class="ant" onclick="ZZ.adminTab('page-settings')">⚙️ إعدادات الصفحات</button>
+        <button class="ant" onclick="ZZ.adminTab('cashiers')">👨‍💼 الكاشيرين</button>
       </div>
 
       <!-- ══ TAB: OFFERS ══ -->
@@ -1082,8 +1100,29 @@ a{text-decoration:none;color:inherit}
             <div id="ml-wa-note" style="font-size:12px;color:#4ade80;margin-top:6px;min-height:16px"></div>
           </div>
         </div>
-        <div class="admin-sec-divider"></div>
 
+        <div class="admin-sec-divider"></div>
+        <div class="admin-sec-title">&#x1F550; أوقات استقبال طلبات المولد</div>
+        <div class="admin-form-grid" style="margin-bottom:8px">
+          <div>
+            <label class="admin-lbl">وقت البداية</label>
+            <input type="time" id="ml-hour-from" class="admin-inp" dir="ltr">
+          </div>
+          <div>
+            <label class="admin-lbl">وقت النهاية</label>
+            <input type="time" id="ml-hour-to" class="admin-inp" dir="ltr">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <label style="display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.7);font-size:13px;cursor:pointer">
+            <input type="checkbox" id="ml-hours-enabled" style="width:16px;height:16px;accent-color:#f5c842">
+            تفعيل تحديد أوقات الطلبات
+          </label>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.35);margin-bottom:10px">لو مش مفعل العملاء يقدروا يطلبوا في اي وقت</div>
+        <button onclick="ZZ.saveMawledHours()" style="padding:10px 24px;background:linear-gradient(135deg,#f5c842,#e8a020);color:#000;border:none;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">&#x1F4BE; حفظ الاوقات</button>
+        <div id="ml-hours-note" style="font-size:12px;color:#4ade80;margin-top:8px;min-height:16px"></div>
+        <div class="admin-sec-divider"></div>
         <div class="admin-sec-title">🎉 إضافة صنف حلويات مولد جديد</div>
         <div class="admin-form-grid">
           <div>
@@ -1312,8 +1351,29 @@ a{text-decoration:none;color:inherit}
             <div id="kh-wa-note" style="font-size:12px;color:#4ade80;margin-top:6px;min-height:16px"></div>
           </div>
         </div>
-        <div class="admin-sec-divider"></div>
 
+        <div class="admin-sec-divider"></div>
+        <div class="admin-sec-title">&#x1F550; أوقات استقبال طلبات الكحك</div>
+        <div class="admin-form-grid" style="margin-bottom:8px">
+          <div>
+            <label class="admin-lbl">وقت البداية</label>
+            <input type="time" id="kh-hour-from" class="admin-inp" dir="ltr">
+          </div>
+          <div>
+            <label class="admin-lbl">وقت النهاية</label>
+            <input type="time" id="kh-hour-to" class="admin-inp" dir="ltr">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <label style="display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.7);font-size:13px;cursor:pointer">
+            <input type="checkbox" id="kh-hours-enabled" style="width:16px;height:16px;accent-color:#d97706">
+            تفعيل تحديد أوقات الطلبات
+          </label>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.35);margin-bottom:10px">لو مش مفعل العملاء يقدروا يطلبوا في اي وقت</div>
+        <button onclick="ZZ.saveKahkHours()" style="padding:10px 24px;background:linear-gradient(135deg,#d97706,#b45309);color:#fff;border:none;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">&#x1F4BE; حفظ الاوقات</button>
+        <div id="kh-hours-note" style="font-size:12px;color:#4ade80;margin-top:8px;min-height:16px"></div>
+        <div class="admin-sec-divider"></div>
         <div class="admin-sec-title">🍪 إضافة صنف كحك جديد</div>
         <div class="admin-form-grid">
           <div>
@@ -1419,8 +1479,29 @@ a{text-decoration:none;color:inherit}
             <div id="ch-wa-note" style="font-size:12px;color:#4ade80;margin-top:6px;min-height:16px"></div>
           </div>
         </div>
-        <div class="admin-sec-divider"></div>
 
+        <div class="admin-sec-divider"></div>
+        <div class="admin-sec-title">&#x1F550; أوقات استقبال طلبات الشيكولاتة</div>
+        <div class="admin-form-grid" style="margin-bottom:8px">
+          <div>
+            <label class="admin-lbl">وقت البداية</label>
+            <input type="time" id="ch-hour-from" class="admin-inp" dir="ltr">
+          </div>
+          <div>
+            <label class="admin-lbl">وقت النهاية</label>
+            <input type="time" id="ch-hour-to" class="admin-inp" dir="ltr">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <label style="display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.7);font-size:13px;cursor:pointer">
+            <input type="checkbox" id="ch-hours-enabled" style="width:16px;height:16px;accent-color:#7c3aed">
+            تفعيل تحديد أوقات الطلبات
+          </label>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.35);margin-bottom:10px">لو مش مفعل العملاء يقدروا يطلبوا في اي وقت</div>
+        <button onclick="ZZ.saveChocoHours()" style="padding:10px 24px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:none;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">&#x1F4BE; حفظ الاوقات</button>
+        <div id="ch-hours-note" style="font-size:12px;color:#4ade80;margin-top:8px;min-height:16px"></div>
+        <div class="admin-sec-divider"></div>
         <div class="admin-sec-title">🍫 إضافة صنف شيكولاتة جديد</div>
         <div class="admin-form-grid">
           <div>
@@ -1849,9 +1930,60 @@ a{text-decoration:none;color:inherit}
       </div>
       <div class="pin-status" id="pin-status"></div>
       </div><!-- end tab-security -->
+
+      <!-- admin tab page-settings -->
+      <div id="admin-tab-page-settings" class="admin-panel-sec">
+  <div class="admin-sec-title">اعدادات الصفحات</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+    <button id="pset-btn-mawled" onclick="ZZ.psetSwitch('mawled')" style="padding:9px 20px;border-radius:10px;border:1px solid rgba(245,200,66,.4);background:rgba(245,200,66,.12);color:#f5c842;font-weight:800;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">حلويات المولد</button>
+    <button id="pset-btn-kahk"   onclick="ZZ.psetSwitch('kahk')"   style="padding:9px 20px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-weight:700;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">كحك العيد</button>
+    <button id="pset-btn-choco"  onclick="ZZ.psetSwitch('choco')"  style="padding:9px 20px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-weight:700;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">شيكولاتة العيد</button>
+  </div>
+  <div id="pset-content"></div>
+</div>
+
+<!-- admin tab cashiers -->
+<div id="admin-tab-cashiers" class="admin-panel-sec">
+  <div class="admin-sec-title">ادارة الكاشيرين</div>
+  <div style="font-size:12px;color:rgba(255,255,255,.35);margin-bottom:16px;line-height:1.7">الدخول لصفحة الكاشير: اضغط 7 مرات على "تأسست عام 1990" في اسفل الصفحة</div>
+  <div class="admin-sec-divider"></div>
+  <div class="admin-sec-title" style="font-size:14px">اضافة كاشير جديد</div>
+  <div class="admin-form-grid" style="margin-bottom:10px">
+    <div>
+      <label class="admin-lbl">اسم المستخدم</label>
+      <input id="cashier-new-name" class="admin-inp" type="text" placeholder="cashier1" dir="ltr" autocomplete="off">
+    </div>
+    <div>
+      <label class="admin-lbl">PIN (ارقام فقط 4+ خانات)</label>
+      <input id="cashier-new-pin" class="admin-inp" type="password" placeholder="1234" maxlength="8" inputmode="numeric">
+    </div>
+  </div>
+  <button onclick="ZZ.addCashier()" style="padding:10px 24px;background:linear-gradient(135deg,#f5c842,#e8a020);color:#000;border:none;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">اضافة</button>
+  <div id="cashier-add-note" style="font-size:12px;color:#4ade80;margin-top:8px;min-height:16px"></div>
+  <div class="admin-sec-divider"></div>
+  <div class="admin-sec-title" style="font-size:14px">الكاشيرين الحاليين</div>
+  <div id="cashiers-list"><div style="color:rgba(255,255,255,.3);font-size:13px;padding:12px">لا يوجد كاشيرين بعد</div></div>
+</div>
     </div>
   </div>
 </div>
+
+
+<!-- cashier login modal -->
+<div id="cashier-login-modal">
+  <div class="cl-box">
+    <div class="cl-logo">&#x1F468;&#x200D;&#x1F373;</div>
+    <div class="cl-title">دخول الكاشير</div>
+    <div class="cl-sub">CASHIER ACCESS</div>
+    <input id="cl-username" class="cl-inp" type="text" placeholder="اسم المستخدم" autocomplete="off" autocorrect="off" spellcheck="false">
+    <input id="cl-pin" class="cl-inp" type="password" placeholder="الـ PIN" maxlength="8" inputmode="numeric">
+    <button class="cl-btn" onclick="ZZ.cashierLogin()">دخول</button>
+    <div class="cl-err" id="cl-err"></div>
+    <button class="cl-cancel" onclick="ZZ.closeCashierLogin()">الغاء</button>
+  </div>
+</div>
+
+
 
 <!-- ══════════════════════════════════
      CONTACT MODAL
@@ -2322,7 +2454,7 @@ a{text-decoration:none;color:inherit}
 
     <div class="footer-bottom">
       <span>© 2026 ZAMZAM DESSERT · جميع الحقوق محفوظة</span>
-      <span>تأسست عام 1990 🍰</span>
+      <span id="footer-est-1990" onclick="ZZ._cashierTap()" style="cursor:default;user-select:none">تأسست عام 1990 🍰</span>
     </div>
     <div style="text-align:center;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.04)">
       <span id="dev-credit" style="color:rgba(255,255,255,.13);font-size:10px;letter-spacing:.08em;cursor:default;user-select:none;font-family:'Cairo',sans-serif">
@@ -6142,32 +6274,7 @@ ZZ.printMawledOrders = function() {
   }).join('');
 
   var win = window.open('', '_blank', 'width=1100,height=800');
-  win.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">'
-    + '<title>تقرير طلبات حلاوة المولد</title>'
-    + '<style>body{font-family:Arial,sans-serif;padding:20px;color:#111}'
-    + 'h2{color:#b45309;margin-bottom:4px}'
-    + '.meta{color:#666;font-size:12px;margin-bottom:16px}'
-    + 'table{width:100%;border-collapse:collapse;font-size:12px}'
-    + 'th{background:#b45309;color:#fff;padding:8px;text-align:right}'
-    + 'tr:nth-child(even){background:#fef9ec}'
-    + '.summary{margin-top:16px;background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:12px;display:flex;gap:30px}'
-    + '.sum-item{text-align:center} .sum-val{font-size:1.3rem;font-weight:900;color:#b45309}'
-    + '@media print{button{display:none}}'
-    + '</style></head><body>'
-    + '<h2>📊 تقرير طلبات حلاوة المولد — زمزم ديزيرت</h2>'
-    + '<div class="meta">تاريخ التقرير: ' + now + ' | عدد الطلبات: ' + orders.length + '</div>'
-    + '<div class="summary">'
-    + '<div class="sum-item"><div class="sum-val">' + orders.length + '</div><div>إجمالي الطلبات</div></div>'
-    + '<div class="sum-item"><div class="sum-val">' + totalRevenue.toLocaleString() + ' ج</div><div>إجمالي المبيعات</div></div>'
-    + '<div class="sum-item"><div class="sum-val">' + orders.filter(function(o){return o.orderType==='delivery'}).length + '</div><div>ديليفري</div></div>'
-    + '<div class="sum-item"><div class="sum-val">' + orders.filter(function(o){return o.orderType!=='delivery'}).length + '</div><div>استلام</div></div>'
-    + '</div>'
-    + '<br><table><thead><tr>'
-    + '<th>#</th><th>التاريخ</th><th>العميل</th><th>التليفون</th>'
-    + '<th>النوع</th><th>المنطقة</th><th>المنتجات</th><th>توصيل</th><th>الإجمالي</th>'
-    + '</tr></thead><tbody>' + rows + '</tbody></table>'
-    + '<br><button onclick="window.print()" style="background:#b45309;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;cursor:pointer">🖨️ اطبع الآن</button>'
-    + '</body></html>');
+  win.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">' + '<title>تقرير طلبات حلاوة المولد</title>' + '<style>body{font-family:Arial,sans-serif;padding:20px;color:#111}' + 'h2{color:#b45309;margin-bottom:4px}' + '.meta{color:#666;font-size:12px;margin-bottom:16px}' + 'table{width:100%;border-collapse:collapse;font-size:12px}' + 'th{background:#b45309;color:#fff;padding:8px;text-align:right}' + 'tr:nth-child(even){background:#fef9ec}' + '.summary{margin-top:16px;background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:12px;display:flex;gap:30px}' + '.sum-item{text-align:center} .sum-val{font-size:1.3rem;font-weight:900;color:#b45309}' + '@media print{button{display:none}}' + '</style></head><body>' + '<h2>📊 تقرير طلبات حلاوة المولد — زمزم ديزيرت</h2>' + '<div class="meta">تاريخ التقرير: ' + now + ' | عدد الطلبات: ' + orders.length + '</div>' + '<div class="summary">' + '<div class="sum-item"><div class="sum-val">' + orders.length + '</div><div>إجمالي الطلبات</div></div>' + '<div class="sum-item"><div class="sum-val">' + totalRevenue.toLocaleString() + ' ج</div><div>إجمالي المبيعات</div></div>' + '<div class="sum-item"><div class="sum-val">' + orders.filter(function(o){return o.orderType==='delivery'}).length + '</div><div>ديليفري</div></div>' + '<div class="sum-item"><div class="sum-val">' + orders.filter(function(o){return o.orderType!=='delivery'}).length + '</div><div>استلام</div></div>' + '</div>' + '<br><table><thead><tr>' + '<th>#</th><th>التاريخ</th><th>العميل</th><th>التليفون</th>' + '<th>النوع</th><th>المنطقة</th><th>المنتجات</th><th>توصيل</th><th>الإجمالي</th>' + '</tr></thead><tbody>' + rows + '</tbody></table>' + '<br><button onclick="window.print()" style="background:#b45309;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;cursor:pointer">🖨️ اطبع الآن</button>' + '</body></html>');
   win.document.close();
 };
 
@@ -6674,6 +6781,209 @@ ZZ._applyBtnSettings = function(){
   if (mtKahk)   mtKahk.style.display   = (ZZ._btnSettings.kahk   && ZZ._kahkPublicItems   && ZZ._kahkPublicItems.length)   ? '' : 'none';
   var mtChoco  = document.getElementById('choco-menu-tab');
   if (mtChoco)  mtChoco.style.display  = (ZZ._btnSettings.choco  && ZZ._chocoPublicItems  && ZZ._chocoPublicItems.length)  ? '' : 'none';
+};
+
+
+/* hours save/load */
+ZZ._saveOrderHours = function(type, prefix, noteId) {
+  var fromEl    = document.getElementById(prefix + '-hour-from');
+  var toEl      = document.getElementById(prefix + '-hour-to');
+  var enabledEl = document.getElementById(prefix + '-hours-enabled');
+  if (!fromEl || !toEl || !enabledEl) return;
+  var fromVal = fromEl.value; var toVal = toEl.value; var enabled = enabledEl.checked;
+  if (enabled && (!fromVal || !toVal)) { alert('اختار وقت البداية والنهاية'); return; }
+  if (!window.zzdb || !window.ZZ_AUTH_READY) { alert('انتظر...'); return; }
+  zzdb.ref('landing/' + type + '/settings/orderHours').set({ enabled: enabled, from: fromVal, to: toVal })
+    .then(function() {
+      var n = document.getElementById(noteId);
+      if (n) { n.textContent = 'تم الحفظ'; setTimeout(function(){ n.textContent=''; }, 3000); }
+    }).catch(function(e) { alert(e.message); });
+};
+ZZ.saveMawledHours = function() { ZZ._saveOrderHours('mawled','ml','ml-hours-note'); };
+ZZ.saveKahkHours   = function() { ZZ._saveOrderHours('kahk','kh','kh-hours-note'); };
+ZZ.saveChocoHours  = function() { ZZ._saveOrderHours('choco','ch','ch-hours-note'); };
+
+ZZ._loadOrderHours = function(type, prefix) {
+  if (!window.zzdb) return;
+  zzdb.ref('landing/' + type + '/settings/orderHours').once('value').then(function(snap) {
+    var d = snap.val(); if (!d) return;
+    var f = document.getElementById(prefix+'-hour-from');
+    var t = document.getElementById(prefix+'-hour-to');
+    var e = document.getElementById(prefix+'-hours-enabled');
+    if (f && d.from) f.value = d.from;
+    if (t && d.to)   t.value = d.to;
+    if (e) e.checked = !!d.enabled;
+  });
+};
+ZZ._loadMawledHours = function() { ZZ._loadOrderHours('mawled','ml'); };
+ZZ._loadKahkHours   = function() { ZZ._loadOrderHours('kahk','kh'); };
+ZZ._loadChocoHours  = function() { ZZ._loadOrderHours('choco','ch'); };
+
+/* page settings */
+ZZ._psetCurrent = 'mawled';
+ZZ.psetSwitch = function(type) {
+  ZZ._psetCurrent = type;
+  var colors = { mawled:{a:'rgba(245,200,66,.12)',b:'rgba(245,200,66,.4)',c:'#f5c842'}, kahk:{a:'rgba(217,119,6,.15)',b:'rgba(217,119,6,.5)',c:'#d97706'}, choco:{a:'rgba(124,58,237,.15)',b:'rgba(124,58,237,.5)',c:'#7c3aed'} };
+  ['mawled','kahk','choco'].forEach(function(t) {
+    var btn = document.getElementById('pset-btn-'+t); if (!btn) return;
+    var on = (t===type); var c = colors[t];
+    btn.style.background = on ? c.a : 'transparent';
+    btn.style.border = '1px solid ' + (on ? c.b : 'rgba(255,255,255,.1)');
+    btn.style.color  = on ? c.c : 'rgba(255,255,255,.4)';
+    btn.style.fontWeight = on ? '800' : '600';
+  });
+  ZZ._psetRender(type); ZZ._psetLoad(type);
+};
+ZZ._psetRender = function(type) {
+  var labels = {mawled:'حلويات المولد',kahk:'كحك العيد',choco:'شيكولاتة العيد'};
+  var acc = {mawled:'#f5c842',kahk:'#d97706',choco:'#7c3aed'}[type]||'#f5c842';
+  var el = document.getElementById('pset-content'); if (!el) return;
+  el.innerHTML = '<div class="admin-sec-divider"></div>'
+    + '<div class="admin-sec-title" style="color:'+acc+'">اعدادات '+labels[type]+'</div>'
+    + '<div class="admin-form-grid" style="margin-bottom:8px"><div>'
+    + '<label class="admin-lbl">الحد الادنى لقيمة الطلب (جنيه)</label>'
+    + '<div style="display:flex;gap:8px;align-items:center">'
+    + '<input type="number" id="pset-min-order" class="admin-inp" placeholder="مثال: 50" min="0" style="flex:1;direction:ltr;text-align:center;font-size:1.1rem;font-weight:700">'
+    + '<span style="color:rgba(255,255,255,.4);font-size:13px">جنيه</span></div>'
+    + '<div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:6px">اكتب 0 لالغاء الحد الادنى</div>'
+    + '</div></div>'
+    + '<button onclick="ZZ.psetSave()" style="padding:10px 28px;background:linear-gradient(135deg,'+acc+','+acc+'aa);color:#000;border:none;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer;font-family:Cairo,sans-serif;margin-top:4px">حفظ الاعدادات</button>'
+    + '<div id="pset-note" style="font-size:12px;color:#4ade80;margin-top:8px;min-height:16px"></div>';
+};
+ZZ._psetLoad = function(type) {
+  if (!window.zzdb) return;
+  zzdb.ref('landing/'+type+'/settings/pageConfig').once('value').then(function(snap) {
+    var d = snap.val()||{}; var inp = document.getElementById('pset-min-order');
+    if (inp) inp.value = (d.minOrder!==undefined) ? d.minOrder : '';
+  });
+};
+ZZ.psetSave = function() {
+  var type = ZZ._psetCurrent;
+  var inp  = document.getElementById('pset-min-order'); if (!inp) return;
+  var minOrder = parseFloat(inp.value)||0;
+  if (!window.zzdb||!window.ZZ_AUTH_READY) { alert('انتظر...'); return; }
+  zzdb.ref('landing/'+type+'/settings/pageConfig').update({minOrder:minOrder})
+    .then(function() {
+      var n=document.getElementById('pset-note');
+      if(n){n.textContent='تم الحفظ';setTimeout(function(){n.textContent='';},3000);}
+    }).catch(function(e){alert(e.message);});
+};
+
+/* cashier tap */
+ZZ._cashierTapCount = 0;
+ZZ._cashierTapTimer = null;
+ZZ._cashierTap = function() {
+  ZZ._cashierTapCount++;
+  clearTimeout(ZZ._cashierTapTimer);
+  ZZ._cashierTapTimer = setTimeout(function(){ ZZ._cashierTapCount=0; }, 3000);
+  if (ZZ._cashierTapCount >= 7) { ZZ._cashierTapCount=0; ZZ.openCashierLogin(); }
+};
+ZZ.openCashierLogin = function() {
+  var m=document.getElementById('cashier-login-modal'); if(!m) return;
+  var u=document.getElementById('cl-username'); var p=document.getElementById('cl-pin'); var e=document.getElementById('cl-err');
+  if(u)u.value=''; if(p)p.value=''; if(e)e.textContent='';
+  m.classList.add('open');
+  setTimeout(function(){if(u)u.focus();},100);
+};
+ZZ.closeCashierLogin = function() {
+  var m=document.getElementById('cashier-login-modal'); if(m) m.classList.remove('open');
+};
+ZZ._sha256 = async function(str) {
+  var buf=new TextEncoder().encode(str);
+  var hash=await crypto.subtle.digest('SHA-256',buf);
+  return Array.from(new Uint8Array(hash)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+};
+ZZ.cashierLogin = async function() {
+  var username=(document.getElementById('cl-username').value||'').trim().toLowerCase();
+  var pin=(document.getElementById('cl-pin').value||'').trim();
+  var errEl=document.getElementById('cl-err');
+  if(!username){if(errEl)errEl.textContent='ادخل اسم المستخدم';return;}
+  if(!pin){if(errEl)errEl.textContent='ادخل الـ PIN';return;}
+  if(errEl)errEl.textContent='...جاري التحقق';
+  if(!window.zzdb){if(errEl)errEl.textContent='خطا في الاتصال';return;}
+  var pinHash=await ZZ._sha256(pin);
+  zzdb.ref('landing/cashiers').orderByChild('username').equalTo(username).once('value')
+    .then(async function(snap){
+      if(!snap.exists()){if(errEl)errEl.textContent='اسم المستخدم او الـ PIN غلط';return;}
+      var found=false;
+      snap.forEach(function(ch){
+        var d=ch.val();
+        if(d.pinHash===pinHash&&d.active!==false){
+          found=true;
+          sessionStorage.setItem('zz_cashier_id',ch.key);
+          sessionStorage.setItem('zz_cashier_name',d.username);
+        }
+      });
+      if(found){ZZ.closeCashierLogin();window.location.href='cashier.html';}
+      else{if(errEl)errEl.textContent='اسم المستخدم او الـ PIN غلط';}
+    }).catch(function(e){if(errEl)errEl.textContent=e.message;});
+};
+document.addEventListener('DOMContentLoaded',function(){
+  var p=document.getElementById('cl-pin');
+  if(p)p.addEventListener('keydown',function(e){if(e.key==='Enter')ZZ.cashierLogin();});
+  var m=document.getElementById('cashier-login-modal');
+  if(m)m.addEventListener('click',function(e){if(e.target===m)ZZ.closeCashierLogin();});
+});
+
+/* cashier management */
+ZZ.addCashier = async function() {
+  var nameInp=document.getElementById('cashier-new-name');
+  var pinInp=document.getElementById('cashier-new-pin');
+  var noteEl=document.getElementById('cashier-add-note');
+  var name=(nameInp?nameInp.value.trim().toLowerCase():'');
+  var pin=(pinInp?pinInp.value.trim():'');
+  if(!name){if(noteEl)noteEl.textContent='ادخل اسم المستخدم';return;}
+  if(pin.length<4){if(noteEl)noteEl.textContent='الـ PIN لازم 4 ارقام على الاقل';return;}
+  if(!/^\d+$/.test(pin)){if(noteEl)noteEl.textContent='الـ PIN ارقام فقط';return;}
+  if(!window.zzdb||!window.ZZ_AUTH_READY){if(noteEl)noteEl.textContent='انتظر...';return;}
+  var pinHash=await ZZ._sha256(pin);
+  zzdb.ref('landing/cashiers').push({username:name,pinHash:pinHash,active:true,createdAt:Date.now()})
+    .then(function(){
+      if(nameInp)nameInp.value=''; if(pinInp)pinInp.value='';
+      if(noteEl){noteEl.textContent='تم الاضافة';setTimeout(function(){noteEl.textContent='';},3000);}
+      ZZ._loadCashiersList();
+    }).catch(function(e){if(noteEl)noteEl.textContent=e.message;});
+};
+ZZ.deleteCashier = function(id) {
+  if(!confirm('حذف هذا الكاشير؟'))return;
+  if(!window.zzdb)return;
+  zzdb.ref('landing/cashiers/'+id).remove().then(function(){ZZ._loadCashiersList();});
+};
+ZZ.toggleCashierActive = function(id,currentVal) {
+  if(!window.zzdb)return;
+  zzdb.ref('landing/cashiers/'+id+'/active').set(!currentVal).then(function(){ZZ._loadCashiersList();});
+};
+ZZ._loadCashiersList = function() {
+  if(!window.zzdb)return;
+  var listEl=document.getElementById('cashiers-list'); if(!listEl)return;
+  listEl.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:13px;padding:12px">جاري التحميل...</div>';
+  zzdb.ref('landing/cashiers').once('value').then(function(snap){
+    if(!snap.exists()){listEl.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:13px;padding:12px">لا يوجد كاشيرين بعد</div>';return;}
+    var rows='';
+    snap.forEach(function(ch){
+      var d=ch.val(); var id=ch.key; var isActive=d.active!==false;
+      var toggleLabel=isActive?'ايقاف':'تفعيل';
+      var statusIcon=isActive?'🟢':'🔴';
+      rows+='<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,.04);border-radius:12px;margin-bottom:8px;border:1px solid rgba(255,255,255,.07)">'
+        +'<span style="font-size:18px">'+statusIcon+'</span>'
+        +'<span style="flex:1;color:#fff;font-weight:700;font-size:14px">'+(d.username||'-')+'</span>'
+        +'<button onclick="ZZ.toggleCashierActive(\''+id+'\','+isActive+')" style="padding:6px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);font-size:12px;cursor:pointer;font-family:Cairo,sans-serif">'+toggleLabel+'</button>'
+        +'<button onclick="ZZ.deleteCashier(\''+id+'\')" style="padding:6px 12px;border-radius:8px;border:none;background:rgba(239,68,68,.15);color:#f87171;font-size:12px;cursor:pointer">حذف</button>'
+        +'</div>';
+    });
+    listEl.innerHTML=rows;
+  });
+};
+
+/* extend adminTab */
+var _prevAdminTabAllNew = ZZ.adminTab;
+ZZ.adminTab = function(tab) {
+  _prevAdminTabAllNew(tab);
+  if (tab==='mawled-menu')   { ZZ._loadMawledHours(); }
+  if (tab==='kahk-menu')     { ZZ._loadKahkHours(); }
+  if (tab==='choco-menu')    { ZZ._loadChocoHours(); }
+  if (tab==='page-settings') { ZZ.psetSwitch(ZZ._psetCurrent||'mawled'); }
+  if (tab==='cashiers')      { ZZ._loadCashiersList(); }
 };
 
 </script>

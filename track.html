@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تتبع طلبك — زمزم ديزيرت</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:     #07050f;
+  --surface:#0f0c1a;
+  --border: rgba(255,255,255,.07);
+  --gold:   #f5c842;
+  --text:   #fff;
+  --dim:    rgba(255,255,255,.45);
+  --faint:  rgba(255,255,255,.18);
+}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif}
+
+/* ══ TOPBAR ══ */
+.topbar{
+  position:fixed;top:0;right:0;left:0;z-index:10;height:56px;
+  background:rgba(7,5,15,.95);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;padding:0 18px;
+}
+.tb-logo{font-weight:900;font-size:14px;letter-spacing:.22em;color:var(--gold)}
+.tb-logo span{color:var(--dim);font-size:9px;letter-spacing:.38em;display:block;font-weight:600}
+.tb-back{
+  color:var(--dim);font-size:13px;font-weight:700;text-decoration:none;
+  display:flex;align-items:center;gap:5px;
+}
+.tb-back:hover{color:var(--text)}
+
+/* ══ MAIN ══ */
+.main{
+  padding:80px 18px 40px;max-width:480px;margin:0 auto;
+}
+
+/* ══ ORDER ID HEADER ══ */
+.order-header{text-align:center;margin-bottom:32px}
+.order-id{
+  display:inline-block;padding:8px 20px;
+  background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.25);
+  border-radius:10px;color:var(--gold);font-size:13px;font-weight:800;
+  letter-spacing:.08em;margin-bottom:12px;
+}
+.order-title{font-size:1.05rem;font-weight:700;color:var(--dim)}
+
+/* ══ STATUS TIMELINE ══ */
+.timeline{position:relative;padding-right:32px;margin-bottom:32px}
+.timeline::before{
+  content:'';position:absolute;right:11px;top:8px;bottom:8px;
+  width:2px;background:var(--border);
+}
+
+.tl-step{
+  position:relative;display:flex;align-items:flex-start;gap:14px;
+  padding:0 0 24px 0;
+}
+.tl-step:last-child{padding-bottom:0}
+
+/* dot */
+.tl-dot{
+  position:absolute;right:-32px;top:2px;
+  width:22px;height:22px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;flex-shrink:0;z-index:1;
+  border:2px solid var(--border);background:var(--bg);
+  color:var(--faint);transition:all .4s;
+}
+.tl-dot.done  {border-color:var(--gold);background:rgba(245,200,66,.15);color:var(--gold)}
+.tl-dot.active{border-color:var(--gold);background:var(--gold);color:#000;animation:dotPulse 1.5s ease infinite}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,200,66,.5)}50%{box-shadow:0 0 0 8px rgba(245,200,66,0)}}
+
+/* content */
+.tl-content{flex:1}
+.tl-label{font-size:14px;font-weight:800;color:var(--faint);transition:color .4s}
+.tl-sub{font-size:12px;color:var(--faint);margin-top:3px;transition:color .4s}
+.tl-step.done   .tl-label{color:var(--text)}
+.tl-step.active .tl-label{color:var(--gold)}
+.tl-step.active .tl-sub{color:var(--dim)}
+.tl-step.done   .tl-sub{color:var(--dim)}
+
+/* ══ INFO CARD ══ */
+.info-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:16px 18px;margin-bottom:16px;
+}
+.info-row{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);
+}
+.info-row:last-child{border:none}
+.info-lbl{color:var(--dim);font-weight:600}
+.info-val{font-weight:800;text-align:left;direction:ltr}
+.info-total{color:var(--gold);font-size:1rem}
+
+/* ══ TYPE BADGE ══ */
+.type-badge{
+  display:inline-block;padding:3px 10px;border-radius:6px;
+  font-size:11px;font-weight:800;letter-spacing:.04em;margin-bottom:8px;
+}
+.type-badge.mawled{background:rgba(245,200,66,.12);color:var(--gold)}
+.type-badge.kahk  {background:rgba(217,119,6,.12); color:#d97706}
+.type-badge.choco {background:rgba(124,58,237,.12);color:#a78bfa}
+
+/* ══ LOADING / ERROR ══ */
+.screen-center{
+  min-height:60vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;padding:40px;
+}
+.sc-icon{font-size:56px;margin-bottom:16px;opacity:.5}
+.sc-title{font-size:1.1rem;font-weight:800;color:var(--dim);margin-bottom:8px}
+.sc-sub{font-size:13px;color:var(--faint)}
+.spinner{
+  width:36px;height:36px;border:3px solid var(--border);
+  border-top-color:var(--gold);border-radius:50%;
+  animation:spin .8s linear infinite;margin-bottom:16px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ══ REFRESH ══ */
+.refresh-note{
+  text-align:center;font-size:12px;color:var(--faint);margin-top:20px;
+}
+.refresh-btn{
+  display:block;margin:12px auto 0;padding:10px 24px;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:10px;color:var(--dim);font-size:13px;font-weight:700;
+  cursor:pointer;font-family:'Cairo',sans-serif;transition:all .2s;
+}
+.refresh-btn:hover{background:rgba(255,255,255,.1);color:var(--text)}
+
+/* ══ DELIVERY ADDR ══ */
+.addr-box{
+  background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.18);
+  border-radius:10px;padding:10px 14px;font-size:13px;color:#93c5fd;
+  margin-top:10px;
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-logo">ZAMZAM<span>DESSERT</span></div>
+  <a class="tb-back" href="javascript:history.back()">← رجوع</a>
+</div>
+
+<div class="main" id="main">
+  <div class="screen-center" id="loading-screen">
+    <div class="spinner"></div>
+    <div class="sc-title">جاري تحميل بيانات طلبك...</div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
+/* ════ ZAMZAM ORDER TRACKER ════ */
+
+const FB_CFG = {
+  apiKey:            "AIzaSyBpZwrt4wHgWKz_dC1nBhqJ6OzypySYKNQ",
+  authDomain:        "zamzam-landing.firebaseapp.com",
+  databaseURL:       "https://zamzam-landing-default-rtdb.firebaseio.com",
+  projectId:         "zamzam-landing",
+  storageBucket:     "zamzam-landing.firebasestorage.app",
+  messagingSenderId: "192876961013",
+  appId:             "1:192876961013:web:8fd0f7a5d6f1db4a9e79bc"
+};
+
+/* الحالات بالترتيب */
+var STATUSES = [
+  { key:'pending',   icon:'⏳', label:'لم يتم استلام الطلب بعد', sub:'طلبك وصلنا وهيتراجع قريباً' },
+  { key:'received',  icon:'📥', label:'تم استلام الطلب',          sub:'الفريق شاف طلبك وبيستعد' },
+  { key:'preparing', icon:'👨‍🍳', label:'جاري التحضير',             sub:'بنحضر طلبك بعناية' },
+  { key:'ready',     icon:'✅', label:'جاهز للاستلام',             sub:'طلبك جاهز — تقدر تيجي' },
+  { key:'delivery',  icon:'🛵', label:'في الطريق إليك',            sub:'الطلب انطلق وهيوصلك قريباً' },
+  { key:'delivered', icon:'🎉', label:'تم التسليم',                sub:'وصل طلبك بالسلامة — بالهنا والشفا' },
+];
+
+var TR = {
+  orderId: null,
+  type:    null,
+  db:      null,
+  _ref:    null,
+
+  init: function() {
+    var params = new URLSearchParams(window.location.search);
+    TR.orderId = params.get('id');
+    TR.type    = params.get('type');
+
+    if (!TR.orderId || !TR.type) {
+      TR.showError('لينك غير صحيح', 'الرجاء استخدام اللينك الموجود في شاشة تأكيد طلبك');
+      return;
+    }
+
+    /* init Firebase */
+    if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
+    TR.db = firebase.database();
+
+    firebase.auth().signInAnonymously().then(function() {
+      TR.subscribe();
+    }).catch(function(e) {
+      /* حاول بدون auth */
+      TR.subscribe();
+    });
+  },
+
+  subscribe: function() {
+    var path = TR.type + '/orders/' + TR.orderId;
+    TR._ref = TR.db.ref(path);
+    TR._ref.on('value', function(snap) {
+      if (!snap.exists()) {
+        TR.showError('الطلب مش موجود', 'تأكد من رقم الطلب أو ابدأ طلب جديد');
+        return;
+      }
+      TR.render(snap.val());
+    }, function(err) {
+      TR.showError('خطأ في الاتصال', err.message);
+    });
+  },
+
+  render: function(order) {
+    var curStatus = order.status || 'pending';
+    var curIdx    = STATUSES.findIndex(function(s){ return s.key === curStatus; });
+    if (curIdx === -1) curIdx = 0;
+
+    var typeLabels = { mawled:'🎉 حلويات المولد', kahk:'🍪 كحك العيد', choco:'🍫 شيكولاتة العيد' };
+    var typeBadge  = typeLabels[TR.type] || TR.type;
+
+    /* timeline */
+    var tlHTML = STATUSES.map(function(s, i) {
+      var isDone   = i < curIdx;
+      var isActive = i === curIdx;
+      var cls      = isDone ? 'done' : (isActive ? 'active' : '');
+      var dotCls   = isDone ? 'done' : (isActive ? 'active' : '');
+      return '<div class="tl-step ' + cls + '">'
+        + '<div class="tl-dot ' + dotCls + '">' + (isDone ? '✓' : s.icon) + '</div>'
+        + '<div class="tl-content">'
+        +   '<div class="tl-label">' + s.label + '</div>'
+        +   (isActive ? '<div class="tl-sub">' + s.sub + '</div>' : '')
+        + '</div>'
+        + '</div>';
+    }).join('');
+
+    /* order info */
+    var grandTotal = parseFloat(order.grandTotal) || parseFloat(order.total) || 0;
+    var delivFee   = parseFloat(order.deliveryFee) || 0;
+
+    var infoHTML = '<div class="info-card">'
+      + '<div class="info-row"><span class="info-lbl">الاسم</span><span class="info-val">' + (order.name||'—') + '</span></div>'
+      + '<div class="info-row"><span class="info-lbl">نوع الطلب</span><span class="info-val">'
+      +   (order.orderType==='delivery' ? '🛵 ديليفري' : '🏪 استلام من المحل') + '</span></div>'
+      + (delivFee > 0 ? '<div class="info-row"><span class="info-lbl">رسوم التوصيل</span><span class="info-val">' + delivFee + ' ج</span></div>' : '')
+      + '<div class="info-row"><span class="info-lbl">الإجمالي</span><span class="info-val info-total">' + grandTotal + ' ج</span></div>'
+      + '</div>';
+
+    /* delivery address */
+    var addrHTML = '';
+    if (order.orderType === 'delivery' && order.address) {
+      addrHTML = '<div class="addr-box">📍 ' + (order.zone ? order.zone + ' — ' : '') + order.address + '</div>';
+    }
+
+    document.getElementById('main').innerHTML =
+      '<div class="order-header">'
+      + '<div class="type-badge ' + TR.type + '">' + typeBadge + '</div>'
+      + '<div class="order-id">🆔 ' + TR.orderId + '</div>'
+      + '<div class="order-title">تتبع حالة طلبك</div>'
+      + '</div>'
+      + '<div class="timeline">' + tlHTML + '</div>'
+      + infoHTML
+      + addrHTML
+      + '<div class="refresh-note">الصفحة بتتحدث تلقائياً 🔄</div>'
+      + '<button class="refresh-btn" onclick="location.reload()">تحديث يدوي</button>';
+  },
+
+  showError: function(title, sub) {
+    document.getElementById('main').innerHTML =
+      '<div class="screen-center">'
+      + '<div class="sc-icon">😕</div>'
+      + '<div class="sc-title">' + title + '</div>'
+      + '<div class="sc-sub">' + sub + '</div>'
+      + '</div>';
+  }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+  TR.init();
+});
+</script>
+</body>
+</html>

@@ -1008,9 +1008,57 @@ body{ padding-top:62px; }
 /* إضافة padding للصفحة عشان المحتوى ما يتغطاش */
 body.has-send-bar .page-wrap{padding-bottom:100px!important}
 
+
+
+
+
+
+
+
+/* ── شاشة تأكيد الطلب ── */
+#order-confirm-screen{
+  display:none;position:fixed;inset:0;z-index:9998;
+  background:linear-gradient(160deg,#06030a 0%,#080210 100%);
+  flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:32px;animation:fadeInUp .4s ease;
+}
+#order-confirm-screen.show{display:flex;}
+.oc-icon{font-size:80px;margin-bottom:20px;animation:floatY 3s ease-in-out infinite;}
+.oc-title{font-size:clamp(1.5rem,5vw,2.2rem);font-weight:900;color:#fff;margin-bottom:10px;font-family:'Cairo',sans-serif;}
+.oc-sub{font-size:1rem;color:rgba(255,255,255,.6);line-height:1.8;max-width:380px;font-family:'Cairo',sans-serif;margin-bottom:20px;}
+.oc-id{padding:12px 28px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;color:#d97706;font-size:1rem;font-weight:800;font-family:'Cairo',sans-serif;margin-bottom:24px;letter-spacing:.05em;}
+.oc-back{padding:13px 36px;background:linear-gradient(135deg,#d97706,#d97706aa);color:#000;border:none;border-radius:13px;font-weight:900;font-size:1rem;cursor:pointer;font-family:'Cairo',sans-serif;}
+
+
+/* ── زرار الإرسال — حالة مغلق ── */
+.btn-send-order.closed{
+  background:linear-gradient(135deg,#1e1e2e,#2a2a3e) !important;
+  border:1px solid rgba(255,255,255,.12);
+  cursor:not-allowed;
+  flex-direction:column;
+  gap:2px;
+  padding:10px 18px;
+  box-shadow:none;
+}
+.btn-send-order.closed:hover{transform:none;filter:none;}
+.bsb-closed-label{font-size:11px;font-weight:700;color:rgba(255,100,100,.85);letter-spacing:.03em;}
+.bsb-countdown{font-size:16px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:.05em;font-family:'Cairo',sans-serif;}
+
 </style>
 </head>
 <body>
+
+<!-- ══ شاشة تأكيد الطلب ══ -->
+<div id="order-confirm-screen">
+  <div class="oc-icon">🍪</div>
+  <div class="oc-title">تم إرسال طلبك! ✅</div>
+  <div class="oc-sub">طلبك وصلنا وهنتواصل معاك على الواتساب في أقرب وقت 💬</div>
+  <div class="oc-id" id="oc-order-id">—</div>
+  <a id="oc-track-link" href="#" target="_blank" style="display:inline-block;margin-bottom:12px;padding:12px 28px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;color:rgba(255,255,255,.7);font-size:.95rem;font-weight:700;text-decoration:none;font-family:'Cairo',sans-serif">📍 تتبع طلبك</a>
+  <br>
+  <button class="oc-back" onclick="ML._closeConfirm()">🔄 طلب جديد</button>
+</div>
+
 
 <!-- TOPBAR -->
 <div class="topbar">
@@ -1241,7 +1289,10 @@ body.has-send-bar .page-wrap{padding-bottom:100px!important}
     <div class="bsb-total-items" id="bsb-items-count"></div>
   </div>
   <button class="btn-send-order" id="btn-send-order" onclick="ML.sendOrder()">
-    <span>💬</span> إرسال الطلب
+    <span id="bsb-btn-icon">💬</span>
+    <span id="bsb-btn-label">إرسال الطلب</span>
+    <span class="bsb-closed-label" id="bsb-closed-label" style="display:none">الطلبات مغلقة حالياً</span>
+    <span class="bsb-countdown" id="bsb-countdown" style="display:none">--:--:--</span>
   </button>
 </div>
 
@@ -1355,6 +1406,7 @@ const ML = {
   }
   if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
   ML.db = firebase.database();
+  ML._loadPageConfig();
   firebase.auth().signInAnonymously()
     .then(function(c) { ML.loadData(); })
     .catch(function()  { ML.loadData(); });
@@ -1405,6 +1457,10 @@ ML.loadData = function() {
       if (wt) wt.textContent = ML.welcome;
     }
     ML.renderAdminPanel();
+    /* فحص أوقات الطلبات */
+    ML._checkOrderHours(d.orderHours || null);
+    if (!ML._hoursTimer) ML._hoursTimer = setInterval(function(){ ML._checkOrderHours(ML._lastOrderHours); }, 60000);
+    ML._lastOrderHours = d.orderHours || null;
   });
 
   /* ── الأقسام ── */
@@ -1711,6 +1767,12 @@ ML.sendOrder = function() {
 
   if (!name)  { ML.markErr('cust-name',  'اكتب اسمك'); return; }
   if (!phone) { ML.markErr('cust-phone', 'اكتب رقم التليفون'); return; }
+  /* تحقق من رقم الموبايل — 11 رقم يبدأ بـ 01 */
+  var cleanPhone = phone.replace(/\D/g,'');
+  if (cleanPhone.length !== 11 || !cleanPhone.startsWith('01')) {
+    ML.markErr('cust-phone', 'رقم غير صحيح — لازم 11 رقم يبدأ بـ 01');
+    return;
+  }
 
   /* لو ديليفري: لازم منطقة وعنوان */
   if (ML.orderType === 'delivery') {
@@ -1719,6 +1781,11 @@ ML.sendOrder = function() {
   }
 
   var prodTotal   = items.reduce(function(s,p) { return s + (ML.cart[p.id] * (parseFloat(p.price)||0)); }, 0);
+  /* فحص الحد الأدنى للطلب */
+  if (ML._minOrder > 0 && prodTotal < ML._minOrder) {
+    ML.toast('❌ الحد الأدنى للطلب ' + ML._minOrder + ' جنيه — إجمالي طلبك ' + prodTotal + ' جنيه');
+    return;
+  }
   var deliveryFee = (ML.orderType === 'delivery' && ML.selectedZone) ? (ML.selectedZone.fee || 0) : 0;
   var grandTotal  = prodTotal + deliveryFee;
   var orderId     = 'KH-' + Date.now().toString(36).toUpperCase();
@@ -1759,7 +1826,7 @@ ML.sendOrder = function() {
     return n;
   }
   var orderData = {
-    id: orderId, name: name, phone: phone, whatsapp: _normalizePhone(wa),
+    id: orderId, status: 'pending', name: name, phone: phone, whatsapp: _normalizePhone(wa),
     orderType: ML.orderType,
     zone: ML.orderType === 'delivery' && ML.selectedZone ? ML.selectedZone.name : null,
     deliveryFee: deliveryFee,
@@ -1777,6 +1844,9 @@ ML.sendOrder = function() {
   var waTarget = ML.waNum;
   if (!waTarget) { ML.toast('❌ رقم الواتساب مش متحدد — تواصل مع الإدارة'); return; }
   window.open('https://wa.me/' + waTarget + '?text=' + encodeURIComponent(waMsg), '_blank');
+
+  /* شاشة تأكيد الطلب */
+  ML._showConfirm(orderId);
 
   /* شاشة النجاح */
   document.getElementById('success-screen').classList.add('show');
@@ -2297,6 +2367,131 @@ ML._startHeroAnim = function(type) {
     cvs.width  = hero.offsetWidth  || window.innerWidth;
     cvs.height = hero.offsetHeight || window.innerHeight;
   });
+};
+
+
+/* ════ ORDER HOURS CHECK ════ */
+ML._checkOrderHours = function(d) {
+  ML._lastOrderHours = d || null;
+  ML._updateSendBtn();
+  /* شغّل العداد لو الأوقات مفعّلة */
+  if (d && d.enabled) ML._startHoursTimer();
+};
+
+
+
+
+
+/* ════ ORDER HOURS CHECK ════ */
+ML._checkOrderHours = function(d) {
+  ML._lastOrderHours = d || null;
+  ML._updateSendBtn();
+  /* شغّل العداد لو الأوقات مفعّلة */
+  if (d && d.enabled) ML._startHoursTimer();
+};
+
+
+/* ════ PAGE CONFIG (حد أدنى للطلب) ════ */
+ML._minOrder = 0;
+
+ML._loadPageConfig = function() {
+  if (!ML.db) return;
+  ML.db.ref('landing/kahk/settings/pageConfig').on('value', function(snap) {
+    var d = snap.val() || {};
+    ML._minOrder = parseFloat(d.minOrder) || 0;
+  });
+};
+
+/* ════ تأكيد الطلب ════ */
+ML._showConfirm = function(orderId) {
+  var screen = document.getElementById('order-confirm-screen');
+  var idEl   = document.getElementById('oc-order-id');
+  if (idEl) idEl.textContent = '🆔 رقم طلبك: ' + orderId;
+  /* track link */
+  var trackLink = document.getElementById('oc-track-link');
+  if (trackLink) trackLink.href = 'track.html?id=' + orderId + '&type=kahk';
+  if (screen) screen.classList.add('show');
+};
+
+ML._closeConfirm = function() {
+  var screen = document.getElementById('order-confirm-screen');
+  if (screen) screen.classList.remove('show');
+  /* reset الكارت */
+  ML.cart = {};
+  ML.renderCart && ML.renderCart();
+  ML._updateCartUI && ML._updateCartUI();
+  window.scrollTo({top:0, behavior:'smooth'});
+};
+
+
+/* ════ ORDER HOURS — عداد تنازلي في الزرار ════ */
+ML._isOrderOpen = function() {
+  var d = ML._lastOrderHours;
+  if (!d || !d.enabled) return true;
+  var now  = new Date();
+  var curr = now.getHours() * 60 + now.getMinutes();
+  var fp   = (d.from || '00:00').split(':');
+  var tp   = (d.to   || '23:59').split(':');
+  var fromMin = parseInt(fp[0]) * 60 + parseInt(fp[1]);
+  var toMin   = parseInt(tp[0]) * 60 + parseInt(tp[1]);
+  return (curr >= fromMin && curr <= toMin);
+};
+
+ML._getSecondsToOpen = function() {
+  var d = ML._lastOrderHours;
+  if (!d || !d.from) return 0;
+  var now  = new Date();
+  var fp   = d.from.split(':');
+  var open = new Date();
+  open.setHours(parseInt(fp[0]), parseInt(fp[1]), 0, 0);
+  /* لو وقت الفتح فات النهارده — يبقى بكره */
+  if (open <= now) open.setDate(open.getDate() + 1);
+  return Math.floor((open - now) / 1000);
+};
+
+ML._updateSendBtn = function() {
+  var btn       = document.getElementById('btn-send-order');
+  var icon      = document.getElementById('bsb-btn-icon');
+  var label     = document.getElementById('bsb-btn-label');
+  var closedLbl = document.getElementById('bsb-closed-label');
+  var countdown = document.getElementById('bsb-countdown');
+  if (!btn) return;
+
+  if (ML._isOrderOpen()) {
+    /* مفتوح — الزرار عادي */
+    btn.classList.remove('closed');
+    btn.onclick = ML.sendOrder;
+    if (icon)      { icon.style.display = ''; icon.textContent = '💬'; }
+    if (label)     { label.style.display = ''; label.textContent = 'إرسال الطلب'; }
+    if (closedLbl) closedLbl.style.display = 'none';
+    if (countdown) countdown.style.display = 'none';
+  } else {
+    /* مغلق — عداد تنازلي */
+    btn.classList.add('closed');
+    btn.onclick = null;
+    if (icon)  icon.style.display = 'none';
+    if (label) label.style.display = 'none';
+    if (closedLbl) closedLbl.style.display = '';
+    if (countdown) {
+      countdown.style.display = '';
+      var secs = ML._getSecondsToOpen();
+      var hh   = Math.floor(secs / 3600);
+      var mm   = Math.floor((secs % 3600) / 60);
+      var ss   = secs % 60;
+      countdown.textContent = (hh < 10 ? '0' : '') + hh + ':'
+                            + (mm < 10 ? '0' : '') + mm + ':'
+                            + (ss < 10 ? '0' : '') + ss;
+    }
+  }
+};
+
+/* شغّل العداد كل ثانية */
+ML._startHoursTimer = function() {
+  if (ML._hoursInterval) clearInterval(ML._hoursInterval);
+  ML._hoursInterval = setInterval(function() {
+    ML._updateSendBtn();
+  }, 1000);
+  ML._updateSendBtn(); /* تحديث فوري */
 };
 
 </script>
