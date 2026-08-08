@@ -1044,9 +1044,25 @@ body.has-send-bar .page-wrap{padding-bottom:100px!important}
 .bsb-closed-label{font-size:11px;font-weight:700;color:rgba(255,100,100,.85);letter-spacing:.03em;}
 .bsb-countdown{font-size:16px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:.05em;font-family:'Cairo',sans-serif;}
 
+
+/* زرار تتبع آخر طلب — ثابت أسفل الشاشة */
+#track-my-order-btn{
+  display:none;position:fixed;bottom:100px;left:16px;z-index:60;
+  padding:11px 18px;border-radius:9999px;
+  background:rgba(20,20,30,.92);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.15);
+  color:#fff;font-size:12.5px;font-weight:800;
+  text-decoration:none;font-family:'Cairo',sans-serif;
+  box-shadow:0 6px 24px rgba(0,0,0,.4);
+  align-items:center;gap:6px;
+}
+#track-my-order-btn.show{display:flex}
+
 </style>
 </head>
 <body>
+<a id="track-my-order-btn" href="#">📍 تتبع طلبي الأخير</a>
+
 
 <!-- ══ شاشة تأكيد الطلب ══ -->
 <div id="order-confirm-screen">
@@ -1846,7 +1862,7 @@ ML.sendOrder = function() {
       return { name: p.name, qty: ML.cart[p.id], priceType: p.priceType||'piece', price: parseFloat(p.price)||0, subtotal: ML.cart[p.id]*(parseFloat(p.price)||0) };
     }),
     prodTotal: prodTotal, deliveryFee: deliveryFee, total: grandTotal,
-    status: 'new', createdAt: Date.now()
+    createdAt: Date.now()
   };
   if (ML.db) ML.db.ref('choco/orders/' + orderId).set(orderData).catch(function(){});
 
@@ -1855,8 +1871,14 @@ ML.sendOrder = function() {
   if (!waTarget) { ML.toast('❌ رقم الواتساب مش متحدد — تواصل مع الإدارة'); return; }
   window.open('https://wa.me/' + waTarget + '?text=' + encodeURIComponent(waMsg), '_blank');
 
-  /* شاشة تأكيد الطلب */
+  /* حفظ آخر طلب محلياً — عشان العميل يقدر يرجع لصفحة التتبع في أي وقت */
+  try { localStorage.setItem('zz_last_order', JSON.stringify({ id: orderId, type: 'choco', ts: Date.now() })); } catch(e) {}
+
+  /* شاشة تأكيد الطلب — ثم التحويل التلقائي لصفحة التتبع */
   ML._showConfirm(orderId);
+  setTimeout(function() {
+    window.location.href = 'track.html?id=' + orderId + '&type=choco';
+  }, 1800);
 
   /* شاشة النجاح */
   document.getElementById('success-screen').classList.add('show');
@@ -2503,6 +2525,23 @@ ML._startHoursTimer = function() {
   }, 1000);
   ML._updateSendBtn(); /* تحديث فوري */
 };
+
+
+/* ── زرار تتبع آخر طلب ── */
+(function() {
+  try {
+    var saved = localStorage.getItem('zz_last_order');
+    if (!saved) return;
+    var d = JSON.parse(saved);
+    if (d && d.id && d.type === 'choco') {
+      var btn = document.getElementById('track-my-order-btn');
+      if (btn) {
+        btn.href = 'track.html?id=' + d.id + '&type=' + d.type;
+        btn.classList.add('show');
+      }
+    }
+  } catch(e) {}
+})();
 
 </script>
 </body>

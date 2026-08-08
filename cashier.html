@@ -89,6 +89,17 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Cairo'
   background:var(--gold-dim);border-color:rgba(245,200,66,.4);color:var(--gold);
 }
 
+/* ══ SEARCH ══ */
+.search-wrap{padding:0 14px 14px}
+.search-input{
+  width:100%;padding:11px 16px;border-radius:12px;
+  border:1px solid var(--border);background:var(--surface);
+  color:var(--text);font-size:13px;font-family:'Cairo',sans-serif;
+  outline:none;transition:border-color .2s;
+}
+.search-input:focus{border-color:rgba(245,200,66,.4)}
+.search-input::placeholder{color:var(--text-faint)}
+
 /* ══ ORDERS GRID ══ */
 .orders-wrap{padding:0 14px}
 .orders-header{
@@ -352,8 +363,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Cairo'
 #login-gate{
   position:fixed;inset:0;z-index:9999;
   background:var(--bg);
-  display:flex;align-items:center;justify-content:center;padding:24px;
+  display:none;align-items:center;justify-content:center;padding:24px;
 }
+#login-gate.show{display:flex}
 #login-gate.hidden{display:none}
 .lg-box{
   background:var(--surface);border:1px solid var(--border);border-radius:20px;
@@ -411,12 +423,29 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Cairo'
 .st-btn.active-ready    {background:rgba(34,197,94,.15);  border-color:rgba(34,197,94,.4);  color:#4ade80}
 .st-btn.active-delivery {background:rgba(168,85,247,.15); border-color:rgba(168,85,247,.4); color:#c084fc}
 .st-btn.active-delivered{background:rgba(245,200,66,.18); border-color:rgba(245,200,66,.5); color:var(--gold)}
+.st-btn-past{opacity:.3;cursor:not-allowed;text-decoration:line-through}
+.st-btn-past:hover{opacity:.3}
+
+/* ── تأثير خفيف على الكارت نفسه بس لما حالته تتغير ── */
+@keyframes cardFlash{
+  0%{box-shadow:0 0 0 rgba(245,200,66,0)}
+  30%{box-shadow:0 0 24px rgba(245,200,66,.45)}
+  100%{box-shadow:0 0 0 rgba(245,200,66,0)}
+}
+.card-flash{animation:cardFlash .9s ease}
 
 /* ══ PRINT ══ */
 @media print{.topbar,.tb-actions,.oc-btn-del,.oc-btn-done{display:none!important}}
 </style>
 </head>
 <body>
+
+<!-- ══ BOOT LOADING (شاشة محايدة أثناء التحقق) ══ -->
+<div id="boot-loading" style="position:fixed;inset:0;z-index:10000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+  <div style="width:38px;height:38px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--gold);border-radius:50%;animation:bootSpin .8s linear infinite"></div>
+  <div style="color:var(--text-dim);font-size:13px;font-family:'Cairo',sans-serif">جاري التحقق...</div>
+</div>
+<style>@keyframes bootSpin{to{transform:rotate(360deg)}}</style>
 
 <!-- ══ LOGIN GATE ══ -->
 <div id="login-gate">
@@ -489,6 +518,22 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Cairo'
     <button class="filter-btn active" onclick="CA.setDeliveryFilter('all')" id="fd-all">الكل</button>
     <button class="filter-btn" onclick="CA.setDeliveryFilter('delivery')" id="fd-delivery">🛵 توصيل</button>
     <button class="filter-btn" onclick="CA.setDeliveryFilter('pickup')" id="fd-pickup">🏪 استلام</button>
+  </div>
+
+  <!-- STATUS FILTERS -->
+  <div class="filters">
+    <button class="filter-btn status-filter-btn active" data-status="all" onclick="CA.setStatusFilter('all')">كل المراحل</button>
+    <button class="filter-btn status-filter-btn" data-status="pending"   onclick="CA.setStatusFilter('pending')">⏳ جديد</button>
+    <button class="filter-btn status-filter-btn" data-status="received" onclick="CA.setStatusFilter('received')">📥 استلام</button>
+    <button class="filter-btn status-filter-btn" data-status="preparing" onclick="CA.setStatusFilter('preparing')">👨‍🍳 تجهيز</button>
+    <button class="filter-btn status-filter-btn" data-status="ready"    onclick="CA.setStatusFilter('ready')">✅ جاهز</button>
+    <button class="filter-btn status-filter-btn" data-status="delivery" onclick="CA.setStatusFilter('delivery')">🛵 في الطريق</button>
+    <button class="filter-btn status-filter-btn" data-status="delivered" onclick="CA.setStatusFilter('delivered')">🎉 تم التسليم</button>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <input type="text" id="search-input" class="search-input" placeholder="🔍 بحث بالاسم أو رقم التليفون..." oninput="CA.onSearchInput(this.value)">
   </div>
 
   <!-- ORDERS -->
@@ -577,7 +622,7 @@ const CA = {
             }
           });
           if (found) {
-            document.getElementById('login-gate').classList.add('hidden');
+            document.getElementById('login-gate').classList.remove('show');
             CA.init(localStorage.getItem('zz_cashier_name'));
           } else {
             errEl.textContent = 'اسم المستخدم أو الـ PIN غلط';
@@ -590,20 +635,34 @@ const CA = {
   checkSession: function() {
     var id   = localStorage.getItem('zz_cashier_id');
     var name = localStorage.getItem('zz_cashier_name');
-    if (!id || !name) return false;
-    /* init Firebase */
+    var boot = document.getElementById('boot-loading');
+    if (!id || !name) {
+      /* مفيش جلسة خالص — اظهر فورم الدخول فوراً */
+      if (boot) boot.style.display = 'none';
+      var gate = document.getElementById('login-gate');
+      if (gate) gate.classList.add('show');
+      return false;
+    }
+    /* فيه جلسة محفوظة — خلي شاشة التحقق المحايدة شغالة لحد ما نتأكد */
     if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
     CA.db = firebase.database();
     firebase.auth().signInAnonymously().then(function() {
       /* تحقق إن الكاشير لسه active */
       CA.db.ref('landing/cashiers/' + id + '/active').once('value').then(function(snap) {
-        if (snap.val() === false) { CA.logout(); return; }
-        document.getElementById('login-gate').classList.add('hidden');
+        if (boot) boot.style.display = 'none';
+        if (snap.val() === false) {
+          CA.logout();
+          return;
+        }
         CA.init(name);
-      }).catch(function() { CA.logout(); });
+      }).catch(function() {
+        if (boot) boot.style.display = 'none';
+        var gate3 = document.getElementById('login-gate');
+        if (gate3) gate3.classList.add('show');
+      });
     }).catch(function() {
-      /* لو Firebase فشل — اتابع بالـ session */
-      document.getElementById('login-gate').classList.add('hidden');
+      /* لو Firebase فشل — اتابع بالجلسة المحفوظة بدون تحقق إضافي */
+      if (boot) boot.style.display = 'none';
       CA.init(name);
     });
     return true;
@@ -666,7 +725,7 @@ const CA = {
     ref.on('child_changed', function(snap) {
       var order = Object.assign({ id: snap.key, _type: type }, snap.val());
       CA.orders[snap.key] = order;
-      CA._render();
+      CA._updateCardInPlace(order);
     });
   },
 
@@ -774,8 +833,49 @@ const CA = {
     CA._render();
   },
 
+  /* ── فلتر الحالة (المرحلة) ── */
+  statusFilter: 'all',
+  setStatusFilter: function(f) {
+    CA.statusFilter = f;
+    document.querySelectorAll('.status-filter-btn').forEach(function(btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-status') === f);
+    });
+    CA._render();
+  },
+
+  /* ── البحث بالاسم أو رقم التليفون ── */
+  searchQuery: '',
+  onSearchInput: function(val) {
+    CA.searchQuery = val || '';
+    CA._render();
+  },
+
+  /* ── هل الطلب مطابق للفلاتر الحالية؟ (تاب النوع + توصيل/استلام + الحالة + البحث) ── */
+  _orderMatchesCurrentFilters: function(o) {
+    if (CA.filter !== 'all' && o._type !== CA.filter) return false;
+    if (CA.deliveryFilter === 'delivery' && o.orderType !== 'delivery') return false;
+    if (CA.deliveryFilter === 'pickup'   && o.orderType === 'delivery') return false;
+    if (CA.statusFilter && CA.statusFilter !== 'all') {
+      var st = o.status || 'pending';
+      if (st !== CA.statusFilter) return false;
+    }
+    if (CA.searchQuery) {
+      var q = CA.searchQuery.trim().toLowerCase();
+      if (q) {
+        var nameMatch  = (o.name || '').toLowerCase().indexOf(q) !== -1;
+        var qDigits    = q.replace(/\D/g, '');
+        var phoneMatch = qDigits && (
+          (o.phone     || '').replace(/\D/g,'').indexOf(qDigits) !== -1 ||
+          (o.whatsapp  || '').replace(/\D/g,'').indexOf(qDigits) !== -1
+        );
+        if (!nameMatch && !phoneMatch) return false;
+      }
+    }
+    return true;
+  },
+
   _filteredOrders: function() {
-    var all = Object.values(CA.orders);
+    var all = Object.values(CA.orders).filter(CA._orderMatchesCurrentFilters);
     all.sort(function(a, b) {
       /* الطلبات المُسلَّمة تنزل لآخر القائمة دايماً */
       var aDone = a.status === 'delivered';
@@ -783,22 +883,15 @@ const CA = {
       if (aDone !== bDone) return aDone ? 1 : -1;
       return (b.createdAt||0) - (a.createdAt||0);
     });
-    if (CA.filter !== 'all') all = all.filter(function(o){ return o._type === CA.filter; });
-    if (CA.deliveryFilter === 'delivery') all = all.filter(function(o){ return o.orderType === 'delivery'; });
-    if (CA.deliveryFilter === 'pickup')   all = all.filter(function(o){ return o.orderType !== 'delivery'; });
     return all;
   },
 
   /* عدد الطلبات الجديدة لسه ملحوظتش لكل نوع */
   _unseenByType: { mawled:0, kahk:0, choco:0 },
 
-  /* ── RENDER ── */
-  _render: function() {
-    var orders  = CA._filteredOrders();
-    var grid    = document.getElementById('orders-grid');
+  /* ── تحديث الإحصائيات والـ badges بس (من غير لمس الشبكة) ── */
+  _updateStatsOnly: function() {
     var allOrds = Object.values(CA.orders);
-
-    /* stats */
     var totalRev = allOrds.reduce(function(s,o){ return s + (parseFloat(o.grandTotal)||parseFloat(o.total)||0); }, 0);
     var newOrds  = allOrds.filter(function(o){ return CA._isNew(o); }).length;
     var deliv    = allOrds.filter(function(o){ return o.orderType==='delivery'; }).length;
@@ -806,9 +899,9 @@ const CA = {
     document.getElementById('stat-new').textContent     = newOrds;
     document.getElementById('stat-revenue').textContent = Math.round(totalRev);
     document.getElementById('stat-delivery').textContent= deliv;
+    var orders = CA._filteredOrders();
     document.getElementById('orders-count').textContent = orders.length + ' طلب';
 
-    /* badges على التابات */
     ['mawled','kahk','choco'].forEach(function(t) {
       var badge = document.getElementById('badge-' + t);
       var count = CA._unseenByType[t] || 0;
@@ -823,6 +916,48 @@ const CA = {
       if (totalUnseen > 0) { allBadge.style.display='flex'; allBadge.textContent = totalUnseen; }
       else allBadge.style.display = 'none';
     }
+  },
+
+  _checkEmptyState: function() {
+    var grid = document.getElementById('orders-grid');
+    if (grid && !grid.children.length) {
+      grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">لا توجد طلبات</div><div class="empty-sub">جرّب فلتر تاني أو امسح البحث</div></div>';
+    }
+  },
+
+  /* ── تحديث كارت واحد بس في مكانه — بدون إعادة رسم الشبكة كلها ── */
+  _updateCardInPlace: function(order) {
+    CA._updateStatsOnly();
+    var el = document.getElementById('card-' + order.id);
+    var matches = CA._orderMatchesCurrentFilters(order);
+    if (!matches) {
+      if (el) {
+        el.style.transition = 'opacity .25s ease, transform .25s ease';
+        el.style.opacity = '0';
+        el.style.transform = 'scale(.95)';
+        setTimeout(function(){ if (el.parentNode) el.remove(); CA._checkEmptyState(); }, 260);
+      }
+      return;
+    }
+    if (el) {
+      var wrapper = document.createElement('div');
+      wrapper.innerHTML = CA._cardHTML(order);
+      var newEl = wrapper.firstElementChild;
+      newEl.classList.add('card-flash');
+      el.replaceWith(newEl);
+      setTimeout(function(){ newEl.classList.remove('card-flash'); }, 900);
+    } else {
+      /* الكارت مش ظاهر دلوقتي (فلتر مختلف أو لسه هيتحمل) — رندر كامل أبسط وأأمن */
+      CA._render();
+    }
+  },
+
+  /* ── RENDER ── */
+  _render: function() {
+    var orders  = CA._filteredOrders();
+    var grid    = document.getElementById('orders-grid');
+
+    CA._updateStatsOnly();
 
     if (!orders.length) {
       grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">لا توجد طلبات</div><div class="empty-sub">الطلبات هتظهر هنا فور وصولها</div></div>';
@@ -957,8 +1092,15 @@ const CA = {
 
   _statusBar: function(o) {
     var cur = o.status || 'pending';
-    var btns = CA._statuses.map(function(s) {
+    var curIdx = CA._statuses.findIndex(function(s){ return s.key === cur; });
+    if (curIdx === -1) curIdx = 0;
+    var btns = CA._statuses.map(function(s, i) {
       var isActive = (cur === s.key);
+      var isPast   = i < curIdx; /* مرحلة سابقة اتخطتها — ميتنفعش نرجعلها */
+      if (isPast) {
+        return '<button class="st-btn st-btn-past" disabled title="مرحلة سابقة — ما ينفعش الرجوع ليها">'
+          + s.icon + ' ' + s.label + '</button>';
+      }
       return '<button class="st-btn' + (isActive ? ' ' + s.cls : '') + '" '
         + 'onclick="CA.setStatus(\'' + o.id + '\',\'' + o._type + '\',\'' + s.key + '\')">'
         + s.icon + ' ' + s.label + '</button>';
@@ -968,6 +1110,16 @@ const CA = {
 
   setStatus: function(id, type, status) {
     if (!CA.db) return;
+    /* حماية إضافية: امنع الرجوع لمرحلة سابقة حتى لو الطلب اتنادى بطريقة مباشرة */
+    var order = CA.orders[id];
+    if (order) {
+      var curIdx    = CA._statuses.findIndex(function(s){ return s.key === (order.status||'pending'); });
+      var targetIdx = CA._statuses.findIndex(function(s){ return s.key === status; });
+      if (curIdx !== -1 && targetIdx !== -1 && targetIdx < curIdx) {
+        CA.toast('⚠️ ما ينفعش ترجع لمرحلة سابقة');
+        return;
+      }
+    }
     var lbl = CA._statuses.find(function(s){ return s.key===status; });
     /* الـ render بيحصل تلقائي من مستمع child_changed — منعمل رندر يدوي تاني عشان منلاجش */
     CA.db.ref(type + '/orders/' + id + '/status').set(status).then(function() {

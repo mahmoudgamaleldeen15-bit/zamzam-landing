@@ -980,6 +980,7 @@ a{text-decoration:none;color:inherit}
         <button class="ant" onclick="ZZ.adminTab('security')">🔐 الأمان</button>
         <button class="ant" onclick="ZZ.adminTab('page-settings')">⚙️ إعدادات الصفحات</button>
         <button class="ant" onclick="ZZ.adminTab('cashiers')">👨‍💼 الكاشيرين</button>
+        <button class="ant" onclick="ZZ.adminTab('orders-mgmt')">📦 إدارة الطلبات</button>
       </div>
 
       <!-- ══ TAB: OFFERS ══ -->
@@ -1963,6 +1964,49 @@ a{text-decoration:none;color:inherit}
   <div class="admin-sec-divider"></div>
   <div class="admin-sec-title" style="font-size:14px">الكاشيرين الحاليين</div>
   <div id="cashiers-list"><div style="color:rgba(255,255,255,.3);font-size:13px;padding:12px">لا يوجد كاشيرين بعد</div></div>
+</div>
+
+<!-- admin tab orders management -->
+<div id="admin-tab-orders-mgmt" class="admin-panel-sec">
+  <div class="admin-sec-title">📦 إدارة الطلبات</div>
+  <div style="font-size:12px;color:rgba(255,255,255,.35);margin-bottom:16px;line-height:1.7">مراقبة وتحكم كامل في كل الطلبات — بدون الحاجة لصفحة الكاشير</div>
+
+  <!-- اختيار الصفحة -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+    <button id="om-tab-mawled" onclick="ZZ.omSwitchType('mawled')" style="padding:9px 20px;border-radius:10px;border:1px solid rgba(245,200,66,.4);background:rgba(245,200,66,.12);color:#f5c842;font-weight:800;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">🎉 المولد</button>
+    <button id="om-tab-kahk" onclick="ZZ.omSwitchType('kahk')" style="padding:9px 20px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-weight:700;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">🍪 الكحك</button>
+    <button id="om-tab-choco" onclick="ZZ.omSwitchType('choco')" style="padding:9px 20px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-weight:700;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">🍫 الشيكولاتة</button>
+  </div>
+
+  <!-- أرشفة -->
+  <div class="admin-sec-divider"></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:6px">
+    <button onclick="ZZ.omArchiveAll()" style="padding:9px 18px;border-radius:10px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.1);color:#f87171;font-weight:800;font-size:12.5px;cursor:pointer;font-family:'Cairo',sans-serif">🗄 أرشفة كل الطلبات الحالية</button>
+    <button onclick="ZZ.omRestoreArchive()" style="padding:9px 18px;border-radius:10px;border:1px solid rgba(96,165,250,.3);background:rgba(96,165,250,.1);color:#60a5fa;font-weight:800;font-size:12.5px;cursor:pointer;font-family:'Cairo',sans-serif">♻️ استرجاع الأرشيف</button>
+    <span id="om-archive-note" style="font-size:11.5px;color:rgba(255,255,255,.35)"></span>
+  </div>
+  <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:14px">الأرشفة بتشيل الطلبات من القائمة النشطة (بعد انتهاء الموسم) عشان الصفحة متحملش على الفاضي — تقدر ترجعهم في أي وقت</div>
+  <div class="admin-sec-divider"></div>
+
+  <!-- فلاتر الحالة -->
+  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px" id="om-status-filters">
+    <button class="om-filter-btn active" data-status="all" onclick="ZZ.omSetStatusFilter('all')" style="padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.15);background:rgba(245,200,66,.12);color:#f5c842;font-size:11.5px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif">كل المراحل</button>
+    <button class="om-filter-btn" data-status="pending" onclick="ZZ.omSetStatusFilter('pending')" style="padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-size:11.5px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif">⏳ جديد</button>
+    <button class="om-filter-btn" data-status="received" onclick="ZZ.omSetStatusFilter('received')" style="padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-size:11.5px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif">📥 استلام</button>
+    <button class="om-filter-btn" data-status="preparing" onclick="ZZ.omSetStatusFilter('preparing')" style="padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-size:11.5px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif">👨‍🍳 تجهيز</button>
+    <button class="om-filter-btn" data-status="ready" onclick="ZZ.omSetStatusFilter('ready')" style="padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-size:11.5px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif">✅ جاهز</button>
+    <button class="om-filter-btn" data-status="delivery" onclick="ZZ.omSetStatusFilter('delivery')" style="padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-size:11.5px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif">🛵 الطريق</button>
+    <button class="om-filter-btn" data-status="delivered" onclick="ZZ.omSetStatusFilter('delivered')" style="padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-size:11.5px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif">🎉 تم التسليم</button>
+  </div>
+
+  <!-- بحث -->
+  <input type="text" id="om-search-input" placeholder="🔍 بحث بالاسم أو رقم التليفون..." oninput="ZZ.omSearch(this.value)"
+    style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#fff;font-size:13px;font-family:'Cairo',sans-serif;outline:none;margin-bottom:14px">
+
+  <div id="om-count" style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:10px">0 طلب</div>
+  <div id="om-orders-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">
+    <div style="color:rgba(255,255,255,.3);font-size:13px;padding:20px;grid-column:1/-1;text-align:center">اختر صفحة من فوق</div>
+  </div>
 </div>
     </div>
   </div>
@@ -6984,7 +7028,275 @@ ZZ.adminTab = function(tab) {
   if (tab==='choco-menu')    { ZZ._loadChocoHours(); }
   if (tab==='page-settings') { ZZ.psetSwitch(ZZ._psetCurrent||'mawled'); }
   if (tab==='cashiers')      { ZZ._loadCashiersList(); }
+  if (tab==='orders-mgmt')   { ZZ.omSwitchType(ZZ._omCurrentType || 'mawled'); }
 };
+
+/* ════════════════════════════════════════════════════════
+   ORDERS MANAGEMENT — إدارة الطلبات (أدمن)
+   Firebase: {type}/orders/{id}  و  {type}/archive/{id}
+════════════════════════════════════════════════════════ */
+
+ZZ._omStatuses = [
+  { key:'pending',   icon:'⏳', label:'لم يتم الاستلام' },
+  { key:'received',  icon:'📥', label:'تم الاستلام' },
+  { key:'preparing', icon:'👨\u200d🍳', label:'جاري التحضير' },
+  { key:'ready',     icon:'✅', label:'جاهز للاستلام' },
+  { key:'delivery',  icon:'🛵', label:'في الطريق' },
+  { key:'delivered', icon:'🎉', label:'تم التسليم' },
+];
+
+ZZ._omCurrentType   = 'mawled';
+ZZ._omOrders        = {};
+ZZ._omStatusFilter  = 'all';
+ZZ._omSearchQuery   = '';
+ZZ._omRef           = null;
+ZZ._omValueCb       = null;
+
+/* ── تبديل الصفحة ── */
+ZZ.omSwitchType = function(type) {
+  /* افصل المستمع القديم لو موجود */
+  if (ZZ._omRef && ZZ._omValueCb) { ZZ._omRef.off('value', ZZ._omValueCb); }
+
+  ZZ._omCurrentType  = type;
+  ZZ._omOrders       = {};
+  ZZ._omStatusFilter = 'all';
+  ZZ._omSearchQuery  = '';
+  var searchInp = document.getElementById('om-search-input');
+  if (searchInp) searchInp.value = '';
+  document.querySelectorAll('.om-filter-btn').forEach(function(b) {
+    var isAll = b.getAttribute('data-status') === 'all';
+    b.classList.toggle('active', isAll);
+    b.style.background = isAll ? 'rgba(245,200,66,.12)' : 'transparent';
+    b.style.color      = isAll ? '#f5c842' : 'rgba(255,255,255,.5)';
+  });
+
+  var colors = { mawled:{a:'rgba(245,200,66,.12)',b:'rgba(245,200,66,.4)',c:'#f5c842'}, kahk:{a:'rgba(217,119,6,.15)',b:'rgba(217,119,6,.5)',c:'#d97706'}, choco:{a:'rgba(124,58,237,.15)',b:'rgba(124,58,237,.5)',c:'#7c3aed'} };
+  ['mawled','kahk','choco'].forEach(function(t) {
+    var btn = document.getElementById('om-tab-' + t); if (!btn) return;
+    var on = (t === type); var c = colors[t];
+    btn.style.background = on ? c.a : 'transparent';
+    btn.style.border     = '1px solid ' + (on ? c.b : 'rgba(255,255,255,.1)');
+    btn.style.color      = on ? c.c : 'rgba(255,255,255,.5)';
+  });
+
+  if (!window.zzdb) return;
+  ZZ._omRef = zzdb.ref(type + '/orders').orderByChild('createdAt').limitToLast(200);
+  ZZ._omValueCb = function(snap) {
+    ZZ._omOrders = {};
+    snap.forEach(function(ch) {
+      ZZ._omOrders[ch.key] = Object.assign({ id: ch.key }, ch.val());
+    });
+    ZZ._omRender();
+  };
+  ZZ._omRef.on('value', ZZ._omValueCb);
+};
+
+/* ── فلتر الحالة ── */
+ZZ.omSetStatusFilter = function(f) {
+  ZZ._omStatusFilter = f;
+  document.querySelectorAll('.om-filter-btn').forEach(function(b) {
+    var isActive = b.getAttribute('data-status') === f;
+    b.classList.toggle('active', isActive);
+    b.style.background = isActive ? 'rgba(245,200,66,.12)' : 'transparent';
+    b.style.color      = isActive ? '#f5c842' : 'rgba(255,255,255,.5)';
+  });
+  ZZ._omRender();
+};
+
+/* ── بحث ── */
+ZZ.omSearch = function(val) {
+  ZZ._omSearchQuery = val || '';
+  ZZ._omRender();
+};
+
+/* ── فلترة ── */
+ZZ._omFilteredOrders = function() {
+  var all = Object.values(ZZ._omOrders);
+  if (ZZ._omStatusFilter !== 'all') {
+    all = all.filter(function(o) { return (o.status || 'pending') === ZZ._omStatusFilter; });
+  }
+  if (ZZ._omSearchQuery) {
+    var q = ZZ._omSearchQuery.trim().toLowerCase();
+    if (q) {
+      var qDigits = q.replace(/\D/g, '');
+      all = all.filter(function(o) {
+        var nameMatch  = (o.name || '').toLowerCase().indexOf(q) !== -1;
+        var phoneMatch = qDigits && (
+          (o.phone    || '').replace(/\D/g,'').indexOf(qDigits) !== -1 ||
+          (o.whatsapp || '').replace(/\D/g,'').indexOf(qDigits) !== -1
+        );
+        return nameMatch || phoneMatch;
+      });
+    }
+  }
+  all.sort(function(a, b) {
+    var aDone = a.status === 'delivered', bDone = b.status === 'delivered';
+    if (aDone !== bDone) return aDone ? 1 : -1;
+    return (b.createdAt||0) - (a.createdAt||0);
+  });
+  return all;
+};
+
+/* ── رندر ── */
+ZZ._omRender = function() {
+  var orders = ZZ._omFilteredOrders();
+  var listEl = document.getElementById('om-orders-list');
+  var cntEl  = document.getElementById('om-count');
+  if (cntEl) cntEl.textContent = orders.length + ' طلب';
+  if (!listEl) return;
+  if (!orders.length) {
+    listEl.innerHTML = '<div style="color:rgba(255,255,255,.3);font-size:13px;padding:20px;grid-column:1/-1;text-align:center">لا توجد طلبات مطابقة</div>';
+    return;
+  }
+  listEl.innerHTML = orders.map(function(o) { return ZZ._omCardHTML(o); }).join('');
+};
+
+/* ── كارت الطلب ── */
+ZZ._omCardHTML = function(o) {
+  var isDelivered = (o.status === 'delivered');
+  var curIdx = ZZ._omStatuses.findIndex(function(s){ return s.key === (o.status || 'pending'); });
+  if (curIdx === -1) curIdx = 0;
+  var time = o.createdAt ? new Date(o.createdAt).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}) : '—';
+  var date = o.createdAt ? new Date(o.createdAt).toLocaleDateString('ar-EG') : '';
+
+  var items = o.items || [];
+  var itemsHTML = items.map(function(it) {
+    var total = (parseFloat(it.price)||0) * (parseInt(it.qty)||1);
+    return '<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.06)"><span style="color:rgba(255,255,255,.6)">' + (it.name||'') + ' ×' + (it.qty||1) + '</span><span style="color:#f5c842;font-weight:700">' + total + ' ج</span></div>';
+  }).join('');
+
+  var grandTotal = parseFloat(o.grandTotal) || parseFloat(o.total) || 0;
+  var addrHTML = (o.orderType === 'delivery' && o.address)
+    ? '<div style="font-size:11.5px;color:rgba(255,255,255,.45);margin-top:4px">📍 ' + (o.zone ? o.zone + ' — ' : '') + o.address + '</div>'
+    : '';
+
+  var statusBtns = ZZ._omStatuses.map(function(s, i) {
+    var isActive = (i === curIdx);
+    var isPast   = i < curIdx;
+    if (isPast) {
+      return '<button disabled style="padding:5px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:transparent;color:rgba(255,255,255,.2);font-size:10.5px;font-weight:700;cursor:not-allowed;text-decoration:line-through;font-family:Cairo,sans-serif">' + s.icon + ' ' + s.label + '</button>';
+    }
+    var activeStyle = isActive ? 'background:rgba(245,200,66,.18);border-color:rgba(245,200,66,.5);color:#f5c842' : 'background:transparent;border-color:rgba(255,255,255,.12);color:rgba(255,255,255,.55)';
+    return '<button onclick="ZZ.omSetStatus(\'' + o.id + '\',\'' + s.key + '\')" style="padding:5px 10px;border-radius:8px;border:1px solid;' + activeStyle + ';font-size:10.5px;font-weight:700;cursor:pointer;font-family:Cairo,sans-serif">' + s.icon + ' ' + s.label + '</button>';
+  }).join('');
+
+  var waNum = ZZ._omNormalizePhone(o.whatsapp || o.phone);
+
+  return '<div id="om-card-' + o.id + '" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;' + (isDelivered ? 'opacity:.5' : '') + '">'
+    + (isDelivered ? '<div style="text-align:center;background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.3);border-radius:8px;padding:6px;margin-bottom:8px;color:#f5c842;font-weight:800;font-size:11.5px">🎉 تم تسليم الأوردر</div>' : '')
+    + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'
+    +   '<div>'
+    +     '<div style="font-size:11px;color:rgba(255,255,255,.35);font-weight:700">' + (o.id||'') + '</div>'
+    +     '<div style="font-size:10px;color:rgba(255,255,255,.25)">' + time + (date?' · '+date:'') + '</div>'
+    +   '</div>'
+    +   '<span style="font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:6px;background:' + (o.orderType==='delivery'?'rgba(59,130,246,.15);color:#60a5fa':'rgba(34,197,94,.12);color:#4ade80') + '">' + (o.orderType==='delivery'?'🛵 ديليفري':'🏪 استلام') + '</span>'
+    + '</div>'
+    + '<div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:2px">' + (o.name||'—') + '</div>'
+    + '<div style="font-size:12px;color:rgba(255,255,255,.5)">📞 ' + (waNum ? '<a href="tel:+' + waNum + '" style="color:#4ade80;text-decoration:none">' + (o.phone||waNum) + '</a>' : (o.phone||'—')) + '</div>'
+    + addrHTML
+    + (itemsHTML ? '<div style="margin:8px 0">' + itemsHTML + '</div>' : '')
+    + '<div style="display:flex;justify-content:space-between;align-items:center;background:rgba(245,200,66,.07);border-radius:8px;padding:7px 10px;margin:8px 0">'
+    +   '<span style="font-size:11.5px;color:rgba(255,255,255,.5)">الإجمالي</span>'
+    +   '<span style="font-size:15px;font-weight:900;color:#f5c842">' + grandTotal + ' ج</span>'
+    + '</div>'
+    + (o.notes ? '<div style="font-size:11px;color:rgba(255,255,255,.45);background:rgba(255,255,255,.03);border-radius:8px;padding:6px 9px;margin-bottom:8px">💬 ' + o.notes + '</div>' : '')
+    + '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px">' + statusBtns + '</div>'
+    + '<div style="display:flex;gap:6px">'
+    +   (waNum ? '<a href="https://wa.me/' + waNum + '" target="_blank" style="flex:1;text-align:center;padding:7px;border-radius:8px;background:rgba(34,197,94,.12);color:#4ade80;text-decoration:none;font-size:11.5px;font-weight:700;font-family:Cairo,sans-serif">💬 واتساب</a>' : '')
+    +   '<button onclick="ZZ.omDeleteOrder(\'' + o.id + '\')" style="padding:7px 14px;border-radius:8px;background:rgba(239,68,68,.12);color:#f87171;border:none;font-size:11.5px;font-weight:700;cursor:pointer;font-family:Cairo,sans-serif">🗑 حذف</button>'
+    + '</div>'
+    + '</div>';
+};
+
+/* ── تطبيع رقم مصري ── */
+ZZ._omNormalizePhone = function(raw) {
+  if (!raw) return '';
+  var d = String(raw).replace(/\D/g, '');
+  if (!d) return '';
+  if (d.indexOf('00') === 0) d = d.slice(2);
+  if (d.charAt(0) === '0' && d.length === 11) d = '20' + d.slice(1);
+  else if (d.length === 10 && d.charAt(0) === '1') d = '20' + d;
+  if (d.length !== 12 || d.indexOf('20') !== 0) return '';
+  return d;
+};
+
+/* ── تغيير الحالة (بحماية من الرجوع للخلف) ── */
+ZZ.omSetStatus = function(id, status) {
+  if (!window.zzdb) return;
+  var type  = ZZ._omCurrentType;
+  var order = ZZ._omOrders[id];
+  if (order) {
+    var curIdx    = ZZ._omStatuses.findIndex(function(s){ return s.key === (order.status||'pending'); });
+    var targetIdx = ZZ._omStatuses.findIndex(function(s){ return s.key === status; });
+    if (curIdx !== -1 && targetIdx !== -1 && targetIdx < curIdx) {
+      alert('⚠️ ما ينفعش ترجع لمرحلة سابقة');
+      return;
+    }
+  }
+  zzdb.ref(type + '/orders/' + id + '/status').set(status).catch(function(e) { alert('❌ ' + e.message); });
+};
+
+/* ── حذف طلب ── */
+ZZ.omDeleteOrder = function(id) {
+  if (!confirm('حذف هذا الطلب نهائياً؟')) return;
+  if (!window.zzdb) return;
+  zzdb.ref(ZZ._omCurrentType + '/orders/' + id).remove();
+};
+
+/* ── أرشفة كل الطلبات الحالية ── */
+ZZ.omArchiveAll = function() {
+  var type = ZZ._omCurrentType;
+  var orders = Object.values(ZZ._omOrders);
+  if (!orders.length) { alert('مفيش طلبات نشطة عشان تتأرشف'); return; }
+  if (!confirm('هيتم نقل كل طلبات "' + type + '" الحالية (' + orders.length + ' طلب) للأرشيف وحذفها من القائمة النشطة. متأكد؟')) return;
+  if (!window.zzdb) return;
+
+  var updates = {};
+  orders.forEach(function(o) {
+    var clean = Object.assign({}, o);
+    delete clean.id;
+    updates['/' + type + '/archive/' + o.id] = clean;
+  });
+
+  var note = document.getElementById('om-archive-note');
+  if (note) note.textContent = '⏳ جاري الأرشفة...';
+
+  zzdb.ref().update(updates)
+    .then(function() { return zzdb.ref(type + '/orders').remove(); })
+    .then(function() {
+      if (note) { note.textContent = '✅ تمت أرشفة ' + orders.length + ' طلب'; setTimeout(function(){ note.textContent=''; }, 4000); }
+    })
+    .catch(function(e) { if (note) note.textContent = '❌ ' + e.message; });
+};
+
+/* ── استرجاع الأرشيف ── */
+ZZ.omRestoreArchive = function() {
+  var type = ZZ._omCurrentType;
+  if (!window.zzdb) return;
+  var note = document.getElementById('om-archive-note');
+  if (note) note.textContent = '⏳ جاري التحميل...';
+
+  zzdb.ref(type + '/archive').once('value').then(function(snap) {
+    if (!snap.exists()) { if (note) note.textContent = 'الأرشيف فاضي'; return; }
+    var count = 0;
+    var updates = {};
+    snap.forEach(function(ch) {
+      updates['/' + type + '/orders/' + ch.key] = ch.val();
+      count++;
+    });
+    if (!confirm('هيتم استرجاع ' + count + ' طلب من الأرشيف للقائمة النشطة. متأكد؟')) {
+      if (note) note.textContent = '';
+      return;
+    }
+    zzdb.ref().update(updates)
+      .then(function() { return zzdb.ref(type + '/archive').remove(); })
+      .then(function() {
+        if (note) { note.textContent = '✅ تم استرجاع ' + count + ' طلب'; setTimeout(function(){ note.textContent=''; }, 4000); }
+      })
+      .catch(function(e) { if (note) note.textContent = '❌ ' + e.message; });
+  }).catch(function(e) { if (note) note.textContent = '❌ ' + e.message; });
+};
+
 
 </script>
 
