@@ -1819,10 +1819,20 @@ ML.sendOrder = function() {
     + (notes ? '• ملاحظات: ' + notes + '\n' : '')
     + '━━━━━━━━━━━━━━━';
 
-  /* تطبيع رقم الواتساب — إضافة كود مصر */
+  /* تطبيع رقم الواتساب — تحقق صارم (12 رقم بالظبط) + fallback لرقم التليفون */
   function _normalizePhone(num) {
     var n = (num || '').replace(/\D/g, '');
-    if (n.charAt(0) === '0') n = '20' + n.slice(1);
+    var fallback = function() {
+      var p = (phone || '').replace(/\D/g, '');
+      if (p.charAt(0) === '0' && p.length === 11) return '20' + p.slice(1);
+      return p;
+    };
+    if (!n) return fallback();
+    if (n.indexOf('00') === 0) n = n.slice(2);                    /* 0020... -> 20... */
+    if (n.charAt(0) === '0' && n.length === 11) n = '20' + n.slice(1); /* 01xxxxxxxxx -> 20... */
+    else if (n.length === 10 && n.charAt(0) === '1') n = '20' + n;      /* بدون صفر */
+    /* النتيجة النهائية لازم تكون بالظبط 12 رقم (20 + 10 أرقام) وإلا نرجع للتليفون الموثوق */
+    if (n.length !== 12 || n.indexOf('20') !== 0) return fallback();
     return n;
   }
   var orderData = {
