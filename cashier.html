@@ -572,13 +572,13 @@ const CA = {
             var d = ch.val();
             if (d.pinHash === pinHash && d.active !== false) {
               found = true; cashierId = ch.key;
-              sessionStorage.setItem('zz_cashier_id',   ch.key);
-              sessionStorage.setItem('zz_cashier_name', d.username);
+              localStorage.setItem('zz_cashier_id', ch.key);
+              localStorage.setItem('zz_cashier_name', d.username);
             }
           });
           if (found) {
             document.getElementById('login-gate').classList.add('hidden');
-            CA.init(sessionStorage.getItem('zz_cashier_name'));
+            CA.init(localStorage.getItem('zz_cashier_name'));
           } else {
             errEl.textContent = 'اسم المستخدم أو الـ PIN غلط';
           }
@@ -588,8 +588,8 @@ const CA = {
 
   /* ── CHECK SESSION ── */
   checkSession: function() {
-    var id   = sessionStorage.getItem('zz_cashier_id');
-    var name = sessionStorage.getItem('zz_cashier_name');
+    var id   = localStorage.getItem('zz_cashier_id');
+    var name = localStorage.getItem('zz_cashier_name');
     if (!id || !name) return false;
     /* init Firebase */
     if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
@@ -968,20 +968,17 @@ const CA = {
 
   setStatus: function(id, type, status) {
     if (!CA.db) return;
+    var lbl = CA._statuses.find(function(s){ return s.key===status; });
+    /* الـ render بيحصل تلقائي من مستمع child_changed — منعمل رندر يدوي تاني عشان منلاجش */
     CA.db.ref(type + '/orders/' + id + '/status').set(status).then(function() {
-      if (CA.orders[id]) CA.orders[id].status = status;
-      CA._render();
-      var lbl = CA._statuses.find(function(s){ return s.key===status; });
       CA.toast((lbl ? lbl.icon + ' ' : '') + (lbl ? lbl.label : status));
-    });
+    }).catch(function(e) { alert('❌ ' + e.message); });
   },
 
   deleteOrder: function(id, type) {
     if (!confirm('حذف الطلب نهائياً من Firebase؟')) return;
     if (CA.db) CA.db.ref(type + '/orders/' + id).remove();
-    delete CA.orders[id];
-    CA._seenIds.delete(id);
-    CA._render();
+    /* الحذف من الشاشة بيحصل تلقائي من مستمع child_removed */
     CA.toast('🗑 تم حذف الطلب');
   },
 
@@ -997,8 +994,8 @@ const CA = {
 
   /* ── LOGOUT ── */
   logout: function() {
-    sessionStorage.removeItem('zz_cashier_id');
-    sessionStorage.removeItem('zz_cashier_name');
+    localStorage.removeItem('zz_cashier_id');
+    localStorage.removeItem('zz_cashier_name');
     /* شيل الـ listeners */
     if (CA.db) {
       ['mawled','kahk','choco'].forEach(function(t) {

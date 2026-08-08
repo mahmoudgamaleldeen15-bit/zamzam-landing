@@ -6910,8 +6910,8 @@ ZZ.cashierLogin = async function() {
         var d=ch.val();
         if(d.pinHash===pinHash&&d.active!==false){
           found=true;
-          sessionStorage.setItem('zz_cashier_id',ch.key);
-          sessionStorage.setItem('zz_cashier_name',d.username);
+          localStorage.setItem('zz_cashier_id', ch.key);
+          localStorage.setItem('zz_cashier_name',d.username);
         }
       });
       if(found){ZZ.closeCashierLogin();window.location.href='cashier.html';}
