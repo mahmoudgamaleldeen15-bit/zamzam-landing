@@ -1406,7 +1406,6 @@ const ML = {
   }
   if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
   ML.db = firebase.database();
-  ML._loadPageConfig();
   firebase.auth().signInAnonymously()
     .then(function(c) { ML.loadData(); })
     .catch(function()  { ML.loadData(); });
@@ -1433,6 +1432,7 @@ const ML = {
 ════════════════════════════════════════════ */
 ML.loadData = function() {
   var db = ML.db;
+  ML._loadPageConfig();
 
   /* ── إعدادات (واتساب + ترحيب + Hero) ── */
   db.ref('landing/kahk/settings').on('value', function(snap) {

@@ -1406,7 +1406,6 @@ const ML = {
   }
   if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
   ML.db = firebase.database();
-  ML._loadPageConfig();
   firebase.auth().signInAnonymously()
     .then(function(c) { ML.loadData(); })
     .catch(function()  { ML.loadData(); });
@@ -1433,6 +1432,7 @@ const ML = {
 ════════════════════════════════════════════ */
 ML.loadData = function() {
   var db = ML.db;
+  ML._loadPageConfig();
 
   /* ── إعدادات (واتساب + ترحيب + Hero) ── */
   db.ref('landing/mawled/settings').on('value', function(snap) {
@@ -1486,11 +1486,6 @@ ML.loadData = function() {
     ML.products = ML.products.filter(function(p) { return p.available !== false; });
     ML.renderProducts();
     ML.renderAdminPanel();
-    /* فحص أوقات الطلبات */
-    ML._checkOrderHours(d.orderHours || null);
-    /* فحص دوري كل دقيقة */
-    if (!ML._hoursTimer) ML._hoursTimer = setInterval(function(){ ML._checkOrderHours(ML._lastOrderHours); }, 60000);
-    ML._lastOrderHours = d.orderHours || null;
   });
 
   /* ── fallback للـ legacy config إذا لم توجد بيانات في مسار المولد ── */
