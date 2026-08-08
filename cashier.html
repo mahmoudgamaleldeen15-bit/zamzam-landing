@@ -297,6 +297,19 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Cairo'
 .oc-goto:hover{opacity:1;background:rgba(255,255,255,.08)}
 
 
+/* ══ DELIVERED ORDER — dimmed state ══ */
+.order-card.delivered{
+  opacity:.45;filter:grayscale(.35);
+  transition:opacity .3s,filter .3s;
+}
+.order-card.delivered:hover{opacity:.7;filter:grayscale(.1)}
+.delivered-banner{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  background:rgba(245,200,66,.15);border:1px solid rgba(245,200,66,.3);
+  border-radius:10px;padding:8px;margin-bottom:10px;
+  color:var(--gold);font-weight:900;font-size:12.5px;
+}
+
 .empty-state{
   text-align:center;padding:80px 24px;
   grid-column:1/-1;
@@ -763,7 +776,13 @@ const CA = {
 
   _filteredOrders: function() {
     var all = Object.values(CA.orders);
-    all.sort(function(a, b) { return (b.createdAt||0) - (a.createdAt||0); });
+    all.sort(function(a, b) {
+      /* الطلبات المُسلَّمة تنزل لآخر القائمة دايماً */
+      var aDone = a.status === 'delivered';
+      var bDone = b.status === 'delivered';
+      if (aDone !== bDone) return aDone ? 1 : -1;
+      return (b.createdAt||0) - (a.createdAt||0);
+    });
     if (CA.filter !== 'all') all = all.filter(function(o){ return o._type === CA.filter; });
     if (CA.deliveryFilter === 'delivery') all = all.filter(function(o){ return o.orderType === 'delivery'; });
     if (CA.deliveryFilter === 'pickup')   all = all.filter(function(o){ return o.orderType !== 'delivery'; });
@@ -867,8 +886,13 @@ const CA = {
 
     var typeRibbon = '<div class="oc-type-ribbon ' + o._type + '">' + typeLabel + '</div>';
 
-    return '<div class="order-card ' + o._type + (isNew?' new-order':'') + '" id="card-' + o.id + '">'
-      + newBadge
+    var isDelivered = (o.status === 'delivered');
+    var deliveredBanner = isDelivered
+      ? '<div class="delivered-banner">🎉 تم تسليم الأوردر</div>'
+      : '';
+
+    return '<div class="order-card ' + o._type + (isNew&&!isDelivered?' new-order':'') + (isDelivered?' delivered':'') + '" id="card-' + o.id + '">'
+      + (isDelivered ? '' : newBadge)
       + '<div class="oc-head">'
       +   '<div>'
       +     typeRibbon
@@ -878,6 +902,7 @@ const CA = {
       +   '<span class="oc-delivery-badge ' + (o.orderType==='delivery'?'delivery':'pickup') + '">'
       +     (o.orderType==='delivery'?'🛵 ديليفري':'🏪 استلام') + '</span>'
       + '</div>'
+      + deliveredBanner
       + '<div class="oc-cust">'
       +   '<div class="oc-cust-name">' + (o.name||'—') + '</div>'
       +   '<div class="oc-cust-row">📞 '
@@ -894,10 +919,9 @@ const CA = {
       + CA._statusBar(o)
       + '<div class="oc-actions">'
       +   (waNum ? '<button class="oc-btn oc-btn-wa" onclick="CA.openWa(\'' + waNum + '\',\'' + o.id + '\',\'' + (o.name||'').replace(/'/g,"") + '\')">💬 تواصل واتساب</button>' : '')
-      +   '<button class="oc-btn oc-btn-done" onclick="CA.archiveOrder(\'' + o.id + '\',\'' + o._type + '\')">✅ تم</button>'
-      +   '<button class="oc-btn oc-btn-del"  onclick="CA.deleteOrder(\'' + o.id + '\',\'' + o._type + '\')">🗑</button>'
+      +   '<button class="oc-btn oc-btn-del"  onclick="CA.deleteOrder(\'' + o.id + '\',\'' + o._type + '\')">🗑 حذف</button>'
       + '</div>'
-      + '<a class="oc-goto" href="track.html?id=' + o.id + '&type=' + o._type + '" target="_blank">🔗 الذهاب لصفحة الطلب</a>'
+      + '<a class="oc-goto" href="track.html?id=' + o.id + '&type=' + o._type + '&ref=cashier" target="_blank">🔗 الذهاب لصفحة الطلب</a>'
       + '</div>';
   },
 
@@ -950,18 +974,6 @@ const CA = {
       var lbl = CA._statuses.find(function(s){ return s.key===status; });
       CA.toast((lbl ? lbl.icon + ' ' : '') + (lbl ? lbl.label : status));
     });
-  },
-
-  archiveOrder: function(id, type) {
-    /* نشيله من العرض بس — مش من Firebase */
-    var card = document.getElementById('card-' + id);
-    if (card) { card.style.opacity='0'; card.style.transform='scale(.95)'; card.style.transition='.25s'; }
-    setTimeout(function() {
-      delete CA.orders[id];
-      CA._seenIds.delete(id);
-      CA._render();
-    }, 250);
-    CA.toast('✅ تم تأشير الطلب كمنجز');
   },
 
   deleteOrder: function(id, type) {

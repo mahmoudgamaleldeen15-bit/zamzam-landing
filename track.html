@@ -130,6 +130,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'Ca
   background:rgba(255,255,255,.05);border:1px solid var(--border);
   border-radius:10px;color:var(--dim);font-size:13px;font-weight:700;
   cursor:pointer;font-family:'Cairo',sans-serif;transition:all .2s;
+  text-align:center;max-width:280px;
 }
 .refresh-btn:hover{background:rgba(255,255,255,.1);color:var(--text)}
 
@@ -191,6 +192,7 @@ var TR = {
     var params = new URLSearchParams(window.location.search);
     TR.orderId = params.get('id');
     TR.type    = params.get('type');
+    TR.isCashier = params.get('ref') === 'cashier';
 
     if (!TR.orderId || !TR.type) {
       TR.showError('لينك غير صحيح', 'الرجاء استخدام اللينك الموجود في شاشة تأكيد طلبك');
@@ -264,6 +266,23 @@ var TR = {
       addrHTML = '<div class="addr-box">📍 ' + (order.zone ? order.zone + ' — ' : '') + order.address + '</div>';
     }
 
+    /* أزرار مختلفة حسب مين فاتح الصفحة */
+    var footerHTML;
+    if (TR.isCashier) {
+      /* الكاشير — زرار رجوع لصفحة الطلبات + تحديث يدوي */
+      footerHTML =
+          '<div class="refresh-note">الصفحة بتتحدث تلقائياً 🔄</div>'
+        + '<a class="refresh-btn" href="cashier.html" style="display:block;text-decoration:none;box-sizing:border-box">→ رجوع لصفحة الطلبات</a>'
+        + '<button class="refresh-btn" onclick="location.reload()">تحديث يدوي</button>';
+    } else {
+      /* العميل — زرار رجوع للمنيو بس، من غير تحديث يدوي */
+      var menuLinks = { mawled:'mawled-order.html', kahk:'kahk-order.html', choco:'choco-order.html' };
+      var menuHref  = menuLinks[TR.type] || 'index.html';
+      footerHTML =
+          '<div class="refresh-note">الصفحة بتتحدث تلقائياً 🔄</div>'
+        + '<a class="refresh-btn" href="' + menuHref + '" style="display:block;text-decoration:none;box-sizing:border-box">🔙 العودة للمنيو</a>';
+    }
+
     document.getElementById('main').innerHTML =
       '<div class="order-header">'
       + '<div class="type-badge ' + TR.type + '">' + typeBadge + '</div>'
@@ -273,8 +292,7 @@ var TR = {
       + '<div class="timeline">' + tlHTML + '</div>'
       + infoHTML
       + addrHTML
-      + '<div class="refresh-note">الصفحة بتتحدث تلقائياً 🔄</div>'
-      + '<button class="refresh-btn" onclick="location.reload()">تحديث يدوي</button>';
+      + footerHTML;
   },
 
   showError: function(title, sub) {
