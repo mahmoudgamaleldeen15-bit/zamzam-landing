@@ -1866,7 +1866,7 @@ a{text-decoration:none;color:inherit}
 
       <!-- ══ TAB: JOBS ══ -->
       <div id="admin-tab-jobs" class="admin-panel-sec">
-        <div class="admin-sec-title">💼 إضافة وظيفة جديدة</div>
+        <div class="admin-sec-title" id="jb-form-title">💼 إضافة وظيفة جديدة</div>
         <div class="admin-form-grid">
           <div><label class="admin-lbl">مسمى الوظيفة *</label><input id="jb-title" class="admin-inp" type="text" placeholder="مثال: كاشير — خدمة عملاء"></div>
           <div><label class="admin-lbl">القسم / الإدارة</label><input id="jb-dept" class="admin-inp" type="text" placeholder="مثال: المبيعات — الإنتاج — الإدارة"></div>
@@ -1883,7 +1883,10 @@ a{text-decoration:none;color:inherit}
             <div id="jb-wa-list" style="display:flex;flex-wrap:wrap;gap:6px"></div>
           </div>
         </div>
-        <button class="btn-admin-add" style="background:linear-gradient(135deg,#7c3aed,#5b21b6)" onclick="ZZ.addJob()">💼 إضافة الوظيفة</button>
+        <div style="display:flex;gap:10px">
+          <button class="btn-admin-add" id="jb-submit-btn" style="background:linear-gradient(135deg,#7c3aed,#5b21b6)" onclick="ZZ.addJob()">💼 إضافة الوظيفة</button>
+          <button id="jb-cancel-btn" onclick="ZZ.cancelEditJob()" style="display:none;padding:0 20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);border-radius:10px;cursor:pointer;font-size:13px;font-weight:700;font-family:'Cairo',sans-serif">❌ إلغاء التعديل</button>
+        </div>
         <div class="admin-note" id="job-save-note">✅ تم حفظ الوظيفة</div>
 
         <div style="margin-top:24px">
@@ -1891,6 +1894,7 @@ a{text-decoration:none;color:inherit}
           <div id="admin-jobs-list"><div style="text-align:center;color:rgba(255,255,255,.3);padding:20px;font-size:13px">لا توجد وظائف بعد</div></div>
         </div>
       </div>
+
       <!-- ══ TAB: SECURITY ══ -->
       <div id="admin-tab-security" class="admin-panel-sec">
       <div class="admin-sec-divider"></div>
@@ -4588,6 +4592,8 @@ ZZ._previewJobImg = function(url) {
   }
 };
 
+ZZ._editingJobId = null;
+
 ZZ.addJob = function() {
   var title = (document.getElementById('jb-title')||{}).value||'';
   var desc  = (document.getElementById('jb-desc') ||{}).value||'';
@@ -4602,20 +4608,77 @@ ZZ.addJob = function() {
     location: ((document.getElementById('jb-location')||{}).value||'').trim(),
     desc:     desc.trim(),
     req:      ((document.getElementById('jb-req')     ||{}).value||'').trim(),
-    whatsapp: ZZ._jobWaNums.slice(),
-    active:   true,
-    createdAt: Date.now()
+    whatsapp: ZZ._jobWaNums.slice()
   };
-  if (imgUrl) job.img = imgUrl;
-  zzdb.ref('landing/jobs').push(job)
-    .then(function() {
-      ['jb-title','jb-dept','jb-location','jb-desc','jb-req','jb-wa-inp','jb-img'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
-      var prev=document.getElementById('jb-img-preview'); if(prev){prev.style.display='none';prev.style.backgroundImage='';}
-      ZZ._jobWaNums = [];
-      ZZ._renderWaChips('jb-wa-list',[]);
-      var n=document.getElementById('job-save-note'); if(n){n.classList.add('show');setTimeout(function(){n.classList.remove('show');},2500);}
-    })
-    .catch(function(e){ alert('❌ '+e.message); });
+  job.img = imgUrl || null;
+
+  var editId = ZZ._editingJobId;
+
+  if (editId) {
+    /* ── وضع التعديل — تحديث الوظيفة الموجودة ── */
+    zzdb.ref('landing/jobs/' + editId).update(job)
+      .then(function() {
+        ZZ.cancelEditJob();
+        var n = document.getElementById('job-save-note');
+        if (n) { n.textContent = '✅ تم حفظ التعديل'; n.classList.add('show'); setTimeout(function(){ n.classList.remove('show'); n.textContent='✅ تم حفظ الوظيفة'; }, 2500); }
+      })
+      .catch(function(e){ alert('❌ ' + e.message); });
+  } else {
+    /* ── وضع الإضافة — وظيفة جديدة ── */
+    job.active    = true;
+    job.createdAt = Date.now();
+    zzdb.ref('landing/jobs').push(job)
+      .then(function() {
+        ZZ._resetJobForm();
+        var n=document.getElementById('job-save-note'); if(n){n.classList.add('show');setTimeout(function(){n.classList.remove('show');},2500);}
+      })
+      .catch(function(e){ alert('❌ '+e.message); });
+  }
+};
+
+ZZ._resetJobForm = function() {
+  ['jb-title','jb-dept','jb-location','jb-desc','jb-req','jb-wa-inp','jb-img'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
+  var prev=document.getElementById('jb-img-preview'); if(prev){prev.style.display='none';prev.style.backgroundImage='';}
+  ZZ._jobWaNums = [];
+  ZZ._renderWaChips('jb-wa-list',[]);
+};
+
+ZZ.openEditJob = function(id) {
+  var j = ZZ._jobsCache.find(function(x){ return String(x.id) === String(id); });
+  if (!j) return;
+  ZZ._editingJobId = id;
+
+  document.getElementById('jb-title').value    = j.title    || '';
+  document.getElementById('jb-dept').value     = j.dept     || '';
+  document.getElementById('jb-location').value = j.location || '';
+  document.getElementById('jb-desc').value     = j.desc     || '';
+  document.getElementById('jb-req').value      = j.req      || '';
+  document.getElementById('jb-img').value      = j.img      || '';
+  ZZ._previewJobImg(j.img || '');
+
+  ZZ._jobWaNums = (j.whatsapp || []).slice();
+  ZZ._renderWaChips('jb-wa-list', ZZ._jobWaNums);
+
+  var titleEl = document.getElementById('jb-form-title');
+  if (titleEl) titleEl.textContent = '✏️ تعديل الوظيفة: ' + (j.title || '');
+  var submitBtn = document.getElementById('jb-submit-btn');
+  if (submitBtn) submitBtn.textContent = '💾 حفظ التعديل';
+  var cancelBtn = document.getElementById('jb-cancel-btn');
+  if (cancelBtn) cancelBtn.style.display = 'inline-block';
+
+  var section = document.getElementById('admin-tab-jobs');
+  if (section) section.scrollIntoView({ behavior:'smooth', block:'start' });
+};
+
+ZZ.cancelEditJob = function() {
+  ZZ._editingJobId = null;
+  ZZ._resetJobForm();
+  var titleEl = document.getElementById('jb-form-title');
+  if (titleEl) titleEl.textContent = '💼 إضافة وظيفة جديدة';
+  var submitBtn = document.getElementById('jb-submit-btn');
+  if (submitBtn) submitBtn.textContent = '💼 إضافة الوظيفة';
+  var cancelBtn = document.getElementById('jb-cancel-btn');
+  if (cancelBtn) cancelBtn.style.display = 'none';
 };
 
 ZZ.deleteJob = function(id) {
@@ -4638,6 +4701,7 @@ ZZ._renderAdminJobs = function() {
       +'<div class="jac-info"><div class="jac-title">'+(j.title||'')+'</div><div class="jac-dept">'+(j.dept||'')+'</div></div>'
       +'<div class="jac-actions">'
       +'<button class="mai-btn mai-btn-tog '+(j.active?'on':'off')+'" data-jid="'+jid+'" data-active="'+(j.active?'1':'0')+'" title="'+(j.active?'إخفاء':'إظهار')+'">'+(j.active?'✅':'🔴')+'</button>'
+      +'<button class="mai-btn mai-btn-edit" data-jid="'+jid+'" title="تعديل">✏️</button>'
       +'<button class="mai-btn mai-btn-del"  data-jid="'+jid+'" title="حذف">🗑</button>'
       +'</div></div>';
   }).join('');
@@ -4649,6 +4713,7 @@ ZZ._renderAdminJobs = function() {
     var jid2 = row ? row.getAttribute('data-jid') : null;
     if (!jid2) return;
     if (btn.classList.contains('mai-btn-del')) ZZ.deleteJob(jid2);
+    if (btn.classList.contains('mai-btn-edit')) ZZ.openEditJob(jid2);
     if (btn.classList.contains('mai-btn-tog')) {
       var cur = btn.getAttribute('data-active') === '1';
       ZZ.toggleJobActive(jid2, !cur);
@@ -4769,60 +4834,104 @@ ZZ.submitApplication = function() {
   if (!ok) return;
 
   var nums = (job.whatsapp && job.whatsapp.length) ? job.whatsapp : null;
-  if (!nums) { alert('\u26a0\ufe0f \u0644\u0645 \u064a\u062a\u0645 \u062a\u062d\u062f\u064a\u062f \u0631\u0642\u0645 \u0648\u0627\u062a\u0633\u0627\u0628 \u0644\u0647\u0630\u0647 \u0627\u0644\u0648\u0638\u064a\u0641\u0629'); return; }
+  if (!nums) { alert('⚠️ لم يتم تحديد رقم واتساب لهذه الوظيفة'); return; }
 
-  if (window.zzdb) {
-    zzdb.ref('landing/applications').push({
+  var submitBtn = document.getElementById('ap-submit-btn');
+  var origBtnText = submitBtn ? submitBtn.innerHTML : '';
+  function lockBtn(text) { if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = text; } }
+  function unlockBtn()   { if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = origBtnText; } }
+
+  /* حد أقصى لحجم الملف — 4 ميجا (Firebase Realtime DB بيستحمل كده براحة) */
+  var MAX_CV_SIZE = 4 * 1024 * 1024;
+  if (cvFile && cvFile.size > MAX_CV_SIZE) {
+    alert('⚠️ حجم الملف كبير جدًا (' + Math.round(cvFile.size/1024/1024*10)/10 + ' ميجا)\nالحد الأقصى المسموح 4 ميجا — اختر ملف أصغر');
+    return;
+  }
+
+  /* ── تحويل السيرة الذاتية لـ base64 وتخزينها مباشرة في Firebase (بدون احتياج Storage/فوترة) ── */
+  var readPromise;
+  if (cvFile) {
+    lockBtn('⏳ جاري تجهيز الملف...');
+    readPromise = new Promise(function(resolve) {
+      var reader = new FileReader();
+      reader.onload = function() { resolve(reader.result); };
+      reader.onerror = function() { resolve(null); };
+      reader.readAsDataURL(cvFile); /* بيرجع data:mime;base64,.... */
+    });
+  } else {
+    readPromise = Promise.resolve(null);
+  }
+
+  readPromise.then(function(cvDataUrl) {
+    lockBtn('⏳ جاري إرسال الطلب...');
+
+    if (!window.zzdb) { unlockBtn(); alert('⚠️ الاتصال بقاعدة البيانات غير متاح، حاول مجددًا'); return; }
+
+    /* نولّد مفتاح الطلب مقدمًا عشان نبني لينك تحميل السيرة الذاتية قبل الإرسال */
+    var appRef = zzdb.ref('landing/applications').push();
+    var appId  = appRef.key;
+
+    var appData = {
       jobId: job.id, jobTitle: job.title||'',
       name: name.trim(), phone: phone.trim(), whatsapp: wa.trim(),
       address: address.trim(), notes: notes.trim(),
       cvName: cvFile ? cvFile.name : '',
+      cvData: cvDataUrl || '',
       createdAt: Date.now()
-    }).catch(function(){});
-  }
+    };
 
-  var parts = [
-    '== \u0637\u0644\u0628 \u062a\u0648\u0638\u064a\u0641 \u062c\u062f\u064a\u062f ==',
-    '\u0627\u0644\u0648\u0638\u064a\u0641\u0629: ' + (job.title||'')
-  ];
-  if (job.dept)     parts.push('\u0627\u0644\u0642\u0633\u0645: '  + job.dept);
-  if (job.location) parts.push('\u0627\u0644\u0641\u0631\u0639: '  + job.location);
-  parts.push('');
-  parts.push('\u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u0645\u062a\u0642\u062f\u0645');
-  parts.push('\u0627\u0644\u0627\u0633\u0645: '    + name.trim());
-  parts.push('\u0627\u0644\u062a\u0644\u064a\u0641\u0648\u0646: ' + phone.trim());
-  parts.push('\u0627\u0644\u0648\u0627\u062a\u0633\u0627\u0628: wa.me/2' + wa.trim());
-  parts.push('\u0627\u0644\u0639\u0646\u0648\u0627\u0646: ' + address.trim());
-  if (notes.trim()) parts.push('\u0645\u0644\u0627\u062d\u0638\u0627\u062a: ' + notes.trim());
-  if (cvFile) { parts.push(''); parts.push('\u0627\u0644\u0633\u064a\u0631\u0629 \u0627\u0644\u0630\u0627\u062a\u064a\u0629: ' + cvFile.name); parts.push('\u064a\u0631\u062c\u0649 \u0627\u0631\u0633\u0627\u0644 \u0627\u0644\u0645\u0644\u0641 \u0641\u064a \u0631\u0633\u0627\u0644\u0629 \u0645\u0646\u0641\u0635\u0644\u0629'); }
-  var now = new Date();
-  parts.push('\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u0642\u062f\u064a\u0645: ' + now.toLocaleDateString('ar-EG') + ' ' + now.toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}));
+    appRef.set(appData).catch(function(e){ console.warn('[ZAMZAM] save application failed:', e.message); });
 
-  var msg = encodeURIComponent(parts.join('\n'));
+    var parts = [
+      '== طلب توظيف جديد ==',
+      'الوظيفة: ' + (job.title||'')
+    ];
+    if (job.dept)     parts.push('القسم: '  + job.dept);
+    if (job.location) parts.push('الفرع: '  + job.location);
+    parts.push('');
+    parts.push('بيانات المتقدم');
+    parts.push('الاسم: '    + name.trim());
+    parts.push('التليفون: ' + phone.trim());
+    parts.push('الواتساب: wa.me/2' + wa.trim());
+    parts.push('العنوان: ' + address.trim());
+    if (notes.trim()) parts.push('ملاحظات: ' + notes.trim());
+    if (cvFile && cvDataUrl) {
+      parts.push('');
+      parts.push('📎 السيرة الذاتية (' + cvFile.name + '):');
+      parts.push(window.location.origin + window.location.pathname.replace(/index\.html$/,'') + 'resume.html?id=' + appId);
+    } else if (cvFile) {
+      parts.push('');
+      parts.push('السيرة الذاتية: ' + cvFile.name);
+      parts.push('⚠️ حصلت مشكلة في تجهيز الملف — سيتواصل المتقدم لإرسالها بشكل منفصل');
+    }
+    var now = new Date();
+    parts.push('تاريخ التقديم: ' + now.toLocaleDateString('ar-EG') + ' ' + now.toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}));
 
-  /* Use location.href for first number — never blocked by browser */
-  var firstNum = '2' + nums[0];
-  var waUrl = 'https://wa.me/' + firstNum + '?text=' + msg;
-  /* Create and click a link — most reliable cross-browser method */
-  var aLink = document.createElement('a');
-  aLink.href = waUrl;
-  aLink.target = '_blank';
-  aLink.rel = 'noopener';
-  document.body.appendChild(aLink);
-  aLink.click();
-  document.body.removeChild(aLink);
-  /* Additional numbers open after short delay */
-  for (var ni = 1; ni < nums.length; ni++) {
-    (function(num) {
-      setTimeout(function() {
-        var a2 = document.createElement('a');
-        a2.href = 'https://wa.me/2' + num + '?text=' + msg;
-        a2.target = '_blank';
-        a2.rel = 'noopener';
-        document.body.appendChild(a2);
-        a2.click();
-        document.body.removeChild(a2);
-      }, ni * 1500);
+    var msg = encodeURIComponent(parts.join('\n'));
+
+    /* Use location.href for first number — never blocked by browser */
+    var firstNum = '2' + nums[0];
+    var waUrl = 'https://wa.me/' + firstNum + '?text=' + msg;
+    /* Create and click a link — most reliable cross-browser method */
+    var aLink = document.createElement('a');
+    aLink.href = waUrl;
+    aLink.target = '_blank';
+    aLink.rel = 'noopener';
+    document.body.appendChild(aLink);
+    aLink.click();
+    document.body.removeChild(aLink);
+    /* Additional numbers open after short delay */
+    for (var ni = 1; ni < nums.length; ni++) {
+      (function(num) {
+        setTimeout(function() {
+          var a2 = document.createElement('a');
+          a2.href = 'https://wa.me/2' + num + '?text=' + msg;
+          a2.target = '_blank';
+          a2.rel = 'noopener';
+          document.body.appendChild(a2);
+          a2.click();
+          document.body.removeChild(a2);
+        }, ni * 1500);
     })(nums[ni]);
   }
 
@@ -4830,6 +4939,12 @@ ZZ.submitApplication = function() {
   var suc = document.getElementById('apply-success');
   if (apf) apf.style.display = 'none';
   if (suc) suc.classList.add('show');
+  unlockBtn();
+  }).catch(function(e) {
+    console.warn('[ZAMZAM] submitApplication error:', e && e.message);
+    unlockBtn();
+    alert('❌ حدث خطأ أثناء إرسال الطلب، حاول مرة أخرى');
+  });
 };
 /* Close modals on backdrop click — null-safe */
 var _jdModal = document.getElementById('modal-job-detail');

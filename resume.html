@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>السيرة الذاتية — زمزم ديزيرت</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:     #07050f;
+  --surface:#0f0c1a;
+  --border: rgba(255,255,255,.07);
+  --gold:   #f5c842;
+  --text:   #fff;
+  --dim:    rgba(255,255,255,.5);
+  --faint:  rgba(255,255,255,.2);
+}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;display:flex;align-items:center;justify-content:center;padding:24px}
+
+.box{
+  background:var(--surface);border:1px solid var(--border);border-radius:18px;
+  padding:32px 24px;width:100%;max-width:400px;text-align:center;
+}
+.logo{font-weight:900;font-size:15px;letter-spacing:.2em;color:var(--gold);margin-bottom:22px}
+.logo span{color:var(--dim);font-size:9px;letter-spacing:.35em;display:block;font-weight:600;margin-top:3px}
+
+.icon{font-size:52px;margin-bottom:14px}
+.name{font-weight:800;font-size:1.15rem;margin-bottom:4px}
+.job{font-size:13px;color:var(--dim);margin-bottom:22px}
+
+.file-info{
+  background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.22);
+  border-radius:12px;padding:14px;margin-bottom:20px;
+  display:flex;align-items:center;gap:10px;text-align:right;
+}
+.file-icon{font-size:26px;flex-shrink:0}
+.file-name{font-size:13px;font-weight:700;word-break:break-all}
+.file-size{font-size:11px;color:var(--dim);margin-top:2px}
+
+.dl-btn{
+  display:block;width:100%;padding:14px;border:none;border-radius:13px;
+  background:linear-gradient(135deg,var(--gold),#e8a020);
+  color:#000;font-weight:900;font-size:15px;cursor:pointer;
+  font-family:'Cairo',sans-serif;transition:filter .2s,transform .2s;
+}
+.dl-btn:hover{filter:brightness(1.08);transform:translateY(-2px)}
+.dl-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+.spinner{
+  width:34px;height:34px;border:3px solid var(--border);
+  border-top-color:var(--gold);border-radius:50%;
+  animation:spin .8s linear infinite;margin:0 auto 16px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.msg{color:var(--dim);font-size:13px}
+.err-icon{font-size:52px;margin-bottom:14px;opacity:.6}
+</style>
+</head>
+<body>
+
+<div class="box" id="box">
+  <div class="logo">ZAMZAM<span>DESSERT</span></div>
+  <div class="spinner"></div>
+  <div class="msg">جاري تحميل بيانات الطلب...</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
+const FB_CFG = {
+  apiKey:            "AIzaSyBpZwrt4wHgWKz_dC1nBhqJ6OzypySYKNQ",
+  authDomain:        "zamzam-landing.firebaseapp.com",
+  databaseURL:       "https://zamzam-landing-default-rtdb.firebaseio.com",
+  projectId:         "zamzam-landing",
+  storageBucket:     "zamzam-landing.firebasestorage.app",
+  messagingSenderId: "192876961013",
+  appId:             "1:192876961013:web:8fd0f7a5d6f1db4a9e79bc"
+};
+
+function showError(title, sub) {
+  document.getElementById('box').innerHTML =
+    '<div class="logo">ZAMZAM<span>DESSERT</span></div>'
+    + '<div class="err-icon">😕</div>'
+    + '<div class="name">' + title + '</div>'
+    + '<div class="job">' + sub + '</div>';
+}
+
+function humanFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' بايت';
+  if (bytes < 1024*1024) return Math.round(bytes/1024) + ' كيلوبايت';
+  return (Math.round(bytes/1024/1024*10)/10) + ' ميجابايت';
+}
+
+function esc(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get('id');
+
+  if (!id || !/^[A-Za-z0-9_-]{5,40}$/.test(id)) {
+    showError('لينك غير صحيح', 'الرجاء استخدام اللينك الموجود في رسالة الواتساب');
+    return;
+  }
+
+  if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
+  var db = firebase.database();
+
+  firebase.auth().signInAnonymously().then(function() {
+    db.ref('landing/applications/' + id).once('value').then(function(snap) {
+      if (!snap.exists()) {
+        showError('الطلب غير موجود', 'ربما تم حذفه أو انتهت صلاحيته');
+        return;
+      }
+      var app = snap.val();
+      if (!app.cvData || !app.cvName) {
+        showError('لا توجد سيرة ذاتية', 'المتقدم لم يرفق ملف مع هذا الطلب');
+        return;
+      }
+
+      /* تقدير الحجم من طول base64 */
+      var approxBytes = Math.round((app.cvData.length - (app.cvData.indexOf(',')+1)) * 0.75);
+      var ext = (app.cvName.split('.').pop() || '').toUpperCase();
+      var icon = /pdf/i.test(ext) ? '📕' : /doc/i.test(ext) ? '📘' : /jpg|jpeg|png/i.test(ext) ? '🖼️' : '📄';
+
+      document.getElementById('box').innerHTML =
+        '<div class="logo">ZAMZAM<span>DESSERT</span></div>'
+        + '<div class="icon">👤</div>'
+        + '<div class="name">' + esc(app.name || 'متقدم') + '</div>'
+        + '<div class="job">تقدم لوظيفة: ' + esc(app.jobTitle || '') + '</div>'
+        + '<div class="file-info">'
+        +   '<div class="file-icon">' + icon + '</div>'
+        +   '<div>'
+        +     '<div class="file-name">' + esc(app.cvName) + '</div>'
+        +     '<div class="file-size">' + humanFileSize(approxBytes) + '</div>'
+        +   '</div>'
+        + '</div>'
+        + '<button class="dl-btn" id="dl-btn">📥 تحميل السيرة الذاتية</button>';
+
+      document.getElementById('dl-btn').addEventListener('click', function() {
+        var btn = this;
+        btn.disabled = true;
+        btn.textContent = '⏳ جاري التحميل...';
+        try {
+          /* تحويل الـ data URL (base64) لملف حقيقي وتنزيله */
+          var a = document.createElement('a');
+          a.href = app.cvData;
+          a.download = app.cvName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(function() {
+            btn.disabled = false;
+            btn.textContent = '📥 تحميل السيرة الذاتية';
+          }, 800);
+        } catch (e) {
+          btn.disabled = false;
+          btn.textContent = '📥 تحميل السيرة الذاتية';
+          alert('حدث خطأ أثناء التحميل، حاول مرة أخرى');
+        }
+      });
+    }).catch(function(e) {
+      showError('خطأ في تحميل البيانات', e.message);
+    });
+  }).catch(function() {
+    showError('خطأ في الاتصال', 'تأكد من اتصالك بالإنترنت وحاول مجددًا');
+  });
+});
+</script>
+</body>
+</html>
