@@ -577,6 +577,9 @@ const FB_CFG = {
   appId:             "1:192876961013:web:8fd0f7a5d6f1db4a9e79bc"
 };
 
+/* ── Salt ثابت — لازم يكون نفسه بالظبط في index.html ── */
+const ZZ_PIN_SALT = 'zmzm_9f3k_salt_2026_x7q';
+
 const CA = {
   db:           null,
   soundOn:      true,
@@ -593,6 +596,9 @@ const CA = {
     var hash = await crypto.subtle.digest('SHA-256', buf);
     return Array.from(new Uint8Array(hash)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
   },
+  sha256Salted: async function(str) {
+    return CA.sha256(ZZ_PIN_SALT + str);
+  },
 
   /* ── LOGIN ── */
   login: async function() {
@@ -608,7 +614,7 @@ const CA = {
     CA.db = firebase.database();
 
     firebase.auth().signInAnonymously().then(async function() {
-      var pinHash = await CA.sha256(pin);
+      var pinHash = await CA.sha256Salted(pin);
       CA.db.ref('landing/cashiers').orderByChild('username').equalTo(username).once('value')
         .then(function(snap) {
           if (!snap.exists()) { errEl.textContent = 'اسم المستخدم أو الـ PIN غلط'; return; }
@@ -995,7 +1001,7 @@ const CA = {
         var typeStr = ptL[it.priceType] || it.priceType || '';
         var total   = (parseFloat(it.price)||0) * (parseInt(it.qty)||1);
         return '<div class="oc-item-row">'
-          + '<span class="oc-item-name">' + (it.name||'') + (typeStr?' ('+typeStr+')':'') + '</span>'
+          + '<span class="oc-item-name">' + CA.esc(it.name||'') + (typeStr?' ('+typeStr+')':'') + '</span>'
           + '<span class="oc-item-qty">×' + (it.qty||1) + '</span>'
           + '<span class="oc-item-price">' + total + ' ج</span>'
           + '</div>';
@@ -1009,12 +1015,12 @@ const CA = {
     /* address */
     var addressHTML = '';
     if (o.orderType === 'delivery' && o.address) {
-      addressHTML = '<div class="oc-cust-row">📍 ' + (o.zone ? o.zone + ' — ' : '') + o.address + '</div>';
+      addressHTML = '<div class="oc-cust-row">📍 ' + (o.zone ? CA.esc(o.zone) + ' — ' : '') + CA.esc(o.address) + '</div>';
     }
 
     /* notes */
     var notesHTML = o.notes
-      ? '<div class="oc-notes">💬 ' + o.notes + '</div>'
+      ? '<div class="oc-notes">💬 ' + CA.esc(o.notes) + '</div>'
       : '';
 
     var newBadge = isNew ? '<div class="new-badge">جديد</div>' : '';
@@ -1026,12 +1032,12 @@ const CA = {
       ? '<div class="delivered-banner">🎉 تم تسليم الأوردر</div>'
       : '';
 
-    return '<div class="order-card ' + o._type + (isNew&&!isDelivered?' new-order':'') + (isDelivered?' delivered':'') + '" id="card-' + o.id + '">'
+    return '<div class="order-card ' + o._type + (isNew&&!isDelivered?' new-order':'') + (isDelivered?' delivered':'') + '" id="card-' + CA.esc(o.id) + '">'
       + (isDelivered ? '' : newBadge)
       + '<div class="oc-head">'
       +   '<div>'
       +     typeRibbon
-      +     '<div class="oc-id">' + (o.id||'') + '</div>'
+      +     '<div class="oc-id">' + CA.esc(o.id||'') + '</div>'
       +     '<div class="oc-time">' + time + (date?' · '+date:'') + '</div>'
       +   '</div>'
       +   '<span class="oc-delivery-badge ' + (o.orderType==='delivery'?'delivery':'pickup') + '">'
@@ -1039,9 +1045,9 @@ const CA = {
       + '</div>'
       + deliveredBanner
       + '<div class="oc-cust">'
-      +   '<div class="oc-cust-name">' + (o.name||'—') + '</div>'
+      +   '<div class="oc-cust-name">' + CA.esc(o.name||'—') + '</div>'
       +   '<div class="oc-cust-row">📞 '
-      +     (waNum ? '<a href="tel:+' + waNum + '">' + (o.phone||waNum) + '</a>' : (o.phone||'—'))
+      +     (waNum ? '<a href="tel:+' + waNum + '">' + CA.esc(o.phone||waNum) + '</a>' : CA.esc(o.phone||'—'))
       +   '</div>'
       +   addressHTML
       + '</div>'
@@ -1053,10 +1059,10 @@ const CA = {
       + notesHTML
       + CA._statusBar(o)
       + '<div class="oc-actions">'
-      +   (waNum ? '<button class="oc-btn oc-btn-wa" onclick="CA.openWa(\'' + waNum + '\',\'' + o.id + '\',\'' + (o.name||'').replace(/'/g,"") + '\')">💬 تواصل واتساب</button>' : '')
-      +   '<button class="oc-btn oc-btn-del"  onclick="CA.deleteOrder(\'' + o.id + '\',\'' + o._type + '\')">🗑 حذف</button>'
+      +   (waNum ? '<button class="oc-btn oc-btn-wa" onclick="CA.openWa(\'' + CA.escJsAttr(waNum) + '\',\'' + CA.escJsAttr(o.id) + '\',\'' + CA.escJsAttr(o.name||'') + '\')">💬 تواصل واتساب</button>' : '')
+      +   '<button class="oc-btn oc-btn-del"  onclick="CA.deleteOrder(\'' + CA.escJsAttr(o.id) + '\',\'' + CA.escJsAttr(o._type) + '\')">🗑 حذف</button>'
       + '</div>'
-      + '<a class="oc-goto" href="track.html?id=' + o.id + '&type=' + o._type + '&ref=cashier" target="_blank">🔗 الذهاب لصفحة الطلب</a>'
+      + '<a class="oc-goto" href="track.html?id=' + encodeURIComponent(o.id) + '&type=' + encodeURIComponent(o._type) + '&ref=cashier" target="_blank">🔗 الذهاب لصفحة الطلب</a>'
       + '</div>';
   },
 
@@ -1071,6 +1077,28 @@ const CA = {
     if (d.length === 10 && d.charAt(0) === '1') return '20' + d;         /* 1xxxxxxxxx بدون صفر */
     if (d.indexOf('20') === 0) return d; /* أي صيغة تانية تبدأ بـ 20 سيبها */
     return d;
+  },
+
+  /* ── تنظيف أي نص جاي من العميل قبل عرضه — حماية من XSS ── */
+  esc: function(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  },
+
+  /* ── تنظيف نص هيتحط جوه onclick="..." (سياق JS + HTML attribute مع بعض) ── */
+  escJsAttr: function(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/\\/g, '\\\\')
+      .replace(/'/g, "\\'")
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   },
 
   /* ── ACTIONS ── */
@@ -1102,7 +1130,7 @@ const CA = {
           + s.icon + ' ' + s.label + '</button>';
       }
       return '<button class="st-btn' + (isActive ? ' ' + s.cls : '') + '" '
-        + 'onclick="CA.setStatus(\'' + o.id + '\',\'' + o._type + '\',\'' + s.key + '\')">'
+        + 'onclick="CA.setStatus(\'' + CA.escJsAttr(o.id) + '\',\'' + CA.escJsAttr(o._type) + '\',\'' + s.key + '\')">'
         + s.icon + ' ' + s.label + '</button>';
     }).join('');
     return '<div class="status-bar">' + btns + '</div>';

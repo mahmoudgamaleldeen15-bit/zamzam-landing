@@ -1955,8 +1955,8 @@ a{text-decoration:none;color:inherit}
       <input id="cashier-new-name" class="admin-inp" type="text" placeholder="cashier1" dir="ltr" autocomplete="off">
     </div>
     <div>
-      <label class="admin-lbl">PIN (ارقام فقط 4+ خانات)</label>
-      <input id="cashier-new-pin" class="admin-inp" type="password" placeholder="1234" maxlength="8" inputmode="numeric">
+      <label class="admin-lbl">PIN (ارقام فقط 6+ خانات)</label>
+      <input id="cashier-new-pin" class="admin-inp" type="password" placeholder="123456" maxlength="10" inputmode="numeric">
     </div>
   </div>
   <button onclick="ZZ.addCashier()" style="padding:10px 24px;background:linear-gradient(135deg,#f5c842,#e8a020);color:#000;border:none;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">اضافة</button>
@@ -6225,11 +6225,11 @@ ZZ._renderMawledOrdersTable = function() {
     return '<tr class="mord-tr">'
       + '<td class="mord-td" style="font-family:monospace;font-size:10px;color:rgba(255,255,255,.4)">' + (o.id||o._key||'—') + '</td>'
       + '<td class="mord-td" style="white-space:nowrap">' + dt + '</td>'
-      + '<td class="mord-td" style="font-weight:700;color:#fff">' + (o.name||'—') + '</td>'
-      + '<td class="mord-td" style="direction:ltr;text-align:left">' + (o.phone||'—') + '</td>'
+      + '<td class="mord-td" style="font-weight:700;color:#fff">' + ZZ._omEsc(o.name||'—') + '</td>'
+      + '<td class="mord-td" style="direction:ltr;text-align:left">' + ZZ._omEsc(o.phone||'—') + '</td>'
       + '<td class="mord-td">' + waBtn + '</td>'
       + '<td class="mord-td">' + typeBadge + '</td>'
-      + '<td class="mord-td">' + (o.zone||'—') + '</td>'
+      + '<td class="mord-td">' + ZZ._omEsc(o.zone||'—') + '</td>'
       + '<td class="mord-td"><div class="mord-items-list">' + (itemsList||'—') + '</div></td>'
       + '<td class="mord-td" style="text-align:center">' + (o.prodTotal||o.total||0) + ' ج</td>'
       + '<td class="mord-td" style="text-align:center">' + (o.deliveryFee > 0 ? o.deliveryFee + ' ج' : 'مجاني') + '</td>'
@@ -6274,7 +6274,10 @@ ZZ.exportMawledExcel = function() {
 
   var csv = BOM + rows.map(function(r) {
     return r.map(function(c) {
-      var s = String(c).replace(/"/g,'""');
+      var s = String(c);
+      /* حماية من Formula Injection في Excel — لو القيمة بتبدأ بـ = + - @ نضيف علامة قبلها */
+      if (/^[=+\-@]/.test(s)) s = '\t' + s;
+      s = s.replace(/"/g,'""');
       return '"' + s + '"';
     }).join(',');
   }).join('\r\n');
@@ -6302,15 +6305,15 @@ ZZ.printMawledOrders = function() {
   var rows = orders.map(function(o, i) {
     var d  = o.createdAt ? new Date(o.createdAt).toLocaleString('ar-EG') : '—';
     var items = (o.items||[]).map(function(it){
-      return it.name + ' ×' + it.qty + (it.priceType==='kilo'?' كيلو':' قطعة');
+      return ZZ._omEsc(it.name) + ' ×' + it.qty + (it.priceType==='kilo'?' كيلو':' قطعة');
     }).join('، ');
     return '<tr style="border-bottom:1px solid #eee">'
       + '<td style="padding:6px 8px;text-align:center;color:#666">' + (i+1) + '</td>'
       + '<td style="padding:6px 8px">' + d + '</td>'
-      + '<td style="padding:6px 8px;font-weight:700">' + (o.name||'—') + '</td>'
-      + '<td style="padding:6px 8px;direction:ltr">' + (o.phone||'—') + '</td>'
+      + '<td style="padding:6px 8px;font-weight:700">' + ZZ._omEsc(o.name||'—') + '</td>'
+      + '<td style="padding:6px 8px;direction:ltr">' + ZZ._omEsc(o.phone||'—') + '</td>'
       + '<td style="padding:6px 8px">' + (o.orderType==='delivery'?'🛵 ديليفري':'🏪 استلام') + '</td>'
-      + '<td style="padding:6px 8px">' + (o.zone||'—') + '</td>'
+      + '<td style="padding:6px 8px">' + ZZ._omEsc(o.zone||'—') + '</td>'
       + '<td style="padding:6px 8px;font-size:11px;color:#666">' + items + '</td>'
       + '<td style="padding:6px 8px;text-align:center">' + (o.deliveryFee>0?o.deliveryFee+' ج':'مجاني') + '</td>'
       + '<td style="padding:6px 8px;font-weight:900;color:#b45309;text-align:center">' + (o.total||0) + ' ج</td>'
@@ -6625,8 +6628,8 @@ ZZ._renderKahkOrdersTable = function(){
     var wl=(o.whatsapp||o.phone||'').replace(/\D/g,'');if(wl&&wl.charAt(0)==='0')wl='20'+wl.slice(1);
     var waBtn=wl?'<a href="https://wa.me/'+wl+'" target="_blank" class="mord-phone-btn">💬</a>':'—';
     var ptB=o.orderType==='delivery'?'<span class="mord-badge mord-badge-delivery">🛵</span>':'<span class="mord-badge mord-badge-pickup">🏪</span>';
-    var itms=(o.items||[]).map(function(it){return it.name+'×'+it.qty;}).join('<br>');
-    return '<tr class="mord-tr"><td class="mord-td" style="font-size:10px;color:rgba(255,255,255,.4)">'+(o.id||o._key||'—')+'</td><td class="mord-td">'+dt+'</td><td class="mord-td" style="font-weight:700;color:#fff">'+(o.name||'—')+'</td><td class="mord-td" dir="ltr">'+(o.phone||'—')+'</td><td class="mord-td">'+waBtn+'</td><td class="mord-td">'+ptB+'</td><td class="mord-td">'+(o.zone||'—')+'</td><td class="mord-td"><div class="mord-items-list">'+itms+'</div></td><td class="mord-td" style="text-align:center">'+(o.prodTotal||o.total||0)+' ج</td><td class="mord-td" style="text-align:center">'+(o.deliveryFee>0?o.deliveryFee+' ج':'مجاني')+'</td><td class="mord-td" style="font-weight:900;color:#d97706;text-align:center">'+(o.total||0)+' ج</td></tr>';
+    var itms=(o.items||[]).map(function(it){return ZZ._omEsc(it.name)+'×'+it.qty;}).join('<br>');
+    return '<tr class="mord-tr"><td class="mord-td" style="font-size:10px;color:rgba(255,255,255,.4)">'+(o.id||o._key||'—')+'</td><td class="mord-td">'+dt+'</td><td class="mord-td" style="font-weight:700;color:#fff">'+ZZ._omEsc(o.name||'—')+'</td><td class="mord-td" dir="ltr">'+ZZ._omEsc(o.phone||'—')+'</td><td class="mord-td">'+waBtn+'</td><td class="mord-td">'+ptB+'</td><td class="mord-td">'+ZZ._omEsc(o.zone||'—')+'</td><td class="mord-td"><div class="mord-items-list">'+itms+'</div></td><td class="mord-td" style="text-align:center">'+(o.prodTotal||o.total||0)+' ج</td><td class="mord-td" style="text-align:center">'+(o.deliveryFee>0?o.deliveryFee+' ج':'مجاني')+'</td><td class="mord-td" style="font-weight:900;color:#d97706;text-align:center">'+(o.total||0)+' ج</td></tr>';
   }).join('');
 };
 ZZ.exportKahkExcel  = function(){ZZ._exportGenCsv(ZZ._kahkOrdersFiltered,'طلبات-الكحك');};
@@ -6776,8 +6779,8 @@ ZZ._renderChocoOrdersTable=function(){
     var wl=(o.whatsapp||o.phone||'').replace(/\D/g,'');if(wl&&wl.charAt(0)==='0')wl='20'+wl.slice(1);
     var waBtn=wl?'<a href="https://wa.me/'+wl+'" target="_blank" class="mord-phone-btn">💬</a>':'—';
     var ptB=o.orderType==='delivery'?'<span class="mord-badge mord-badge-delivery">🛵</span>':'<span class="mord-badge mord-badge-pickup">🏪</span>';
-    var itms=(o.items||[]).map(function(it){return it.name+'×'+it.qty+(ptL[it.priceType]?' '+ptL[it.priceType]:'');}).join('<br>');
-    return '<tr class="mord-tr"><td class="mord-td" style="font-size:10px;color:rgba(255,255,255,.4)">'+(o.id||o._key||'—')+'</td><td class="mord-td">'+dt+'</td><td class="mord-td" style="font-weight:700;color:#fff">'+(o.name||'—')+'</td><td class="mord-td" dir="ltr">'+(o.phone||'—')+'</td><td class="mord-td">'+waBtn+'</td><td class="mord-td">'+ptB+'</td><td class="mord-td">'+(o.zone||'—')+'</td><td class="mord-td"><div class="mord-items-list">'+itms+'</div></td><td class="mord-td" style="text-align:center">'+(o.prodTotal||o.total||0)+' ج</td><td class="mord-td" style="text-align:center">'+(o.deliveryFee>0?o.deliveryFee+' ج':'مجاني')+'</td><td class="mord-td" style="font-weight:900;color:#7c3aed;text-align:center">'+(o.total||0)+' ج</td></tr>';
+    var itms=(o.items||[]).map(function(it){return ZZ._omEsc(it.name)+'×'+it.qty+(ptL[it.priceType]?' '+ptL[it.priceType]:'');}).join('<br>');
+    return '<tr class="mord-tr"><td class="mord-td" style="font-size:10px;color:rgba(255,255,255,.4)">'+(o.id||o._key||'—')+'</td><td class="mord-td">'+dt+'</td><td class="mord-td" style="font-weight:700;color:#fff">'+ZZ._omEsc(o.name||'—')+'</td><td class="mord-td" dir="ltr">'+ZZ._omEsc(o.phone||'—')+'</td><td class="mord-td">'+waBtn+'</td><td class="mord-td">'+ptB+'</td><td class="mord-td">'+ZZ._omEsc(o.zone||'—')+'</td><td class="mord-td"><div class="mord-items-list">'+itms+'</div></td><td class="mord-td" style="text-align:center">'+(o.prodTotal||o.total||0)+' ج</td><td class="mord-td" style="text-align:center">'+(o.deliveryFee>0?o.deliveryFee+' ج':'مجاني')+'</td><td class="mord-td" style="font-weight:900;color:#7c3aed;text-align:center">'+(o.total||0)+' ج</td></tr>';
   }).join('');
 };
 ZZ.exportChocoExcel=function(){ZZ._exportGenCsv(ZZ._chocoOrdersFiltered,'طلبات-الشيكولاتة');};
@@ -6802,8 +6805,8 @@ ZZ._printGenReport=function(orders,title,color){
   var total=orders.reduce(function(s,o){return s+(o.total||0);},0),now=new Date().toLocaleString('ar-EG');
   var rows=orders.map(function(o,i){
     var d=o.createdAt?new Date(o.createdAt).toLocaleString('ar-EG'):'—';
-    var itms=(o.items||[]).map(function(it){return it.name+' ×'+it.qty;}).join('، ');
-    return '<tr style="border-bottom:1px solid #eee"><td style="padding:6px;text-align:center;color:#666">'+(i+1)+'</td><td style="padding:6px">'+d+'</td><td style="padding:6px;font-weight:700">'+(o.name||'—')+'</td><td style="padding:6px;direction:ltr">'+(o.phone||'—')+'</td><td style="padding:6px">'+(o.orderType==='delivery'?'🛵 ديليفري':'🏪 استلام')+'</td><td style="padding:6px">'+(o.zone||'—')+'</td><td style="padding:6px;font-size:11px;color:#666">'+itms+'</td><td style="padding:6px;text-align:center">'+(o.deliveryFee>0?o.deliveryFee+' ج':'مجاني')+'</td><td style="padding:6px;font-weight:900;color:'+color+';text-align:center">'+(o.total||0)+' ج</td></tr>';
+    var itms=(o.items||[]).map(function(it){return ZZ._omEsc(it.name)+' ×'+it.qty;}).join('، ');
+    return '<tr style="border-bottom:1px solid #eee"><td style="padding:6px;text-align:center;color:#666">'+(i+1)+'</td><td style="padding:6px">'+d+'</td><td style="padding:6px;font-weight:700">'+ZZ._omEsc(o.name||'—')+'</td><td style="padding:6px;direction:ltr">'+ZZ._omEsc(o.phone||'—')+'</td><td style="padding:6px">'+(o.orderType==='delivery'?'🛵 ديليفري':'🏪 استلام')+'</td><td style="padding:6px">'+ZZ._omEsc(o.zone||'—')+'</td><td style="padding:6px;font-size:11px;color:#666">'+itms+'</td><td style="padding:6px;text-align:center">'+(o.deliveryFee>0?o.deliveryFee+' ج':'مجاني')+'</td><td style="padding:6px;font-weight:900;color:'+color+';text-align:center">'+(o.total||0)+' ج</td></tr>';
   }).join('');
   var win=window.open('','_blank','width=1100,height=800');
   win.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>'+title+'</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#111}h2{color:'+color+'}table{width:100%;border-collapse:collapse;font-size:12px}th{background:'+color+';color:#fff;padding:8px;text-align:right}tr:nth-child(even){background:#f9f9f9}.s{display:flex;gap:24px;margin:12px 0;background:#f8f8f8;padding:12px;border-radius:8px}.sv{font-size:1.3rem;font-weight:900;color:'+color+'}@media print{button{display:none}}</style></head><body><h2>📊 '+title+' — زمزم ديزيرت</h2><div style="color:#666;font-size:12px;margin-bottom:8px">'+now+' | '+orders.length+' طلب</div><div class="s"><div><div class="sv">'+orders.length+'</div><div>الطلبات</div></div><div><div class="sv">'+total.toLocaleString()+' ج</div><div>المبيعات</div></div><div><div class="sv">'+orders.filter(function(o){return o.orderType==='delivery';}).length+'</div><div>ديليفري</div></div><div><div class="sv">'+orders.filter(function(o){return o.orderType!=='delivery';}).length+'</div><div>استلام</div></div></div><table><thead><tr><th>#</th><th>التاريخ</th><th>العميل</th><th>التليفون</th><th>النوع</th><th>المنطقة</th><th>المنتجات</th><th>توصيل</th><th>الإجمالي</th></tr></thead><tbody>'+rows+'</tbody></table><br><button onclick="window.print()" style="background:'+color+';color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;cursor:pointer">🖨️ اطبع</button></body></html>');
@@ -6932,10 +6935,16 @@ ZZ.openCashierLogin = function() {
 ZZ.closeCashierLogin = function() {
   var m=document.getElementById('cashier-login-modal'); if(m) m.classList.remove('open');
 };
+/* ── Salt ثابت لتشفير الـ PIN — لازم يكون نفسه هنا وفي cashier.html ── */
+var ZZ_PIN_SALT = 'zmzm_9f3k_salt_2026_x7q';
+
 ZZ._sha256 = async function(str) {
   var buf=new TextEncoder().encode(str);
   var hash=await crypto.subtle.digest('SHA-256',buf);
   return Array.from(new Uint8Array(hash)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+};
+ZZ._sha256Salted = async function(str) {
+  return ZZ._sha256(ZZ_PIN_SALT + str);
 };
 ZZ.cashierLogin = async function() {
   var username=(document.getElementById('cl-username').value||'').trim().toLowerCase();
@@ -6945,7 +6954,7 @@ ZZ.cashierLogin = async function() {
   if(!pin){if(errEl)errEl.textContent='ادخل الـ PIN';return;}
   if(errEl)errEl.textContent='...جاري التحقق';
   if(!window.zzdb){if(errEl)errEl.textContent='خطا في الاتصال';return;}
-  var pinHash=await ZZ._sha256(pin);
+  var pinHash=await ZZ._sha256Salted(pin);
   zzdb.ref('landing/cashiers').orderByChild('username').equalTo(username).once('value')
     .then(async function(snap){
       if(!snap.exists()){if(errEl)errEl.textContent='اسم المستخدم او الـ PIN غلط';return;}
@@ -6977,10 +6986,10 @@ ZZ.addCashier = async function() {
   var name=(nameInp?nameInp.value.trim().toLowerCase():'');
   var pin=(pinInp?pinInp.value.trim():'');
   if(!name){if(noteEl)noteEl.textContent='ادخل اسم المستخدم';return;}
-  if(pin.length<4){if(noteEl)noteEl.textContent='الـ PIN لازم 4 ارقام على الاقل';return;}
+  if(pin.length<6){if(noteEl)noteEl.textContent='الـ PIN لازم 6 ارقام على الاقل';return;}
   if(!/^\d+$/.test(pin)){if(noteEl)noteEl.textContent='الـ PIN ارقام فقط';return;}
   if(!window.zzdb||!window.ZZ_AUTH_READY){if(noteEl)noteEl.textContent='انتظر...';return;}
-  var pinHash=await ZZ._sha256(pin);
+  var pinHash=await ZZ._sha256Salted(pin);
   zzdb.ref('landing/cashiers').push({username:name,pinHash:pinHash,active:true,createdAt:Date.now()})
     .then(function(){
       if(nameInp)nameInp.value=''; if(pinInp)pinInp.value='';
@@ -7162,12 +7171,12 @@ ZZ._omCardHTML = function(o) {
   var items = o.items || [];
   var itemsHTML = items.map(function(it) {
     var total = (parseFloat(it.price)||0) * (parseInt(it.qty)||1);
-    return '<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.06)"><span style="color:rgba(255,255,255,.6)">' + (it.name||'') + ' ×' + (it.qty||1) + '</span><span style="color:#f5c842;font-weight:700">' + total + ' ج</span></div>';
+    return '<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.06)"><span style="color:rgba(255,255,255,.6)">' + ZZ._omEsc(it.name||'') + ' ×' + (it.qty||1) + '</span><span style="color:#f5c842;font-weight:700">' + total + ' ج</span></div>';
   }).join('');
 
   var grandTotal = parseFloat(o.grandTotal) || parseFloat(o.total) || 0;
   var addrHTML = (o.orderType === 'delivery' && o.address)
-    ? '<div style="font-size:11.5px;color:rgba(255,255,255,.45);margin-top:4px">📍 ' + (o.zone ? o.zone + ' — ' : '') + o.address + '</div>'
+    ? '<div style="font-size:11.5px;color:rgba(255,255,255,.45);margin-top:4px">📍 ' + (o.zone ? ZZ._omEsc(o.zone) + ' — ' : '') + ZZ._omEsc(o.address) + '</div>'
     : '';
 
   var statusBtns = ZZ._omStatuses.map(function(s, i) {
@@ -7177,38 +7186,60 @@ ZZ._omCardHTML = function(o) {
       return '<button disabled style="padding:5px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:transparent;color:rgba(255,255,255,.2);font-size:10.5px;font-weight:700;cursor:not-allowed;text-decoration:line-through;font-family:Cairo,sans-serif">' + s.icon + ' ' + s.label + '</button>';
     }
     var activeStyle = isActive ? 'background:rgba(245,200,66,.18);border-color:rgba(245,200,66,.5);color:#f5c842' : 'background:transparent;border-color:rgba(255,255,255,.12);color:rgba(255,255,255,.55)';
-    return '<button onclick="ZZ.omSetStatus(\'' + o.id + '\',\'' + s.key + '\')" style="padding:5px 10px;border-radius:8px;border:1px solid;' + activeStyle + ';font-size:10.5px;font-weight:700;cursor:pointer;font-family:Cairo,sans-serif">' + s.icon + ' ' + s.label + '</button>';
+    return '<button onclick="ZZ.omSetStatus(\'' + ZZ._omEscJsAttr(o.id) + '\',\'' + s.key + '\')" style="padding:5px 10px;border-radius:8px;border:1px solid;' + activeStyle + ';font-size:10.5px;font-weight:700;cursor:pointer;font-family:Cairo,sans-serif">' + s.icon + ' ' + s.label + '</button>';
   }).join('');
 
   var waNum = ZZ._omNormalizePhone(o.whatsapp || o.phone);
 
-  return '<div id="om-card-' + o.id + '" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;' + (isDelivered ? 'opacity:.5' : '') + '">'
+  return '<div id="om-card-' + ZZ._omEsc(o.id) + '" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;' + (isDelivered ? 'opacity:.5' : '') + '">'
     + (isDelivered ? '<div style="text-align:center;background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.3);border-radius:8px;padding:6px;margin-bottom:8px;color:#f5c842;font-weight:800;font-size:11.5px">🎉 تم تسليم الأوردر</div>' : '')
     + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'
     +   '<div>'
-    +     '<div style="font-size:11px;color:rgba(255,255,255,.35);font-weight:700">' + (o.id||'') + '</div>'
+    +     '<div style="font-size:11px;color:rgba(255,255,255,.35);font-weight:700">' + ZZ._omEsc(o.id||'') + '</div>'
     +     '<div style="font-size:10px;color:rgba(255,255,255,.25)">' + time + (date?' · '+date:'') + '</div>'
     +   '</div>'
     +   '<span style="font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:6px;background:' + (o.orderType==='delivery'?'rgba(59,130,246,.15);color:#60a5fa':'rgba(34,197,94,.12);color:#4ade80') + '">' + (o.orderType==='delivery'?'🛵 ديليفري':'🏪 استلام') + '</span>'
     + '</div>'
-    + '<div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:2px">' + (o.name||'—') + '</div>'
-    + '<div style="font-size:12px;color:rgba(255,255,255,.5)">📞 ' + (waNum ? '<a href="tel:+' + waNum + '" style="color:#4ade80;text-decoration:none">' + (o.phone||waNum) + '</a>' : (o.phone||'—')) + '</div>'
+    + '<div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:2px">' + ZZ._omEsc(o.name||'—') + '</div>'
+    + '<div style="font-size:12px;color:rgba(255,255,255,.5)">📞 ' + (waNum ? '<a href="tel:+' + waNum + '" style="color:#4ade80;text-decoration:none">' + ZZ._omEsc(o.phone||waNum) + '</a>' : ZZ._omEsc(o.phone||'—')) + '</div>'
     + addrHTML
     + (itemsHTML ? '<div style="margin:8px 0">' + itemsHTML + '</div>' : '')
     + '<div style="display:flex;justify-content:space-between;align-items:center;background:rgba(245,200,66,.07);border-radius:8px;padding:7px 10px;margin:8px 0">'
     +   '<span style="font-size:11.5px;color:rgba(255,255,255,.5)">الإجمالي</span>'
     +   '<span style="font-size:15px;font-weight:900;color:#f5c842">' + grandTotal + ' ج</span>'
     + '</div>'
-    + (o.notes ? '<div style="font-size:11px;color:rgba(255,255,255,.45);background:rgba(255,255,255,.03);border-radius:8px;padding:6px 9px;margin-bottom:8px">💬 ' + o.notes + '</div>' : '')
+    + (o.notes ? '<div style="font-size:11px;color:rgba(255,255,255,.45);background:rgba(255,255,255,.03);border-radius:8px;padding:6px 9px;margin-bottom:8px">💬 ' + ZZ._omEsc(o.notes) + '</div>' : '')
     + '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px">' + statusBtns + '</div>'
     + '<div style="display:flex;gap:6px">'
     +   (waNum ? '<a href="https://wa.me/' + waNum + '" target="_blank" style="flex:1;text-align:center;padding:7px;border-radius:8px;background:rgba(34,197,94,.12);color:#4ade80;text-decoration:none;font-size:11.5px;font-weight:700;font-family:Cairo,sans-serif">💬 واتساب</a>' : '')
-    +   '<button onclick="ZZ.omDeleteOrder(\'' + o.id + '\')" style="padding:7px 14px;border-radius:8px;background:rgba(239,68,68,.12);color:#f87171;border:none;font-size:11.5px;font-weight:700;cursor:pointer;font-family:Cairo,sans-serif">🗑 حذف</button>'
+    +   '<button onclick="ZZ.omDeleteOrder(\'' + ZZ._omEscJsAttr(o.id) + '\')" style="padding:7px 14px;border-radius:8px;background:rgba(239,68,68,.12);color:#f87171;border:none;font-size:11.5px;font-weight:700;cursor:pointer;font-family:Cairo,sans-serif">🗑 حذف</button>'
     + '</div>'
     + '</div>';
 };
 
 /* ── تطبيع رقم مصري ── */
+/* ── تنظيف أي نص جاي من العميل قبل عرضه — حماية من XSS ── */
+ZZ._omEsc = function(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+};
+
+/* ── تنظيف نص هيتحط جوه onclick="..." ── */
+ZZ._omEscJsAttr = function(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+};
+
 ZZ._omNormalizePhone = function(raw) {
   if (!raw) return '';
   var d = String(raw).replace(/\D/g, '');

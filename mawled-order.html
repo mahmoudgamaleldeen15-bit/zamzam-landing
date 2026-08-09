@@ -1773,6 +1773,15 @@ ML.updateCart = function() {
    SEND ORDER
 ════════════════════════════════════════════ */
 ML.sendOrder = function() {
+  /* حماية من إرسال طلبات متكررة بسرعة */
+  var _lastSub = parseInt(localStorage.getItem('zz_last_order_submit_mawled') || '0');
+  var _now     = Date.now();
+  if (_now - _lastSub < 25000) {
+    var _remain = Math.ceil((25000 - (_now - _lastSub)) / 1000);
+    ML.toast('⏳ استنى ' + _remain + ' ثانية قبل إرسال طلب تاني');
+    return;
+  }
+
   var items = ML.products.filter(function(p) { return (ML.cart[p.id] || 0) > 0; });
   if (!items.length) { ML.toast('اختار منتجات الأول 🛒'); return; }
 
@@ -1874,6 +1883,7 @@ ML.sendOrder = function() {
 
   /* حفظ آخر طلب محلياً — عشان العميل يقدر يرجع لصفحة التتبع في أي وقت */
   try { localStorage.setItem('zz_last_order', JSON.stringify({ id: orderId, type: 'mawled', ts: Date.now() })); } catch(e) {}
+  try { localStorage.setItem('zz_last_order_submit_mawled', String(Date.now())); } catch(e) {}
 
   /* شاشة تأكيد الطلب — ثم التحويل التلقائي لصفحة التتبع */
   ML._showConfirm(orderId);

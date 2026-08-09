@@ -182,6 +182,16 @@ var STATUSES = [
   { key:'delivered', icon:'🎉', label:'تم التسليم',                sub:'وصل طلبك بالسلامة — بالهنا والشفا' },
 ];
 
+function escHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 var TR = {
   orderId: null,
   type:    null,
@@ -194,7 +204,11 @@ var TR = {
     TR.type    = params.get('type');
     TR.isCashier = params.get('ref') === 'cashier';
 
-    if (!TR.orderId || !TR.type) {
+    /* تحقق صارم — النوع لازم يكون واحد من التلاتة بس، والـ id بصيغة معروفة */
+    var validTypes = ['mawled', 'kahk', 'choco'];
+    var validId    = TR.orderId && /^[A-Za-z0-9_-]{2,40}$/.test(TR.orderId);
+
+    if (!TR.orderId || !TR.type || validTypes.indexOf(TR.type) === -1 || !validId) {
       TR.showError('لينك غير صحيح', 'الرجاء استخدام اللينك الموجود في شاشة تأكيد طلبك');
       return;
     }
@@ -253,7 +267,7 @@ var TR = {
     var delivFee   = parseFloat(order.deliveryFee) || 0;
 
     var infoHTML = '<div class="info-card">'
-      + '<div class="info-row"><span class="info-lbl">الاسم</span><span class="info-val">' + (order.name||'—') + '</span></div>'
+      + '<div class="info-row"><span class="info-lbl">الاسم</span><span class="info-val">' + escHtml(order.name||'—') + '</span></div>'
       + '<div class="info-row"><span class="info-lbl">نوع الطلب</span><span class="info-val">'
       +   (order.orderType==='delivery' ? '🛵 ديليفري' : '🏪 استلام من المحل') + '</span></div>'
       + (delivFee > 0 ? '<div class="info-row"><span class="info-lbl">رسوم التوصيل</span><span class="info-val">' + delivFee + ' ج</span></div>' : '')
@@ -263,7 +277,7 @@ var TR = {
     /* delivery address */
     var addrHTML = '';
     if (order.orderType === 'delivery' && order.address) {
-      addrHTML = '<div class="addr-box">📍 ' + (order.zone ? order.zone + ' — ' : '') + order.address + '</div>';
+      addrHTML = '<div class="addr-box">📍 ' + (order.zone ? escHtml(order.zone) + ' — ' : '') + escHtml(order.address) + '</div>';
     }
 
     /* أزرار مختلفة حسب مين فاتح الصفحة */
