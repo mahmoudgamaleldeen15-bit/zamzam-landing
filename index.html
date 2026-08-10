@@ -416,6 +416,16 @@ a{text-decoration:none;color:inherit}
 .admin-inp{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);border-radius:12px;color:#fff;font-size:14px;padding:12px 16px;font-family:'Cairo',sans-serif;transition:border-color .2s;outline:none;resize:vertical}
 .admin-inp:focus{border-color:rgba(244,63,94,.6);background:rgba(255,255,255,.09)}
 .admin-inp::placeholder{color:rgba(255,255,255,.28)}
+/* أيقونة اختيار الوقت (⏰) في المتصفح غامقة افتراضياً وبتختفي على الخلفية الغامقة — نخليها بيضاء وواضحة + نكبرها شوية عشان تتضغط بسهولة على الكمبيوتر */
+.admin-inp[type="time"]::-webkit-calendar-picker-indicator{
+  filter: invert(1) brightness(1.8);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+}
+.admin-inp[type="time"]::-webkit-calendar-picker-indicator:hover{
+  background: rgba(255,255,255,.15);
+}
 .img-tabs{display:flex;gap:8px;margin-bottom:10px}
 .img-tab{flex:1;padding:8px;font-size:12px;font-weight:700;border-radius:8px;border:1px solid rgba(255,255,255,.14);background:transparent;color:rgba(255,255,255,.45);cursor:pointer;transition:all .2s;font-family:'Cairo',sans-serif}
 .img-tab.on{background:rgba(244,63,94,.18);border-color:rgba(244,63,94,.45);color:#fff}
@@ -8030,6 +8040,14 @@ document.addEventListener('DOMContentLoaded',function(){
   if(p)p.addEventListener('keydown',function(e){if(e.key==='Enter')ZZ.cashierLogin();});
   var m=document.getElementById('cashier-login-modal');
   if(m)m.addEventListener('click',function(e){if(e.target===m)ZZ.closeCashierLogin();});
+});
+
+/* اضغط في أي مكان في حقل الوقت (مش بس الأيقونة الصغيرة) يفتح مؤقّت اختيار الوقت — بيسهّل الظبط من الكمبيوتر زي الموبايل بالظبط */
+document.addEventListener('click', function(e) {
+  var t = e.target;
+  if (t && t.tagName === 'INPUT' && t.type === 'time' && typeof t.showPicker === 'function') {
+    try { t.showPicker(); } catch (err) { /* بعض المتصفحات القديمة مش بتدعمها — تجاهل بهدوء */ }
+  }
 });
 
 /* cashier management */
