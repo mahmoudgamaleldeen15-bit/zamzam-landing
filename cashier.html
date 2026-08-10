@@ -219,7 +219,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Cairo'
 
 /* ══ TYPE TABS ══ */
 .type-tabs{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+  display:grid;grid-template-columns:repeat(5,1fr);gap:8px;
   padding:0 14px 10px;
 }
 .type-tab{
@@ -233,6 +233,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Cairo'
   background:rgba(255,255,255,.08);border-color:var(--border-hi);color:var(--text);
 }
 .type-tab.tt-mawled.active{background:#1a3a5c;border-color:#2f6fb0;color:#fff}
+.type-tab.tt-desserts.active{background:#0d3d38;border-color:#14b8a6;color:#fff}
 .type-tab.tt-kahk.active{background:#c2660a;border-color:#e8850f;color:#000}
 .type-tab.tt-choco.active{background:#3d2415;border-color:#6b4025;color:#fff}
 .tt-label{white-space:nowrap}
@@ -253,6 +254,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Cairo'
 .order-card.mawled .oc-cust-row{color:#fff!important}
 .order-card.mawled .oc-cust-name{font-weight:900}
 .order-card.mawled .oc-cust{background:rgba(255,255,255,.08)}
+
+.order-card.desserts{background:#0d3d38;border-color:#14b8a6}
+.order-card.desserts .oc-cust-name,
+.order-card.desserts .oc-id,
+.order-card.desserts .oc-time,
+.order-card.desserts .oc-item-name,
+.order-card.desserts .oc-cust-row{color:#fff!important}
+.order-card.desserts .oc-cust-name{font-weight:900}
+.order-card.desserts .oc-cust{background:rgba(255,255,255,.08)}
 
 .order-card.kahk{background:#c2660a;border-color:#e8850f}
 .order-card.kahk .oc-cust-name,
@@ -281,6 +291,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Cairo'
   letter-spacing:.03em;margin-bottom:6px;
 }
 .oc-type-ribbon.mawled{background:rgba(255,255,255,.15);color:#fff}
+.oc-type-ribbon.desserts{background:rgba(255,255,255,.15);color:#fff}
 .oc-type-ribbon.kahk{background:rgba(0,0,0,.18);color:#000}
 .oc-type-ribbon.choco{background:rgba(255,255,255,.15);color:#fff}
 
@@ -503,6 +514,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Cairo'
       <span class="tt-label">🎉 المولد</span>
       <span class="tt-badge" id="badge-mawled" style="display:none">0</span>
     </button>
+    <button class="type-tab tt-desserts" onclick="CA.setFilter('desserts')" id="f-desserts">
+      <span class="tt-label">🍰 الحلويات</span>
+      <span class="tt-badge" id="badge-desserts" style="display:none">0</span>
+    </button>
     <button class="type-tab tt-kahk" onclick="CA.setFilter('kahk')" id="f-kahk">
       <span class="tt-label">🍪 الكحك</span>
       <span class="tt-badge" id="badge-kahk" style="display:none">0</span>
@@ -589,6 +604,7 @@ const CA = {
   _audioCtx:    null,
   _alertTimer:  null,
   _seenIds:     new Set(),
+  assignedTypes: [],       /* الصفحات اللي الكاشير ده محدد يتابعها بس — فاضية = يشوف كل الصفحات */
 
   /* ── SHA-256 ── */
   sha256: async function(str) {
@@ -625,6 +641,7 @@ const CA = {
               found = true; cashierId = ch.key;
               localStorage.setItem('zz_cashier_id', ch.key);
               localStorage.setItem('zz_cashier_name', d.username);
+              CA.assignedTypes = d.assignedTypes || [];
             }
           });
           if (found) {
@@ -653,13 +670,15 @@ const CA = {
     if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
     CA.db = firebase.database();
     firebase.auth().signInAnonymously().then(function() {
-      /* تحقق إن الكاشير لسه active */
-      CA.db.ref('landing/cashiers/' + id + '/active').once('value').then(function(snap) {
+      /* تحقق إن الكاشير لسه active + هات الصفحات المحددة له */
+      CA.db.ref('landing/cashiers/' + id).once('value').then(function(snap) {
         if (boot) boot.style.display = 'none';
-        if (snap.val() === false) {
+        var d = snap.val() || {};
+        if (d.active === false) {
           CA.logout();
           return;
         }
+        CA.assignedTypes = d.assignedTypes || [];
         CA.init(name);
       }).catch(function() {
         if (boot) boot.style.display = 'none';
@@ -669,6 +688,7 @@ const CA = {
     }).catch(function() {
       /* لو Firebase فشل — اتابع بالجلسة المحفوظة بدون تحقق إضافي */
       if (boot) boot.style.display = 'none';
+      CA.assignedTypes = CA.assignedTypes || [];
       CA.init(name);
     });
     return true;
@@ -684,15 +704,36 @@ const CA = {
     CA.soundOn = localStorage.getItem('zz_cashier_sound') !== 'off';
     CA._updateSoundBtn();
 
-    /* subscribe للطلبات */
-    CA._subscribeOrders('mawled');
-    CA._subscribeOrders('kahk');
-    CA._subscribeOrders('choco');
+    /* لو الكاشير محدد له صفحات معينة — يشترك فيهم بس، لو فاضية يشترك في الكل (السلوك الافتراضي زي ما هو) */
+    var allTypes = ['mawled','desserts','kahk','choco'];
+    var typesToSubscribe = (CA.assignedTypes && CA.assignedTypes.length) ? CA.assignedTypes : allTypes;
+
+    /* subscribe للطلبات — بس الصفحات المسموحة */
+    typesToSubscribe.forEach(function(t) { CA._subscribeOrders(t); });
+
+    /* إخفاء تابات الأنواع غير المسموحة (لو فيه تقييد) */
+    CA._applyPageRestriction(typesToSubscribe, allTypes);
 
     /* Enter key في login */
     document.getElementById('lg-pin') && document.getElementById('lg-pin').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') CA.login();
     });
+  },
+
+  /* ── تطبيق تقييد الصفحات على واجهة الكاشير ── */
+  _applyPageRestriction: function(allowedTypes, allTypes) {
+    var isRestricted = CA.assignedTypes && CA.assignedTypes.length > 0;
+    var visibleCount = 1; /* تاب "الكل" ظاهر دايماً */
+    allTypes.forEach(function(t) {
+      var tab = document.getElementById('f-' + t);
+      if (!tab) return;
+      var allowed = !isRestricted || allowedTypes.indexOf(t) !== -1;
+      tab.style.display = allowed ? '' : 'none';
+      if (allowed) visibleCount++;
+    });
+    /* عدّل شكل الشبكة حسب عدد التابات الظاهرة */
+    var wrap = document.querySelector('.type-tabs');
+    if (wrap) wrap.style.gridTemplateColumns = 'repeat(' + visibleCount + ',1fr)';
   },
 
   /* ── SUBSCRIBE ── */
@@ -783,7 +824,7 @@ const CA = {
 
   /* ── ALERT BANNER ── */
   _showAlert: function(order) {
-    var labels = { mawled:'🎉 حلويات المولد', kahk:'🍪 كحك العيد', choco:'🍫 شيكولاتة العيد' };
+    var labels = { mawled:'🎉 حلويات المولد', desserts:'🍰 حلويات شرقي وغربي', kahk:'🍪 كحك العيد', choco:'🍫 شيكولاتة العيد' };
     var el = document.getElementById('order-alert');
     document.getElementById('alert-title').textContent = 'طلب جديد! ' + (labels[order._type]||'');
     document.getElementById('alert-sub').textContent   = (order.name||'عميل') + ' — ' + (order.orderType==='delivery'?'ديليفري':'استلام');
@@ -820,7 +861,7 @@ const CA = {
 
   setFilter: function(f) {
     CA.filter = f;
-    ['all','mawled','kahk','choco'].forEach(function(k) {
+    ['all','mawled','desserts','kahk','choco'].forEach(function(k) {
       var btn = document.getElementById('f-' + k);
       if (btn) btn.classList.toggle('active', k === f);
     });
@@ -893,7 +934,7 @@ const CA = {
   },
 
   /* عدد الطلبات الجديدة لسه ملحوظتش لكل نوع */
-  _unseenByType: { mawled:0, kahk:0, choco:0 },
+  _unseenByType: { mawled:0, desserts:0, kahk:0, choco:0 },
 
   /* ── تحديث الإحصائيات والـ badges بس (من غير لمس الشبكة) ── */
   _updateStatsOnly: function() {
@@ -908,7 +949,7 @@ const CA = {
     var orders = CA._filteredOrders();
     document.getElementById('orders-count').textContent = orders.length + ' طلب';
 
-    ['mawled','kahk','choco'].forEach(function(t) {
+    ['mawled','desserts','kahk','choco'].forEach(function(t) {
       var badge = document.getElementById('badge-' + t);
       var count = CA._unseenByType[t] || 0;
       if (badge) {
@@ -986,7 +1027,7 @@ const CA = {
   },
 
   _cardHTML: function(o) {
-    var typeLabel = { mawled:'🎉 المولد', kahk:'🍪 الكحك', choco:'🍫 شيكولاتة' }[o._type] || o._type;
+    var typeLabel = { mawled:'🎉 المولد', desserts:'🍰 حلويات', kahk:'🍪 الكحك', choco:'🍫 شيكولاتة' }[o._type] || o._type;
     var isNew     = CA._isNew(o);
     var time      = o.createdAt ? new Date(o.createdAt).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}) : '—';
     var date      = o.createdAt ? new Date(o.createdAt).toLocaleDateString('ar-EG') : '';
@@ -1178,7 +1219,7 @@ const CA = {
     localStorage.removeItem('zz_cashier_name');
     /* شيل الـ listeners */
     if (CA.db) {
-      ['mawled','kahk','choco'].forEach(function(t) {
+      ['mawled','desserts','kahk','choco'].forEach(function(t) {
         CA.db.ref(t + '/orders').off();
       });
     }

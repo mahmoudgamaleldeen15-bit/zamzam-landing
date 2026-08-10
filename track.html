@@ -103,6 +103,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'Ca
   font-size:11px;font-weight:800;letter-spacing:.04em;margin-bottom:8px;
 }
 .type-badge.mawled{background:rgba(245,200,66,.12);color:var(--gold)}
+.type-badge.desserts{background:rgba(20,184,166,.12);color:#2dd4bf}
 .type-badge.kahk  {background:rgba(217,119,6,.12); color:#d97706}
 .type-badge.choco {background:rgba(124,58,237,.12);color:#a78bfa}
 
@@ -205,7 +206,7 @@ var TR = {
     TR.isCashier = params.get('ref') === 'cashier';
 
     /* تحقق صارم — النوع لازم يكون واحد من التلاتة بس، والـ id بصيغة معروفة */
-    var validTypes = ['mawled', 'kahk', 'choco'];
+    var validTypes = ['mawled', 'desserts', 'kahk', 'choco'];
     var validId    = TR.orderId && /^[A-Za-z0-9_-]{2,40}$/.test(TR.orderId);
 
     if (!TR.orderId || !TR.type || validTypes.indexOf(TR.type) === -1 || !validId) {
@@ -244,7 +245,7 @@ var TR = {
     var curIdx    = STATUSES.findIndex(function(s){ return s.key === curStatus; });
     if (curIdx === -1) curIdx = 0;
 
-    var typeLabels = { mawled:'🎉 حلويات المولد', kahk:'🍪 كحك العيد', choco:'🍫 شيكولاتة العيد' };
+    var typeLabels = { mawled:'🎉 حلويات المولد', desserts:'🍰 حلويات شرقي وغربي', kahk:'🍪 كحك العيد', choco:'🍫 شيكولاتة العيد' };
     var typeBadge  = typeLabels[TR.type] || TR.type;
 
     /* timeline */
@@ -290,7 +291,7 @@ var TR = {
         + '<button class="refresh-btn" onclick="location.reload()">تحديث يدوي</button>';
     } else {
       /* العميل — زرار رجوع للمنيو بس، من غير تحديث يدوي */
-      var menuLinks = { mawled:'mawled-order.html', kahk:'kahk-order.html', choco:'choco-order.html' };
+      var menuLinks = { mawled:'mawled-order.html', desserts:'desserts-order.html', kahk:'kahk-order.html', choco:'choco-order.html' };
       var menuHref  = menuLinks[TR.type] || 'index.html';
       footerHTML =
           '<div class="refresh-note">الصفحة بتتحدث تلقائياً 🔄</div>'

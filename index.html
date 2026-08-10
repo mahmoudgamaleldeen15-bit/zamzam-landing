@@ -858,6 +858,8 @@ a{text-decoration:none;color:inherit}
   </div>
 </div>
 
+
+
 <!-- ══ EDIT OFFER MODAL ══ -->
 <div id="modal-edit">
   <div class="edit-box">
@@ -969,6 +971,8 @@ a{text-decoration:none;color:inherit}
         <button class="ant" onclick="ZZ.adminTab('mawled-menu')">🎉 منيو المولد</button>
         <button class="ant" onclick="ZZ.adminTab('mawled-zones')">🛵 مناطق التوصيل</button>
         <button class="ant" onclick="ZZ.adminTab('mawled-orders')">📊 تقرير المولد</button>
+        <button class="ant" onclick="ZZ.adminTab('desserts-menu')">🍰 منيو حلويات شرقي وغربي</button>
+        <button class="ant" onclick="ZZ.adminTab('desserts-orders')">📊 تقرير الحلويات</button>
         <button class="ant" onclick="ZZ.adminTab('kahk-menu')">🍪 كحك العيد</button>
         <button class="ant" onclick="ZZ.adminTab('kahk-orders')">📊 تقرير الكحك</button>
         <button class="ant" onclick="ZZ.adminTab('choco-menu')">🍫 شيكولاتة العيد</button>
@@ -1204,6 +1208,127 @@ a{text-decoration:none;color:inherit}
         <div class="admin-note" id="mawled-hero-note">✅ تم الحفظ</div>
       </div><!-- end tab-mawled-menu -->
 
+      <div id="admin-tab-desserts-menu" class="admin-panel-sec">
+
+        <!-- ══ رقم الواتساب ══ -->
+        <div class="admin-sec-title">📱 رقم واتساب استقبال طلبات الحلويات</div>
+        <div class="admin-form-grid" style="margin-bottom:16px">
+          <div>
+            <label class="admin-lbl">رقم الواتساب (بالكود الدولي بدون + )</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="ds-wa-num" class="admin-inp" placeholder="مثال: 201XXXXXXXXX" dir="ltr" style="flex:1;letter-spacing:.05em">
+              <button onclick="ZZ.saveDessertsWa()" style="padding:0 18px;height:44px;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#000;border:none;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif;white-space:nowrap">💾 حفظ</button>
+            </div>
+            <div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:6px">
+              ⚠️ الرقم ده هو اللي هتيجي عليه طلبات العملاء على واتساب
+            </div>
+            <div id="ds-wa-note" style="font-size:12px;color:#4ade80;margin-top:6px;min-height:16px"></div>
+          </div>
+        </div>
+
+        <div class="admin-sec-divider"></div>
+        <div class="admin-sec-title">&#x1F550; أوقات استقبال طلبات الحلويات</div>
+        <div class="admin-form-grid" style="margin-bottom:8px">
+          <div>
+            <label class="admin-lbl">وقت البداية</label>
+            <input type="time" id="ds-hour-from" class="admin-inp" dir="ltr">
+          </div>
+          <div>
+            <label class="admin-lbl">وقت النهاية</label>
+            <input type="time" id="ds-hour-to" class="admin-inp" dir="ltr">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <label style="display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.7);font-size:13px;cursor:pointer">
+            <input type="checkbox" id="ds-hours-enabled" style="width:16px;height:16px;accent-color:#14b8a6">
+            تفعيل تحديد أوقات الطلبات
+          </label>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.35);margin-bottom:10px">لو مش مفعل العملاء يقدروا يطلبوا في اي وقت</div>
+        <button onclick="ZZ.saveDessertsHours()" style="padding:10px 24px;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#000;border:none;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">&#x1F4BE; حفظ الاوقات</button>
+        <div id="ds-hours-note" style="font-size:12px;color:#4ade80;margin-top:8px;min-height:16px"></div>
+        <div class="admin-sec-divider"></div>
+        <div class="admin-sec-title">🍰 إضافة صنف حلويات جديد</div>
+        <div class="admin-form-grid">
+          <div>
+            <label class="admin-lbl">القسم الرئيسي</label>
+            <select id="ds-category" class="admin-inp">
+              <option value="">— بدون قسم —</option>
+            </select>
+          </div>
+          <div>
+            <label class="admin-lbl">اسم الصنف *</label>
+            <input id="ds-name" class="admin-inp" placeholder="مثال: بقلاوة بالفستق — تيراميسو" type="text">
+          </div>
+          <div>
+            <label class="admin-lbl">الوصف / المواصفات</label>
+            <textarea id="ds-desc" class="admin-inp" placeholder="مثال: وصف الصنف ومكوناته......" rows="3"></textarea>
+          </div>
+          <div>
+            <label class="admin-lbl">نوع السعر</label>
+            <div class="delivery-opts">
+              <button type="button" class="dopt on" id="ds-ptype-piece" onclick="ZZ.setDessertsPriceType('piece')">🔢 سعر القطعة</button>
+              <button type="button" class="dopt" id="ds-ptype-kilo" onclick="ZZ.setDessertsPriceType('kilo')">⚖️ سعر الكيلو</button>
+            </div>
+          </div>
+          <div>
+            <label class="admin-lbl" id="ds-price-lbl">السعر بالجنيه المصري</label>
+            <input id="ds-price" class="admin-inp" placeholder="مثال: 45 جنيه" type="text">
+          </div>
+          <div>
+            <label class="admin-lbl">صورة الصنف</label>
+            <div class="img-tabs">
+              <button class="img-tab on" id="ds-imgbtn-url" onclick="ZZ.setDessertsImgMode('url')">🔗 رابط</button>
+              <button class="img-tab" id="ds-imgbtn-file" onclick="ZZ.setDessertsImgMode('file')">📁 رفع</button>
+            </div>
+            <div id="ds-url-row"><input id="ds-imgurl" class="admin-inp" placeholder="https://..." type="url"></div>
+            <div id="ds-file-row" style="display:none"><input id="ds-imgfile" class="admin-inp" type="file" accept="image/*" style="padding:10px;cursor:pointer"></div>
+          </div>
+        </div>
+        <button class="btn-admin-add" style="background:linear-gradient(135deg,#0d9488,#14b8a6);color:#000" onclick="ZZ.addDessertsItem()">➕ إضافة للمنيو</button>
+        <div class="admin-note" id="desserts-menu-note">✅ تم الحفظ</div>
+        <div style="margin-top:28px">
+          <div class="admin-sec-title">🍰 منيو الحلويات الحالي</div>
+          <!-- أقسام المولد في الأدمن -->
+          <div style="margin-bottom:14px">
+            <div class="admin-sec-title" style="font-size:10px">📂 أقسام الحلويات <span id="ds-cat-count" style="opacity:.4;font-weight:400"></span></div>
+            <div style="display:flex;gap:8px;margin-bottom:10px">
+              <input id="ds-new-cat-name" class="admin-inp" placeholder="اسم القسم (مثال: حلويات شرقية)" style="flex:1">
+              <input id="ds-new-cat-icon" class="admin-inp" placeholder="🍰" style="width:60px;text-align:center" maxlength="4">
+              <button onclick="ZZ.addDessertsCategory()" style="padding:0 14px;background:rgba(245,200,66,.15);border:1px solid rgba(20,184,166,.3);color:#14b8a6;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700">+</button>
+            </div>
+            <div id="ds-cat-list"><div style="text-align:center;color:rgba(255,255,255,.3);padding:12px;font-size:13px">لا توجد أقسام بعد</div></div>
+          </div>
+          <div id="admin-desserts-menu-list"><div style="text-align:center;color:rgba(255,255,255,.3);padding:20px;font-size:13px">لا توجد أصناف بعد</div></div>
+        </div>
+
+        <!-- تغيير صورة Hero المولد -->
+        <div class="admin-sec-divider"></div>
+        <div class="admin-sec-title">🖼️ صورة Hero صفحة الحلويات</div>
+        <p style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:14px">غيّر صورة الهيرو في صفحة الحلويات الشرقية والغربية</p>
+        <div class="img-tabs">
+          <button class="img-tab on" id="dshbg-btn-url" onclick="ZZ.setDessertsHeroBgMode('url')">🔗 رابط</button>
+          <button class="img-tab" id="dshbg-btn-file" onclick="ZZ.setDessertsHeroBgMode('file')">📁 رفع</button>
+        </div>
+        <div id="dshbg-url-row"><input id="dshbg-imgurl" class="admin-inp" placeholder="https://..." type="url"></div>
+        <div id="dshbg-file-row" style="display:none"><input id="dshbg-imgfile" class="admin-inp" type="file" accept="image/*" style="padding:10px;cursor:pointer" onchange="ZZ.previewDessertsHeroBgFile(this)"></div>
+        <div id="dshbg-preview" style="display:none;width:100%;aspect-ratio:16/9;background-size:cover;background-position:center;border-radius:12px;margin:10px 0;border:1px solid rgba(255,255,255,.1)"></div>
+
+        <!-- أنيميشن Hero المولد -->
+        <div class="admin-sec-title" style="margin-top:16px">✨ مؤثر Hero الحلويات</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+          <button class="anim-opt on" data-anim="none"     onclick="ZZ.setDessertsHeroAnim(this,'none')">⬜ بدون</button>
+          <button class="anim-opt"    data-anim="stars"    onclick="ZZ.setDessertsHeroAnim(this,'stars')">⭐ نجوم</button>
+          <button class="anim-opt"    data-anim="lanterns" onclick="ZZ.setDessertsHeroAnim(this,'lanterns')">🏮 فوانيس</button>
+          <button class="anim-opt"    data-anim="petals"   onclick="ZZ.setDessertsHeroAnim(this,'petals')">🌸 بتلات</button>
+          <button class="anim-opt"    data-anim="confetti" onclick="ZZ.setDessertsHeroAnim(this,'confetti')">🎊 كونفيتي</button>
+          <button class="anim-opt"    data-anim="sparkle"  onclick="ZZ.setDessertsHeroAnim(this,'sparkle')">💫 بريق</button>
+        </div>
+        <button onclick="ZZ.saveDessertsHero()" class="btn-admin-add" style="background:linear-gradient(135deg,#0d9488,#14b8a6);color:#000">💾 حفظ إعدادات Hero الحلويات</button>
+        <div class="admin-note" id="desserts-hero-note">✅ تم الحفظ</div>
+      </div><!-- end tab-desserts-menu -->
+
+      
       <!-- ══ TAB: MAWLED DELIVERY ZONES ══ -->
       <div id="admin-tab-mawled-zones" class="admin-panel-sec">
         <div class="admin-sec-title">🛵 إضافة منطقة توصيل جديدة</div>
@@ -1338,6 +1463,93 @@ a{text-decoration:none;color:inherit}
         </div>
 
       </div><!-- end tab-mawled-orders -->
+      <div id="admin-tab-desserts-orders" class="admin-panel-sec">
+
+        <!-- Header + KPIs -->
+        <div class="admin-sec-title">📊 تقرير مبيعات الحلويات الشرقية والغربية</div>
+
+        <!-- KPI Cards -->
+        <div id="desserts-kpi-wrap" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px">
+          <div class="mkpi-card">
+            <div class="mkpi-icon">📦</div>
+            <div class="mkpi-val" id="ds-kpi-count">—</div>
+            <div class="mkpi-lbl">إجمالي الطلبات</div>
+          </div>
+          <div class="mkpi-card">
+            <div class="mkpi-icon">💰</div>
+            <div class="mkpi-val" id="ds-kpi-revenue">—</div>
+            <div class="mkpi-lbl">إجمالي المبيعات</div>
+          </div>
+          <div class="mkpi-card">
+            <div class="mkpi-icon">🛵</div>
+            <div class="mkpi-val" id="ds-kpi-delivery">—</div>
+            <div class="mkpi-lbl">طلبات ديليفري</div>
+          </div>
+          <div class="mkpi-card">
+            <div class="mkpi-icon">🏪</div>
+            <div class="mkpi-val" id="ds-kpi-pickup">—</div>
+            <div class="mkpi-lbl">استلام من المحل</div>
+          </div>
+        </div>
+
+        <!-- فلاتر البحث -->
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:14px;align-items:end">
+          <div>
+            <label class="admin-lbl">🔍 بحث (اسم أو تليفون)</label>
+            <input id="dsord-search" class="admin-inp" placeholder="ابحث بالاسم أو رقم التليفون..." oninput="ZZ.filterDessertsOrders()">
+          </div>
+          <div>
+            <label class="admin-lbl">📅 فلتر بالتاريخ</label>
+            <input id="dsord-date" class="admin-inp" type="date" onchange="ZZ.filterDessertsOrders()">
+          </div>
+          <div style="display:flex;gap:6px">
+            <button onclick="ZZ.clearDessertsFilters()" style="padding:0 14px;height:44px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);border-radius:10px;cursor:pointer;font-size:12px;font-family:'Cairo',sans-serif;white-space:nowrap">مسح الفلتر</button>
+          </div>
+        </div>
+
+        <!-- أزرار التصدير -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <button onclick="ZZ.exportDessertsExcel()" style="display:flex;align-items:center;gap:6px;padding:10px 18px;background:linear-gradient(135deg,#15803d,#16a34a);color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:800;font-size:13px;font-family:'Cairo',sans-serif;box-shadow:0 3px 12px rgba(21,128,61,.3)">
+            📥 تصدير Excel
+          </button>
+          <button onclick="ZZ.printDessertsOrders()" style="display:flex;align-items:center;gap:6px;padding:10px 18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;border-radius:10px;cursor:pointer;font-weight:800;font-size:13px;font-family:'Cairo',sans-serif">
+            🖨️ طباعة
+          </button>
+          <div id="dsord-export-count" style="margin-right:auto;font-size:12px;color:rgba(255,255,255,.4);align-self:center"></div>
+        </div>
+
+        <!-- جدول الطلبات -->
+        <div id="desserts-orders-table-wrap" style="overflow-x:auto;border-radius:14px;border:1px solid rgba(255,255,255,.08)">
+          <div style="text-align:center;color:rgba(255,255,255,.3);padding:40px;font-size:13px" id="dsord-loading">
+            <div style="font-size:28px;margin-bottom:10px">⏳</div>
+            جاري تحميل الطلبات...
+          </div>
+          <table id="desserts-orders-table" style="display:none;width:100%;border-collapse:collapse;font-size:12px;direction:rtl">
+            <thead>
+              <tr style="background:rgba(20,184,166,.1);border-bottom:1px solid rgba(20,184,166,.25)">
+                <th class="mord-th">رقم الطلب</th>
+                <th class="mord-th">التاريخ والوقت</th>
+                <th class="mord-th">اسم العميل</th>
+                <th class="mord-th">التليفون</th>
+                <th class="mord-th">واتساب</th>
+                <th class="mord-th">النوع</th>
+                <th class="mord-th">المنطقة</th>
+                <th class="mord-th">المنتجات</th>
+                <th class="mord-th">إجمالي المنتجات</th>
+                <th class="mord-th">توصيل</th>
+                <th class="mord-th" style="color:#14b8a6">الإجمالي</th>
+              </tr>
+            </thead>
+            <tbody id="desserts-orders-tbody"></tbody>
+          </table>
+        </div>
+
+        <div id="dsord-empty" style="display:none;text-align:center;padding:40px;color:rgba(255,255,255,.3)">
+          <div style="font-size:36px;margin-bottom:10px">📭</div>
+          <div>لا توجد طلبات بعد</div>
+        </div>
+
+      </div><!-- end tab-desserts-orders -->
       <!-- ══ TAB: KAHK MENU ══ -->
       <div id="admin-tab-kahk-menu" class="admin-panel-sec">
         <!-- رقم الواتساب -->
@@ -1840,6 +2052,17 @@ a{text-decoration:none;color:inherit}
 
         <div class="btn-toggle-row">
           <div class="btn-toggle-info">
+            🍰 زرار "حلويات شرقي وغربي"
+            <small>يظهر في الصفحة الرئيسية طول الوقت — قائمة حلويات دائمة</small>
+          </div>
+          <label class="toggle-sw">
+            <input type="checkbox" id="tog-desserts" onchange="ZZ.saveBtnSetting('desserts', this.checked)">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="btn-toggle-row">
+          <div class="btn-toggle-info">
             🍪 زرار "اطلب كحك العيد"
             <small>يظهر في الصفحة الرئيسية — فعّله في موسم العيد فقط</small>
           </div>
@@ -1941,6 +2164,7 @@ a{text-decoration:none;color:inherit}
   <div class="admin-sec-title">اعدادات الصفحات</div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
     <button id="pset-btn-mawled" onclick="ZZ.psetSwitch('mawled')" style="padding:9px 20px;border-radius:10px;border:1px solid rgba(245,200,66,.4);background:rgba(245,200,66,.12);color:#f5c842;font-weight:800;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">حلويات المولد</button>
+    <button id="pset-btn-desserts" onclick="ZZ.psetSwitch('desserts')" style="padding:9px 20px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-weight:700;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">حلويات شرقي وغربي</button>
     <button id="pset-btn-kahk"   onclick="ZZ.psetSwitch('kahk')"   style="padding:9px 20px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-weight:700;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">كحك العيد</button>
     <button id="pset-btn-choco"  onclick="ZZ.psetSwitch('choco')"  style="padding:9px 20px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-weight:700;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">شيكولاتة العيد</button>
   </div>
@@ -1970,6 +2194,43 @@ a{text-decoration:none;color:inherit}
   <div id="cashiers-list"><div style="color:rgba(255,255,255,.3);font-size:13px;padding:12px">لا يوجد كاشيرين بعد</div></div>
 </div>
 
+<!-- Modal تعديل صفحات الكاشير -->
+<div id="modal-edit-cashier-pages" style="position:fixed;inset:0;z-index:1400;background:rgba(0,0,0,.92);backdrop-filter:blur(22px);display:none;align-items:center;justify-content:center;font-family:'Cairo',sans-serif;direction:rtl">
+  <div style="width:100%;max-width:420px;margin:16px;background:#0a0804;border:1px solid rgba(245,200,66,.25);border-radius:24px;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(245,200,66,.06)">
+      <div style="font-weight:900;font-size:16px;color:#fff">📄 صفحات الكاشير: <span id="ecp-username" style="color:#f5c842"></span></div>
+      <button onclick="ZZ.closeEditCashierPages()" style="width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:none;color:rgba(255,255,255,.6);font-size:15px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:20px 22px 26px">
+      <input type="hidden" id="ecp-cashier-id">
+      <div style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:16px;line-height:1.7">
+        حدد الصفحات اللي الكاشير ده هيتابعها ويوصله إشعارات طلباتها بس.<br>
+        <b style="color:rgba(245,200,66,.8)">لو سبت كل الاختيارات فاضية → هيشوف كل الصفحات (زي ما هو دلوقتي)</b>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.15);border-radius:12px;cursor:pointer">
+          <input type="checkbox" id="ecp-mawled" style="width:18px;height:18px;accent-color:#f5c842">
+          <span style="color:#fff;font-weight:700;font-size:13.5px">🎉 حلويات المولد</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(20,184,166,.06);border:1px solid rgba(20,184,166,.15);border-radius:12px;cursor:pointer">
+          <input type="checkbox" id="ecp-desserts" style="width:18px;height:18px;accent-color:#14b8a6">
+          <span style="color:#fff;font-weight:700;font-size:13.5px">🍰 حلويات شرقي وغربي</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(217,119,6,.06);border:1px solid rgba(217,119,6,.15);border-radius:12px;cursor:pointer">
+          <input type="checkbox" id="ecp-kahk" style="width:18px;height:18px;accent-color:#d97706">
+          <span style="color:#fff;font-weight:700;font-size:13.5px">🍪 كحك العيد</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.15);border-radius:12px;cursor:pointer">
+          <input type="checkbox" id="ecp-choco" style="width:18px;height:18px;accent-color:#7c3aed">
+          <span style="color:#fff;font-weight:700;font-size:13.5px">🍫 شيكولاتة العيد</span>
+        </label>
+      </div>
+      <button onclick="ZZ.saveCashierPages()" style="width:100%;margin-top:18px;padding:13px;border-radius:12px;background:linear-gradient(135deg,#f5c842,#e8a020);color:#000;font-weight:900;font-size:15px;border:none;cursor:pointer;font-family:'Cairo',sans-serif">💾 حفظ</button>
+      <div id="ecp-note" style="font-size:12px;color:#4ade80;margin-top:8px;min-height:16px;text-align:center"></div>
+    </div>
+  </div>
+</div>
+
 <!-- admin tab orders management -->
 <div id="admin-tab-orders-mgmt" class="admin-panel-sec">
   <div class="admin-sec-title">📦 إدارة الطلبات</div>
@@ -1978,6 +2239,7 @@ a{text-decoration:none;color:inherit}
   <!-- اختيار الصفحة -->
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
     <button id="om-tab-mawled" onclick="ZZ.omSwitchType('mawled')" style="padding:9px 20px;border-radius:10px;border:1px solid rgba(245,200,66,.4);background:rgba(245,200,66,.12);color:#f5c842;font-weight:800;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">🎉 المولد</button>
+    <button id="om-tab-desserts" onclick="ZZ.omSwitchType('desserts')" style="padding:9px 20px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-weight:700;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">🍰 حلويات شرقي وغربي</button>
     <button id="om-tab-kahk" onclick="ZZ.omSwitchType('kahk')" style="padding:9px 20px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-weight:700;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">🍪 الكحك</button>
     <button id="om-tab-choco" onclick="ZZ.omSwitchType('choco')" style="padding:9px 20px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-weight:700;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif">🍫 الشيكولاتة</button>
   </div>
@@ -2391,6 +2653,7 @@ a{text-decoration:none;color:inherit}
         <button class="mtype on" onclick="ZZ.switchMenuDisplay('cake')">🎂 الحلويات والتورتات</button>
         <button class="mtype" onclick="ZZ.switchMenuDisplay('restaurant')">🍔 المطعم</button>
         <button class="mtype" id="mawled-menu-tab" onclick="ZZ.switchMenuDisplay('mawled')" style="display:none">🎉 حلويات المولد</button>
+        <button class="mtype" id="desserts-menu-tab" onclick="ZZ.switchMenuDisplay('desserts')" style="display:none">🍰 حلويات شرقي وغربي</button>
         <button class="mtype" id="kahk-menu-tab"   onclick="ZZ.switchMenuDisplay('kahk')"   style="display:none">🍪 كحك العيد</button>
         <button class="mtype" id="choco-menu-tab"  onclick="ZZ.switchMenuDisplay('choco')"  style="display:none">🍫 شيكولاتة العيد</button>
       </div>
@@ -2417,6 +2680,13 @@ a{text-decoration:none;color:inherit}
       <div class="no-menu-msg">
         <div class="ni">🎉</div>
         <p>جاري تحميل قائمة المولد...</p>
+      </div>
+    </div>
+    <!-- Desserts Menu Grid -->
+    <div id="desserts-menu-display" style="display:none">
+      <div class="no-menu-msg">
+        <div class="ni">🍰</div>
+        <p>جاري تحميل قائمة الحلويات...</p>
       </div>
     </div>
     <!-- Kahk Menu Grid -->
@@ -4212,7 +4482,7 @@ ZZ.renderMenuDisplay = function(type) {
 ZZ.switchMenuDisplay = function(type, catId, noHash) {
   var displays = {
     'cake':'cake-menu-display','restaurant':'resto-menu-display',
-    'mawled':'mawled-menu-display','kahk':'kahk-menu-display','choco':'choco-menu-display'
+    'mawled':'mawled-menu-display','desserts':'desserts-menu-display','kahk':'kahk-menu-display','choco':'choco-menu-display'
   };
   Object.keys(displays).forEach(function(k){
     var el=document.getElementById(displays[k]);
@@ -4223,11 +4493,13 @@ ZZ.switchMenuDisplay = function(type, catId, noHash) {
     if ((type==='cake'       && b.textContent.indexOf('حلويات والتورتات')!==-1) ||
         (type==='restaurant' && b.textContent.indexOf('مطعم')!==-1) ||
         (type==='mawled'     && b.textContent.indexOf('المولد')!==-1) ||
+        (type==='desserts'   && b.textContent.indexOf('شرقي وغربي')!==-1) ||
         (type==='kahk'       && b.textContent.indexOf('كحك')!==-1) ||
         (type==='choco'      && b.textContent.indexOf('شيكولاتة')!==-1))
       b.classList.add('on');
   });
-  if (type==='mawled') ZZ._subscribeMawledPublic();
+  if (type==='mawled')   ZZ._subscribeMawledPublic();
+  if (type==='desserts') ZZ._subscribeDessertsPublic();
   if (type==='kahk')   ZZ._subscribeKahkPublic();
   if (type==='choco')  ZZ._subscribeChocoPublic();
   /* تحديث الـ URL hash */
@@ -5492,6 +5764,7 @@ ZZ.loadBtnSettings = function() {
       menus:      v.menus      !== false,
       jobs:       v.jobs       === true,
       mawled:     v.mawled     === true,
+      desserts:   v.desserts   === true,
       kahk:       v.kahk       === true,
       choco:      v.choco      === true
     };
@@ -5502,12 +5775,14 @@ ZZ.loadBtnSettings = function() {
     var tm = document.getElementById('tog-menus');
     var tj = document.getElementById('tog-jobs');
     var tmw= document.getElementById('tog-mawled');
+    var tds= document.getElementById('tog-desserts');
     if (tc)  tc.checked  = ZZ._btnSettings.cake;
     if (tr)  tr.checked  = ZZ._btnSettings.restaurant;
     if (to)  to.checked  = ZZ._btnSettings.offers;
     if (tm)  tm.checked  = ZZ._btnSettings.menus;
     if (tj)  tj.checked  = ZZ._btnSettings.jobs;
     if (tmw) tmw.checked = ZZ._btnSettings.mawled;
+    if (tds) tds.checked = ZZ._btnSettings.desserts;
   });
 };
 
@@ -6089,6 +6364,328 @@ ZZ._loadMawledWa = function() {
   });
 };
 
+ZZ._dessertsMenuCache  = [];
+ZZ._dessertsCatsCache  = [];
+ZZ._dessertsMenuSubbed = false;
+ZZ._dessertsCatsSubbed = false;
+ZZ._dessertsImgMode    = 'url';
+ZZ._dessertsPriceType  = 'piece';  /* 'piece' | 'kilo' */
+ZZ._dessertsHeroBgMode = 'url';
+ZZ._dessertsHeroAnim   = 'none';
+
+/* ── اشتراك بيانات الحلويات من Firebase ── */
+ZZ.subscribeDesserts = function() {
+  if (!window.zzdb) return;
+
+  /* الأصناف */
+  if (!ZZ._dessertsMenuSubbed) {
+    ZZ._dessertsMenuSubbed = true;
+    zzdb.ref('landing/desserts/items').orderByChild('createdAt').on('value', function(snap) {
+      ZZ._dessertsMenuCache = [];
+      snap.forEach(function(ch) { ZZ._dessertsMenuCache.unshift(Object.assign({ id: ch.key }, ch.val())); });
+      ZZ._renderAdminDessertsList();
+      ZZ._refreshDessertsCatDropdown();
+    });
+  }
+
+  /* الأقسام */
+  if (!ZZ._dessertsCatsSubbed) {
+    ZZ._dessertsCatsSubbed = true;
+    zzdb.ref('landing/desserts/categories').orderByChild('order').on('value', function(snap) {
+      ZZ._dessertsCatsCache = [];
+      snap.forEach(function(ch) { ZZ._dessertsCatsCache.push(Object.assign({ id: ch.key }, ch.val())); });
+      ZZ._renderDessertsCatList();
+      ZZ._refreshDessertsCatDropdown();
+    });
+  }
+};
+
+/* ── نوع السعر ── */
+ZZ.setDessertsPriceType = function(type) {
+  ZZ._dessertsPriceType = type;
+  document.getElementById('ds-ptype-piece').classList.toggle('on', type === 'piece');
+  document.getElementById('ds-ptype-kilo' ).classList.toggle('on', type === 'kilo');
+  var lbl = document.getElementById('ds-price-lbl');
+  if (lbl) lbl.textContent = type === 'kilo' ? 'سعر الكيلو بالجنيه' : 'سعر القطعة بالجنيه';
+};
+
+/* ── وضع الصورة ── */
+ZZ.setDessertsImgMode = function(m) {
+  ZZ._dessertsImgMode = m;
+  document.getElementById('ds-url-row').style.display  = m === 'url'  ? 'block' : 'none';
+  document.getElementById('ds-file-row').style.display = m === 'file' ? 'block' : 'none';
+  document.getElementById('ds-imgbtn-url').classList.toggle('on',  m === 'url');
+  document.getElementById('ds-imgbtn-file').classList.toggle('on', m === 'file');
+};
+
+/* ── إضافة صنف مولد ── */
+ZZ.addDessertsItem = function() {
+  var name = (document.getElementById('ds-name')  || {}).value || '';
+  var desc = (document.getElementById('ds-desc')  || {}).value || '';
+  var price= (document.getElementById('ds-price') || {}).value || '';
+  var catEl= document.getElementById('ds-category');
+  var catId= catEl ? catEl.value : '';
+
+  if (!name.trim()) { alert('من فضلك أدخل اسم الصنف'); return; }
+  if (!window.zzdb || !window.ZZ_AUTH_READY) { alert('⏳ جاري الاتصال — انتظر ثانيتين'); return; }
+
+  var item = {
+    name: name.trim(),
+    desc: desc.trim(),
+    price: price.trim(),
+    priceType: ZZ._dessertsPriceType,
+    categoryId: catId,
+    available: true,
+    createdAt: Date.now()
+  };
+
+  function _save(img) {
+    item.img = img || '';
+    zzdb.ref('landing/desserts/items').push(item)
+      .then(function() {
+        ['ds-name','ds-desc','ds-price','ds-imgurl'].forEach(function(id){ var el=document.getElementById(id);if(el)el.value=''; });
+        if (catEl) catEl.value = '';
+        var n = document.getElementById('desserts-menu-note');
+        if (n) { n.classList.add('show'); setTimeout(function(){ n.classList.remove('show'); }, 2500); }
+      })
+      .catch(function(err) { alert('❌ ' + err.message); });
+  }
+
+  if (ZZ._dessertsImgMode === 'file') {
+    var fe = document.getElementById('ds-imgfile');
+    var f  = fe && fe.files && fe.files[0];
+    if (!f) { alert('من فضلك اختار صورة'); return; }
+    _zzReadFile(f)
+      .then(function(raw) { return _zzCompress(raw, 900, 0.7); })
+      .then(function(img) { if (img.length > 900000) return _zzCompress(img, 600, 0.5); return img; })
+      .then(_save)
+      .catch(function(e) { alert('❌ ' + e.message); });
+  } else {
+    var urlEl = document.getElementById('ds-imgurl');
+    _save(urlEl ? urlEl.value.trim() : '');
+  }
+};
+
+/* ── حذف صنف مولد ── */
+ZZ.deleteDessertsItem = function(id) {
+  if (!confirm('حذف هذا الصنف؟')) return;
+  if (!window.zzdb) return;
+  zzdb.ref('landing/desserts/items/' + id).remove();
+};
+
+/* ── تفعيل/تعطيل صنف ── */
+ZZ.toggleDessertsAvail = function(id, avail) {
+  if (!window.zzdb) return;
+  zzdb.ref('landing/desserts/items/' + id + '/available').set(avail);
+};
+
+/* ── تعديل صنف مولد ── */
+ZZ.openEditDesserts = function(id) {
+  var it = ZZ._dessertsMenuCache.find(function(x){ return x.id === id; });
+  if (!it) return;
+  ZZ._editDessertsId = id;
+  ZZ._editDessertsImg = it.img;
+  var box = document.getElementById('modal-edit-desserts');
+  if (!box) return;
+  document.getElementById('eds-name').value  = it.name  || '';
+  document.getElementById('eds-desc').value  = it.desc  || '';
+  document.getElementById('eds-price').value = it.price || '';
+  /* price type */
+  ZZ._editDessertsPriceType = it.priceType || 'piece';
+  document.getElementById('eds-ptype-piece').classList.toggle('on', ZZ._editDessertsPriceType === 'piece');
+  document.getElementById('eds-ptype-kilo' ).classList.toggle('on', ZZ._editDessertsPriceType === 'kilo');
+  /* category */
+  ZZ._refreshDessertsCatDropdown();
+  setTimeout(function(){
+    var sel = document.getElementById('eds-category');
+    if (sel) sel.value = it.categoryId || '';
+  }, 80);
+  /* image preview */
+  var prev = document.getElementById('eds-preview');
+  if (prev) { prev.style.display = it.img ? 'block' : 'none'; if (it.img) prev.style.backgroundImage = 'url("'+it.img+'")'; }
+  /* reset file inputs */
+  var eu = document.getElementById('eds-imgurl');  if (eu) eu.value = '';
+  var ef = document.getElementById('eds-imgfile'); if (ef) ef.value = '';
+  box.style.display = 'flex';
+};
+
+ZZ.closeEditDesserts = function() {
+  var box = document.getElementById('modal-edit-desserts');
+  if (box) box.style.display = 'none';
+};
+
+ZZ.setEditDessertsImgMode = function(m) {
+  ZZ._editDessertsImgMode = m;
+  document.getElementById('eds-url-row').style.display  = m === 'url'  ? 'block' : 'none';
+  document.getElementById('eds-file-row').style.display = m === 'file' ? 'block' : 'none';
+  document.getElementById('eds-imgbtn-url').classList.toggle('on',  m === 'url');
+  document.getElementById('eds-imgbtn-file').classList.toggle('on', m === 'file');
+};
+
+ZZ.saveEditDesserts = function() {
+  var id   = ZZ._editDessertsId;
+  var name = ((document.getElementById('eds-name') ||{}).value||'').trim();
+  if (!name) { alert('أدخل اسم الصنف'); return; }
+  if (!window.zzdb) return;
+  var catEl = document.getElementById('eds-category');
+  var updates = {
+    name:       name,
+    desc:       ((document.getElementById('eds-desc') ||{}).value||'').trim(),
+    price:      ((document.getElementById('eds-price')||{}).value||'').trim(),
+    priceType:  ZZ._editDessertsPriceType || 'piece',
+    categoryId: catEl ? catEl.value : ''
+  };
+
+  function _doUpdate(img) {
+    updates.img = img || ZZ._editDessertsImg || '';
+    zzdb.ref('landing/desserts/items/' + id).update(updates)
+      .then(function() { ZZ.closeEditDesserts(); })
+      .catch(function(e) { alert('❌ ' + e.message); });
+  }
+
+  var mode = ZZ._editDessertsImgMode || 'url';
+  if (mode === 'file') {
+    var fe = document.getElementById('eds-imgfile');
+    var f  = fe && fe.files && fe.files[0];
+    if (f) {
+      _zzReadFile(f).then(function(r){ return _zzCompress(r,900,0.7); }).then(_doUpdate).catch(function(e){ alert('❌ '+e.message); });
+    } else { _doUpdate(null); }
+  } else {
+    var eu = document.getElementById('eds-imgurl');
+    _doUpdate(eu && eu.value.trim() ? eu.value.trim() : null);
+  }
+};
+
+/* ── قائمة الأصناف في الأدمن ── */
+ZZ._renderAdminDessertsList = function() {
+  var el = document.getElementById('admin-desserts-menu-list');
+  if (!el) return;
+  var items = ZZ._dessertsMenuCache;
+  if (!items.length) {
+    el.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.3);padding:20px;font-size:13px">لا توجد أصناف بعد — أضف من أعلاه</div>';
+    return;
+  }
+  el.innerHTML = items.map(function(it) {
+    var ptLbl = it.priceType === 'kilo' ? '⚖️ كيلو' : '🔢 قطعة';
+    return '<div class="menu-admin-item">'
+      + '<div class="mai-thumb" id="dsmt_' + it.id + '" style="background-color:#1a1020"></div>'
+      + '<div class="mai-info">'
+      +   '<div class="mai-info-name">' + (it.name||'') + '</div>'
+      +   '<div class="mai-price">' + (it.price ? it.price + ' جنيه' : '—') + ' <span style="font-size:10px;color:rgba(20,184,166,.7)">(' + ptLbl + ')</span></div>'
+      + '</div>'
+      + '<div class="mai-actions">'
+      + '<button class="mai-btn mai-btn-tog ' + (it.available?'on':'off') + '" onclick="ZZ.toggleDessertsAvail(\'' + it.id + '\',' + (!it.available) + ')">' + (it.available?'✅':'🔴') + '</button>'
+      + '<button class="mai-btn mai-btn-edit" onclick="ZZ.openEditDesserts(\'' + it.id + '\')">✏️</button>'
+      + '<button class="mai-btn mai-btn-del"  onclick="ZZ.deleteDessertsItem(\'' + it.id + '\')">🗑</button>'
+      + '</div></div>';
+  }).join('');
+  items.forEach(function(it) {
+    var t = document.getElementById('dsmt_' + it.id);
+    if (t && it.img) t.style.backgroundImage = 'url("' + it.img + '")';
+  });
+};
+
+/* ── أقسام الحلويات ── */
+ZZ.addDessertsCategory = function() {
+  var name = (document.getElementById('ds-new-cat-name')||{}).value||'';
+  var icon = (document.getElementById('ds-new-cat-icon')||{}).value||'';
+  if (!name.trim()) { alert('أدخل اسم القسم'); return; }
+  if (!window.zzdb) return;
+  var cat = { name: name.trim(), icon: icon.trim()||'🍰', order: ZZ._dessertsCatsCache.length, createdAt: Date.now() };
+  zzdb.ref('landing/desserts/categories').push(cat)
+    .then(function(){
+      var n = document.getElementById('ds-new-cat-name'); if(n) n.value='';
+      var i = document.getElementById('ds-new-cat-icon'); if(i) i.value='';
+    })
+    .catch(function(e){ alert('❌ '+e.message); });
+};
+
+ZZ.deleteDessertsCategory = function(id) {
+  if (!confirm('حذف هذا القسم؟ الأصناف لن تُحذف')) return;
+  if (!window.zzdb) return;
+  zzdb.ref('landing/desserts/categories/' + id).remove();
+};
+
+ZZ._renderDessertsCatList = function() {
+  var el = document.getElementById('ds-cat-list');
+  var cnt= document.getElementById('ds-cat-count');
+  if (!el) return;
+  var cats = ZZ._dessertsCatsCache;
+  if (cnt) cnt.textContent = cats.length ? '(' + cats.length + ')' : '';
+  if (!cats.length) {
+    el.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.3);padding:12px;font-size:13px">لا توجد أقسام بعد</div>';
+    return;
+  }
+  el.innerHTML = cats.map(function(c) {
+    return '<div class="cat-item">'
+      + '<span style="font-size:18px">' + (c.icon||'🍰') + '</span>'
+      + '<span class="cat-name-lbl">' + (c.name||'') + '</span>'
+      + '<button onclick="ZZ.deleteDessertsCategory(\'' + c.id + '\')" class="btn-del" title="حذف">🗑</button>'
+      + '</div>';
+  }).join('');
+};
+
+ZZ._refreshDessertsCatDropdown = function() {
+  var cats = ZZ._dessertsCatsCache;
+  var opts = '<option value="">— بدون قسم —</option>'
+    + cats.map(function(c){ return '<option value="' + c.id + '">' + (c.icon||'🍰') + ' ' + (c.name||'') + '</option>'; }).join('');
+  var addSel  = document.getElementById('ds-category');
+  var editSel = document.getElementById('emw-category');
+  if (addSel)  { var sv=addSel.value;  addSel.innerHTML =opts; addSel.value =sv; }
+  if (editSel) { var sv=editSel.value; editSel.innerHTML=opts; editSel.value=sv; }
+};
+
+/* ── Hero صفحة الحلويات ── */
+ZZ.setDessertsHeroBgMode = function(m) {
+  ZZ._dessertsHeroBgMode = m;
+  document.getElementById('dshbg-url-row').style.display  = m==='url'  ? 'block':'none';
+  document.getElementById('dshbg-file-row').style.display = m==='file' ? 'block':'none';
+  document.getElementById('dshbg-btn-url').classList.toggle('on',  m==='url');
+  document.getElementById('dshbg-btn-file').classList.toggle('on', m==='file');
+};
+
+ZZ.previewDessertsHeroBgFile = function(inp) {
+  var f = inp && inp.files && inp.files[0];
+  if (!f) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var prev = document.getElementById('dshbg-preview');
+    if (prev) { prev.style.display='block'; prev.style.backgroundImage = 'url("' + e.target.result + '")'; }
+  };
+  reader.readAsDataURL(f);
+};
+
+ZZ.setDessertsHeroAnim = function(btn, type) {
+  ZZ._dessertsHeroAnim = type;
+  document.querySelectorAll('.anim-opt').forEach(function(b){ b.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+};
+
+/* ── حفظ رقم واتساب الحلويات ── */
+ZZ.saveDessertsWa = function() {
+  var inp = document.getElementById('ds-wa-num');
+  var num = (inp ? inp.value.trim() : '').replace(/\D/g,'');
+  if (!num) { alert('من فضلك أدخل رقم الواتساب'); return; }
+  if (!window.zzdb || !window.ZZ_AUTH_READY) { alert('⏳ جاري الاتصال — انتظر ثانيتين'); return; }
+  zzdb.ref('landing/desserts/settings/waNum').set(num)
+    .then(function() {
+      var n = document.getElementById('ds-wa-note');
+      if (n) { n.textContent = '✅ تم الحفظ — ' + num; setTimeout(function(){ n.textContent=''; }, 3000); }
+    })
+    .catch(function(e) { alert('❌ ' + e.message); });
+};
+
+/* ── تحميل رقم الواتساب في الأدمن ── */
+ZZ._loadDessertsWa = function() {
+  if (!window.zzdb) return;
+  zzdb.ref('landing/desserts/settings/waNum').once('value').then(function(snap) {
+    var num = snap.val() || '';
+    var inp = document.getElementById('ds-wa-num');
+    if (inp && num) inp.value = num;
+  });
+};
+
+
 /* ════════════════════════════════════════════════════════
    MAWLED DELIVERY ZONES — نظام مناطق التوصيل
    Firebase: landing/mawled/zones/
@@ -6470,12 +7067,256 @@ ZZ.saveMawledHero = function() {
   }
 };
 
+ZZ._dessertsOrdersCache  = [];
+ZZ._dessertsOrdersFiltered = [];
+ZZ._dessertsOrdersSubbed = false;
+
+ZZ.subscribeDessertsOrders = function() {
+  if (ZZ._dessertsOrdersSubbed || !window.zzdb) return;
+  ZZ._dessertsOrdersSubbed = true;
+  document.getElementById('dsord-loading').style.display = 'block';
+
+  zzdb.ref('desserts/orders').orderByChild('createdAt').on('value', function(snap) {
+    ZZ._dessertsOrdersCache = [];
+    snap.forEach(function(ch) {
+      ZZ._dessertsOrdersCache.unshift(Object.assign({ _key: ch.key }, ch.val()));
+    });
+    ZZ.filterDessertsOrders();
+  }, function(err) {
+    document.getElementById('dsord-loading').innerHTML = '<div style="color:#ef4444">❌ خطأ في التحميل: ' + err.message + '</div>';
+  });
+};
+
+/* ── فلترة الطلبات ── */
+ZZ.filterDessertsOrders = function() {
+  var q    = (document.getElementById('dsord-search').value || '').trim().toLowerCase();
+  var date = (document.getElementById('dsord-date').value || '').trim();
+
+  ZZ._dessertsOrdersFiltered = ZZ._dessertsOrdersCache.filter(function(o) {
+    /* بحث بالاسم أو التليفون */
+    var matchText = !q
+      || (o.name  || '').toLowerCase().indexOf(q) !== -1
+      || (o.phone || '').indexOf(q) !== -1
+      || (o.whatsapp || '').indexOf(q) !== -1;
+
+    /* فلتر بالتاريخ */
+    var matchDate = true;
+    if (date && o.createdAt) {
+      var d = new Date(o.createdAt);
+      var dStr = d.getFullYear() + '-'
+        + String(d.getMonth()+1).padStart(2,'0') + '-'
+        + String(d.getDate()).padStart(2,'0');
+      matchDate = dStr === date;
+    }
+    return matchText && matchDate;
+  });
+
+  ZZ._renderDessertsOrdersTable();
+  ZZ._renderDessertsKPIs();
+};
+
+ZZ.clearDessertsFilters = function() {
+  document.getElementById('dsord-search').value = '';
+  document.getElementById('dsord-date').value   = '';
+  ZZ.filterDessertsOrders();
+};
+
+/* ── رسم الـ KPIs ── */
+ZZ._renderDessertsKPIs = function() {
+  var orders   = ZZ._dessertsOrdersFiltered;
+  var count    = orders.length;
+  var revenue  = orders.reduce(function(s,o){ return s + (o.total||0); }, 0);
+  var delivery = orders.filter(function(o){ return o.orderType === 'delivery'; }).length;
+  var pickup   = orders.filter(function(o){ return o.orderType !== 'delivery'; }).length;
+
+  var kc = document.getElementById('ds-kpi-count');
+  var kr = document.getElementById('ds-kpi-revenue');
+  var kd = document.getElementById('ds-kpi-delivery');
+  var kp = document.getElementById('ds-kpi-pickup');
+  if (kc) kc.textContent = count;
+  if (kr) kr.textContent = revenue.toLocaleString() + ' ج';
+  if (kd) kd.textContent = delivery;
+  if (kp) kp.textContent = pickup;
+};
+
+/* ── رسم الجدول ── */
+ZZ._renderDessertsOrdersTable = function() {
+  var loading = document.getElementById('dsord-loading');
+  var table   = document.getElementById('desserts-orders-table');
+  var tbody   = document.getElementById('desserts-orders-tbody');
+  var empty   = document.getElementById('dsord-empty');
+  var expCnt  = document.getElementById('dsord-export-count');
+
+  if (loading) loading.style.display = 'none';
+
+  var orders = ZZ._dessertsOrdersFiltered;
+  if (expCnt) expCnt.textContent = orders.length + ' طلب';
+
+  if (!orders.length) {
+    if (table)  table.style.display  = 'none';
+    if (empty)  empty.style.display  = 'block';
+    return;
+  }
+  if (table)  table.style.display  = 'table';
+  if (empty)  empty.style.display  = 'none';
+
+  tbody.innerHTML = orders.map(function(o) {
+    var d   = o.createdAt ? new Date(o.createdAt) : null;
+    var dt  = d ? d.toLocaleDateString('ar-EG') + ' ' + d.toLocaleTimeString('ar-EG', {hour:'2-digit',minute:'2-digit'}) : '—';
+    var typeBadge = o.orderType === 'delivery'
+      ? '<span class="mord-badge mord-badge-delivery">🛵 ديليفري</span>'
+      : '<span class="mord-badge mord-badge-pickup">🏪 استلام</span>';
+    var itemsList = (o.items||[]).map(function(it){
+      return it.name + ' ×' + it.qty + (it.priceType==='kilo'?' ك':' ق');
+    }).join('<br>');
+    var waLink  = (o.whatsapp||o.phone||'').replace(/\D/g,'');
+    /* إضافة كود مصر لو الرقم بيبدأ بـ 0 */
+    if (waLink && waLink.charAt(0) === '0') waLink = '20' + waLink.slice(1);
+    var waBtn   = waLink
+      ? '<a href="https://wa.me/' + waLink + '" target="_blank" class="mord-phone-btn">💬 واتساب</a>'
+      : '—';
+    return '<tr class="mord-tr">'
+      + '<td class="mord-td" style="font-family:monospace;font-size:10px;color:rgba(255,255,255,.4)">' + (o.id||o._key||'—') + '</td>'
+      + '<td class="mord-td" style="white-space:nowrap">' + dt + '</td>'
+      + '<td class="mord-td" style="font-weight:700;color:#fff">' + ZZ._omEsc(o.name||'—') + '</td>'
+      + '<td class="mord-td" style="direction:ltr;text-align:left">' + ZZ._omEsc(o.phone||'—') + '</td>'
+      + '<td class="mord-td">' + waBtn + '</td>'
+      + '<td class="mord-td">' + typeBadge + '</td>'
+      + '<td class="mord-td">' + ZZ._omEsc(o.zone||'—') + '</td>'
+      + '<td class="mord-td"><div class="mord-items-list">' + (itemsList||'—') + '</div></td>'
+      + '<td class="mord-td" style="text-align:center">' + (o.prodTotal||o.total||0) + ' ج</td>'
+      + '<td class="mord-td" style="text-align:center">' + (o.deliveryFee > 0 ? o.deliveryFee + ' ج' : 'مجاني') + '</td>'
+      + '<td class="mord-td" style="font-weight:900;color:#14b8a6;font-size:13px;text-align:center">' + (o.total||0) + ' ج</td>'
+      + '</tr>';
+  }).join('');
+};
+
+/* ── تصدير Excel ── */
+ZZ.exportDessertsExcel = function() {
+  var orders = ZZ._dessertsOrdersFiltered;
+  if (!orders.length) { alert('لا توجد طلبات للتصدير'); return; }
+
+  /* CSV بدل Excel — يفتح في Excel مباشرةً */
+  var BOM  = '\uFEFF'; /* BOM للعربي */
+  var rows = [
+    ['رقم الطلب','التاريخ','الوقت','اسم العميل','التليفون','الواتساب',
+     'نوع الاستلام','المنطقة','المنتجات','إجمالي المنتجات','مصاريف التوصيل','الإجمالي النهائي','الملاحظات']
+  ];
+  orders.forEach(function(o) {
+    var d   = o.createdAt ? new Date(o.createdAt) : null;
+    var dt  = d ? d.toLocaleDateString('ar-EG') : '';
+    var tm  = d ? d.toLocaleTimeString('ar-EG', {hour:'2-digit',minute:'2-digit'}) : '';
+    var items = (o.items||[]).map(function(it){
+      return it.name + ' x' + it.qty + (it.priceType==='kilo'?' كيلو':' قطعة') + ' = ' + it.subtotal + ' ج';
+    }).join(' | ');
+    rows.push([
+      o.id||o._key||'',
+      dt, tm,
+      o.name||'',
+      o.phone||'',
+      o.whatsapp||o.phone||'',
+      o.orderType === 'delivery' ? 'ديليفري' : 'استلام',
+      o.zone||'',
+      items,
+      o.prodTotal||o.total||0,
+      o.deliveryFee||0,
+      o.total||0,
+      o.notes||''
+    ]);
+  });
+
+  var csv = BOM + rows.map(function(r) {
+    return r.map(function(c) {
+      var s = String(c);
+      /* حماية من Formula Injection في Excel — لو القيمة بتبدأ بـ = + - @ نضيف علامة قبلها */
+      if (/^[=+\-@]/.test(s)) s = '\t' + s;
+      s = s.replace(/"/g,'""');
+      return '"' + s + '"';
+    }).join(',');
+  }).join('\r\n');
+
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  var now  = new Date();
+  a.href     = url;
+  a.download = 'طلبات-الحلويات-' + now.toLocaleDateString('en-GB').replace(/\//g,'-') + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+/* ── طباعة ── */
+ZZ.printDessertsOrders = function() {
+  var orders = ZZ._dessertsOrdersFiltered;
+  if (!orders.length) { alert('لا توجد طلبات للطباعة'); return; }
+
+  var totalRevenue = orders.reduce(function(s,o){ return s + (o.total||0); }, 0);
+  var now = new Date().toLocaleString('ar-EG');
+
+  var rows = orders.map(function(o, i) {
+    var d  = o.createdAt ? new Date(o.createdAt).toLocaleString('ar-EG') : '—';
+    var items = (o.items||[]).map(function(it){
+      return ZZ._omEsc(it.name) + ' ×' + it.qty + (it.priceType==='kilo'?' كيلو':' قطعة');
+    }).join('، ');
+    return '<tr style="border-bottom:1px solid #eee">'
+      + '<td style="padding:6px 8px;text-align:center;color:#666">' + (i+1) + '</td>'
+      + '<td style="padding:6px 8px">' + d + '</td>'
+      + '<td style="padding:6px 8px;font-weight:700">' + ZZ._omEsc(o.name||'—') + '</td>'
+      + '<td style="padding:6px 8px;direction:ltr">' + ZZ._omEsc(o.phone||'—') + '</td>'
+      + '<td style="padding:6px 8px">' + (o.orderType==='delivery'?'🛵 ديليفري':'🏪 استلام') + '</td>'
+      + '<td style="padding:6px 8px">' + ZZ._omEsc(o.zone||'—') + '</td>'
+      + '<td style="padding:6px 8px;font-size:11px;color:#666">' + items + '</td>'
+      + '<td style="padding:6px 8px;text-align:center">' + (o.deliveryFee>0?o.deliveryFee+' ج':'مجاني') + '</td>'
+      + '<td style="padding:6px 8px;font-weight:900;color:#0d9488;text-align:center">' + (o.total||0) + ' ج</td>'
+      + '</tr>';
+  }).join('');
+
+  var win = window.open('', '_blank', 'width=1100,height=800');
+  win.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">' + '<title>تقرير طلبات الحلويات الشرقية والغربية</title>' + '<style>body{font-family:Arial,sans-serif;padding:20px;color:#111}' + 'h2{color:#0d9488;margin-bottom:4px}' + '.meta{color:#666;font-size:12px;margin-bottom:16px}' + 'table{width:100%;border-collapse:collapse;font-size:12px}' + 'th{background:#0d9488;color:#fff;padding:8px;text-align:right}' + 'tr:nth-child(even){background:rgba(20,184,166,.06)}' + '.summary{margin-top:16px;background:rgba(20,184,166,.12);border:1px solid #14b8a6;border-radius:8px;padding:12px;display:flex;gap:30px}' + '.sum-item{text-align:center} .sum-val{font-size:1.3rem;font-weight:900;color:#0d9488}' + '@media print{button{display:none}}' + '</style></head><body>' + '<h2>📊 تقرير طلبات الحلويات الشرقية والغربية — زمزم ديزيرت</h2>' + '<div class="meta">تاريخ التقرير: ' + now + ' | عدد الطلبات: ' + orders.length + '</div>' + '<div class="summary">' + '<div class="sum-item"><div class="sum-val">' + orders.length + '</div><div>إجمالي الطلبات</div></div>' + '<div class="sum-item"><div class="sum-val">' + totalRevenue.toLocaleString() + ' ج</div><div>إجمالي المبيعات</div></div>' + '<div class="sum-item"><div class="sum-val">' + orders.filter(function(o){return o.orderType==='delivery'}).length + '</div><div>ديليفري</div></div>' + '<div class="sum-item"><div class="sum-val">' + orders.filter(function(o){return o.orderType!=='delivery'}).length + '</div><div>استلام</div></div>' + '</div>' + '<br><table><thead><tr>' + '<th>#</th><th>التاريخ</th><th>العميل</th><th>التليفون</th>' + '<th>النوع</th><th>المنطقة</th><th>المنتجات</th><th>توصيل</th><th>الإجمالي</th>' + '</tr></thead><tbody>' + rows + '</tbody></table>' + '<br><button onclick="window.print()" style="background:#0d9488;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;cursor:pointer">🖨️ اطبع الآن</button>' + '</body></html>');
+  win.document.close();
+};
+
+ZZ.saveDessertsHero = function() {
+  if (!window.zzdb || !window.ZZ_AUTH_READY) { alert('⏳ جاري الاتصال — انتظر ثانيتين'); return; }
+
+  function _doSave(imgUrl) {
+    var saves = {};
+    if (imgUrl) saves.heroBg = imgUrl;
+    saves.heroAnim = ZZ._dessertsHeroAnim;
+    zzdb.ref('landing/desserts/settings').update(saves)
+      .then(function() {
+        var n = document.getElementById('desserts-hero-note');
+        if (n) { n.classList.add('show'); setTimeout(function(){ n.classList.remove('show'); }, 2500); }
+      })
+      .catch(function(e) { alert('❌ ' + e.message); });
+  }
+
+  if (ZZ._dessertsHeroBgMode === 'file') {
+    var fe = document.getElementById('dshbg-imgfile');
+    var f  = fe && fe.files && fe.files[0];
+    if (!f) { _doSave(null); return; }
+    _zzReadFile(f)
+      .then(function(raw) { return _zzCompress(raw, 1200, 0.75); })
+      .then(function(img) { if (img.length > 900000) return _zzCompress(img, 900, 0.6); return img; })
+      .then(_doSave)
+      .catch(function(e) { alert('❌ ' + e.message); });
+  } else {
+    var url = (document.getElementById('dshbg-imgurl')||{}).value||'';
+    _doSave(url.trim() || null);
+  }
+};
+
+
 /* ── تمديد _extraInit لاشتراك بيانات المولد ── */
 var _prevExtraInit3 = ZZ._extraInit;
 ZZ._extraInit = function() {
   _prevExtraInit3();
   ZZ.subscribeMawled();
   ZZ._subscribeMawledPublic();
+  ZZ.subscribeDesserts();
+  ZZ._subscribeDessertsPublic();
 };
 
 /* ── عرض منيو المولد للعميل في صفحة index ── */
@@ -6573,12 +7414,110 @@ ZZ._renderMawledPublic = function() {
   });
 };
 
+/* ── عرض منيو الحلويات للعميل في صفحة index ── */
+ZZ._dessertsPublicSubbed = false;
+ZZ._subscribeDessertsPublic = function() {
+  if (ZZ._dessertsPublicSubbed || !window.zzdb) return;
+  ZZ._dessertsPublicSubbed = true;
+
+  /* الأصناف */
+  zzdb.ref('landing/desserts/items').orderByChild('createdAt').on('value', function(snap) {
+    var items = [];
+    snap.forEach(function(ch) { items.unshift(Object.assign({ id: ch.key }, ch.val())); });
+    ZZ._dessertsPublicItems = items.filter(function(it){ return it.available !== false; });
+
+    /* إظهار/إخفاء التاب حسب وجود أصناف */
+    var tab = document.getElementById('desserts-menu-tab');
+    /* يظهر التاب فقط لو: فيه أصناف + الزرار مفعّل */
+    if (tab) tab.style.display = (ZZ._dessertsPublicItems.length && ZZ._btnSettings.desserts) ? '' : 'none';
+
+    ZZ._renderDessertsPublic();
+  });
+
+  /* الأقسام */
+  zzdb.ref('landing/desserts/categories').orderByChild('order').on('value', function(snap) {
+    ZZ._dessertsPublicCats = [];
+    snap.forEach(function(ch) { ZZ._dessertsPublicCats.push(Object.assign({ id: ch.key }, ch.val())); });
+    ZZ._renderDessertsPublic();
+  });
+};
+
+ZZ._dessertsPublicItems = [];
+ZZ._dessertsPublicCats  = [];
+
+ZZ._renderDessertsPublic = function() {
+  var el = document.getElementById('desserts-menu-display');
+  if (!el) return;
+  var allItems = ZZ._dessertsPublicItems;
+  var cats     = ZZ._dessertsPublicCats || [];
+
+  if (!allItems.length) {
+    el.innerHTML = '<div class="no-menu-msg"><div class="ni">🍰</div><p>لا توجد منتجات حالياً</p></div>';
+    return;
+  }
+
+  function renderCard(it) {
+    var ptLbl = it.priceType === 'kilo' ? '⚖️ الكيلو' : '🔢 القطعة';
+    return '<div class="prod-card">'
+      + '<div class="prod-img" id="dpi_' + it.id + '"><div class="prod-badges"><span class="pbadge pbadge-avail">✅ متاح</span></div></div>'
+      + '<div class="prod-body">'
+      + '<div class="prod-name">' + (it.name||'') + '</div>'
+      + (it.desc ? '<div class="prod-desc">' + it.desc + '</div>' : '')
+      + (it.price ? '<div class="prod-price" style="display:flex;align-items:center;gap:8px">'
+          + '<span style="font-size:10px;background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.3);color:#14b8a6;border-radius:9999px;padding:2px 8px;font-weight:800">' + ptLbl + '</span>'
+          + '<span style="color:#14b8a6;font-weight:900">' + it.price + ' جنيه</span>'
+          + '</div>' : '')
+      + '<a href="desserts-order.html" target="_blank" class="btn-prod-order" style="background:linear-gradient(135deg,#0d9488,#14b8a6);color:#000">اطلب الآن ←</a>'
+      + '</div></div>';
+  }
+
+  var html = '';
+  if (!cats.length) {
+    html = '<div class="menu-grid">' + allItems.map(renderCard).join('') + '</div>';
+  } else {
+    /* مع أقسام */
+    var catsWithItems = [];
+    cats.forEach(function(cat) {
+      var its = allItems.filter(function(it){ return it.categoryId === cat.id; });
+      if (its.length) catsWithItems.push({ cat: cat, items: its });
+    });
+    var uncat = allItems.filter(function(it){
+      return !catsWithItems.some(function(g){ return g.items.some(function(x){ return x.id===it.id; }); });
+    });
+    if (uncat.length) catsWithItems.push({ cat: { id:'__dsother__', name:'متنوعات', icon:'🍰' }, items: uncat });
+
+    if (!catsWithItems.length) { el.innerHTML='<div class="no-menu-msg"><div class="ni">🍰</div><p>لا توجد منتجات</p></div>'; return; }
+
+    var firstId = catsWithItems[0].cat.id;
+    var tabsHtml = '<div class="cat-tabs-wrap" id="cat-tabs-desserts">'
+      + catsWithItems.map(function(g){
+          return '<button class="cat-tab' + (g.cat.id===firstId?' on':'') + '" onclick="ZZ.switchCatTab(\'desserts\',\'' + g.cat.id + '\')">'
+            + (g.cat.icon||'🎉') + ' ' + (g.cat.name||'') + '</button>';
+        }).join('') + '</div>';
+    var panelsHtml = '<div class="cat-panels-wrap" id="cat-panels-desserts">'
+      + catsWithItems.map(function(g){
+          return '<div class="cat-panel' + (g.cat.id===firstId?' on':'') + '" data-cat="' + g.cat.id + '">'
+            + '<div class="menu-grid">' + g.items.map(renderCard).join('') + '</div>'
+            + '</div>';
+        }).join('') + '</div>';
+    html = tabsHtml + panelsHtml;
+  }
+  el.innerHTML = html;
+  allItems.forEach(function(it){
+    var d = document.getElementById('dpi_' + it.id);
+    if (d && it.img) d.style.backgroundImage = 'url("' + it.img + '")';
+  });
+};
+
+
 /* ── تمديد adminTab لفتح تاب المولد + الكحك + الشيكولاتة ── */
 var _prevAdminTab3 = ZZ.adminTab;
 ZZ.adminTab = function(tab) {
   _prevAdminTab3(tab);
   if (tab === 'mawled-menu')  { ZZ._renderAdminMawledList(); ZZ._renderMawledCatList(); ZZ._loadMawledWa(); }
   if (tab === 'mawled-orders'){ ZZ.subscribeMawledOrders(); }
+  if (tab === 'desserts-menu'){ ZZ._renderAdminDessertsList(); ZZ._renderDessertsCatList(); ZZ._loadDessertsWa(); }
+  if (tab === 'desserts-orders'){ ZZ.subscribeDessertsOrders(); }
   if (tab === 'kahk-menu')    { ZZ.subscribeKahk();  ZZ._renderAdminKahkList();  ZZ._renderKahkCatList();  ZZ._loadKahkWa(); }
   if (tab === 'kahk-orders')  { ZZ.subscribeKahkOrders(); }
   if (tab === 'choco-menu')   { ZZ.subscribeChoco(); ZZ._renderAdminChocoList(); ZZ._renderChocoCatList(); ZZ._loadChocoWa(); }
@@ -6985,8 +7924,8 @@ ZZ._loadChocoHours  = function() { ZZ._loadOrderHours('choco','ch'); };
 ZZ._psetCurrent = 'mawled';
 ZZ.psetSwitch = function(type) {
   ZZ._psetCurrent = type;
-  var colors = { mawled:{a:'rgba(245,200,66,.12)',b:'rgba(245,200,66,.4)',c:'#f5c842'}, kahk:{a:'rgba(217,119,6,.15)',b:'rgba(217,119,6,.5)',c:'#d97706'}, choco:{a:'rgba(124,58,237,.15)',b:'rgba(124,58,237,.5)',c:'#7c3aed'} };
-  ['mawled','kahk','choco'].forEach(function(t) {
+  var colors = { mawled:{a:'rgba(245,200,66,.12)',b:'rgba(245,200,66,.4)',c:'#f5c842'}, desserts:{a:'rgba(20,184,166,.12)',b:'rgba(20,184,166,.4)',c:'#14b8a6'}, kahk:{a:'rgba(217,119,6,.15)',b:'rgba(217,119,6,.5)',c:'#d97706'}, choco:{a:'rgba(124,58,237,.15)',b:'rgba(124,58,237,.5)',c:'#7c3aed'} };
+  ['mawled','desserts','kahk','choco'].forEach(function(t) {
     var btn = document.getElementById('pset-btn-'+t); if (!btn) return;
     var on = (t===type); var c = colors[t];
     btn.style.background = on ? c.a : 'transparent';
@@ -6997,8 +7936,8 @@ ZZ.psetSwitch = function(type) {
   ZZ._psetRender(type); ZZ._psetLoad(type);
 };
 ZZ._psetRender = function(type) {
-  var labels = {mawled:'حلويات المولد',kahk:'كحك العيد',choco:'شيكولاتة العيد'};
-  var acc = {mawled:'#f5c842',kahk:'#d97706',choco:'#7c3aed'}[type]||'#f5c842';
+  var labels = {mawled:'حلويات المولد',desserts:'حلويات شرقي وغربي',kahk:'كحك العيد',choco:'شيكولاتة العيد'};
+  var acc = {mawled:'#f5c842',desserts:'#14b8a6',kahk:'#d97706',choco:'#7c3aed'}[type]||'#f5c842';
   var el = document.getElementById('pset-content'); if (!el) return;
   el.innerHTML = '<div class="admin-sec-divider"></div>'
     + '<div class="admin-sec-title" style="color:'+acc+'">اعدادات '+labels[type]+'</div>'
@@ -7127,20 +8066,72 @@ ZZ._loadCashiersList = function() {
   listEl.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:13px;padding:12px">جاري التحميل...</div>';
   zzdb.ref('landing/cashiers').once('value').then(function(snap){
     if(!snap.exists()){listEl.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:13px;padding:12px">لا يوجد كاشيرين بعد</div>';return;}
+    var pageLabels = { mawled:'🎉 المولد', desserts:'🍰 الحلويات', kahk:'🍪 الكحك', choco:'🍫 الشيكولاتة' };
     var rows='';
     snap.forEach(function(ch){
       var d=ch.val(); var id=ch.key; var isActive=d.active!==false;
       var toggleLabel=isActive?'ايقاف':'تفعيل';
       var statusIcon=isActive?'🟢':'🔴';
-      rows+='<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,.04);border-radius:12px;margin-bottom:8px;border:1px solid rgba(255,255,255,.07)">'
+      var assigned = d.assignedTypes || [];
+      var pagesTag = assigned.length
+        ? assigned.map(function(t){ return '<span style="font-size:10px;background:rgba(255,255,255,.08);border-radius:6px;padding:2px 7px;color:rgba(255,255,255,.65)">'+(pageLabels[t]||t)+'</span>'; }).join(' ')
+        : '<span style="font-size:10px;color:rgba(255,255,255,.3)">🌐 كل الصفحات</span>';
+      rows+='<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,.04);border-radius:12px;margin-bottom:8px;border:1px solid rgba(255,255,255,.07)">'
         +'<span style="font-size:18px">'+statusIcon+'</span>'
-        +'<span style="flex:1;color:#fff;font-weight:700;font-size:14px">'+(d.username||'-')+'</span>'
+        +'<div style="flex:1;min-width:140px">'
+        +  '<div style="color:#fff;font-weight:700;font-size:14px">'+(d.username||'-')+'</div>'
+        +  '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">'+pagesTag+'</div>'
+        +'</div>'
+        +'<button onclick="ZZ.openEditCashierPages(\''+id+'\',\''+(d.username||'')+'\')" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(245,200,66,.3);background:rgba(245,200,66,.08);color:#f5c842;font-size:12px;cursor:pointer;font-family:Cairo,sans-serif">📄 الصفحات</button>'
         +'<button onclick="ZZ.toggleCashierActive(\''+id+'\','+isActive+')" style="padding:6px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);font-size:12px;cursor:pointer;font-family:Cairo,sans-serif">'+toggleLabel+'</button>'
         +'<button onclick="ZZ.deleteCashier(\''+id+'\')" style="padding:6px 12px;border-radius:8px;border:none;background:rgba(239,68,68,.15);color:#f87171;font-size:12px;cursor:pointer">حذف</button>'
         +'</div>';
     });
     listEl.innerHTML=rows;
   });
+};
+
+/* ── تعديل الصفحات اللي الكاشير بيتابعها ── */
+ZZ.openEditCashierPages = function(id, username) {
+  if (!window.zzdb) return;
+  document.getElementById('ecp-cashier-id').value = id;
+  document.getElementById('ecp-username').textContent = username || '';
+  var note = document.getElementById('ecp-note'); if (note) note.textContent = '';
+  /* صفّر كل الاختيارات الأول */
+  ['mawled','desserts','kahk','choco'].forEach(function(t) {
+    var cb = document.getElementById('ecp-' + t); if (cb) cb.checked = false;
+  });
+  /* حمّل الاختيار الحالي */
+  zzdb.ref('landing/cashiers/' + id + '/assignedTypes').once('value').then(function(snap) {
+    var assigned = snap.val() || [];
+    assigned.forEach(function(t) {
+      var cb = document.getElementById('ecp-' + t); if (cb) cb.checked = true;
+    });
+    document.getElementById('modal-edit-cashier-pages').style.display = 'flex';
+  });
+};
+
+ZZ.closeEditCashierPages = function() {
+  var m = document.getElementById('modal-edit-cashier-pages');
+  if (m) m.style.display = 'none';
+};
+
+ZZ.saveCashierPages = function() {
+  var id = document.getElementById('ecp-cashier-id').value;
+  if (!id || !window.zzdb) return;
+  var assigned = [];
+  ['mawled','desserts','kahk','choco'].forEach(function(t) {
+    var cb = document.getElementById('ecp-' + t);
+    if (cb && cb.checked) assigned.push(t);
+  });
+  zzdb.ref('landing/cashiers/' + id + '/assignedTypes').set(assigned)
+    .then(function() {
+      var note = document.getElementById('ecp-note');
+      if (note) { note.textContent = '✅ تم الحفظ'; }
+      ZZ._loadCashiersList();
+      setTimeout(function(){ ZZ.closeEditCashierPages(); }, 900);
+    })
+    .catch(function(e) { var note = document.getElementById('ecp-note'); if (note) note.textContent = '❌ ' + e.message; });
 };
 
 /* extend adminTab */
@@ -7194,8 +8185,8 @@ ZZ.omSwitchType = function(type) {
     b.style.color      = isAll ? '#f5c842' : 'rgba(255,255,255,.5)';
   });
 
-  var colors = { mawled:{a:'rgba(245,200,66,.12)',b:'rgba(245,200,66,.4)',c:'#f5c842'}, kahk:{a:'rgba(217,119,6,.15)',b:'rgba(217,119,6,.5)',c:'#d97706'}, choco:{a:'rgba(124,58,237,.15)',b:'rgba(124,58,237,.5)',c:'#7c3aed'} };
-  ['mawled','kahk','choco'].forEach(function(t) {
+  var colors = { mawled:{a:'rgba(245,200,66,.12)',b:'rgba(245,200,66,.4)',c:'#f5c842'}, desserts:{a:'rgba(20,184,166,.12)',b:'rgba(20,184,166,.4)',c:'#14b8a6'}, kahk:{a:'rgba(217,119,6,.15)',b:'rgba(217,119,6,.5)',c:'#d97706'}, choco:{a:'rgba(124,58,237,.15)',b:'rgba(124,58,237,.5)',c:'#7c3aed'} };
+  ['mawled','desserts','kahk','choco'].forEach(function(t) {
     var btn = document.getElementById('om-tab-' + t); if (!btn) return;
     var on = (t === type); var c = colors[t];
     btn.style.background = on ? c.a : 'transparent';
@@ -7484,6 +8475,47 @@ ZZ.omRestoreArchive = function() {
     </div>
   </div>
 </div>
+
+
+<div id="modal-edit-desserts" style="position:fixed;inset:0;z-index:1350;background:rgba(0,0,0,.92);backdrop-filter:blur(22px);display:none;align-items:center;justify-content:center;font-family:'Cairo',sans-serif;direction:rtl">
+  <div style="width:100%;max-width:520px;margin:16px;background:#0a0804;border:1px solid rgba(20,184,166,.3);border-radius:24px;overflow:hidden;max-height:92vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(20,184,166,.08);position:sticky;top:0;z-index:1">
+      <div style="font-weight:900;font-size:16px;color:#fff">✏️ تعديل صنف الحلويات</div>
+      <button onclick="ZZ.closeEditDesserts()" style="width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:none;color:rgba(255,255,255,.6);font-size:15px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:20px 22px 26px">
+      <div class="admin-form-grid">
+        <div>
+          <label class="admin-lbl">القسم الرئيسي</label>
+          <select id="eds-category" class="admin-inp"><option value="">— بدون قسم —</option></select>
+        </div>
+        <div><label class="admin-lbl">اسم الصنف *</label><input id="eds-name" class="admin-inp" type="text"></div>
+        <div><label class="admin-lbl">الوصف</label><textarea id="eds-desc" class="admin-inp" rows="3"></textarea></div>
+        <div>
+          <label class="admin-lbl">نوع السعر</label>
+          <div class="delivery-opts">
+            <button type="button" class="dopt on" id="eds-ptype-piece" onclick="ZZ._editDessertsPriceType='piece';this.classList.add('on');document.getElementById('eds-ptype-kilo').classList.remove('on')">🔢 قطعة</button>
+            <button type="button" class="dopt" id="eds-ptype-kilo" onclick="ZZ._editDessertsPriceType='kilo';this.classList.add('on');document.getElementById('eds-ptype-piece').classList.remove('on')">⚖️ كيلو</button>
+          </div>
+        </div>
+        <div><label class="admin-lbl">السعر بالجنيه</label><input id="eds-price" class="admin-inp" type="text"></div>
+        <div>
+          <label class="admin-lbl">صورة جديدة (اختياري)</label>
+          <div class="img-tabs">
+            <button class="img-tab on" id="eds-imgbtn-url"  onclick="ZZ.setEditDessertsImgMode('url')">🔗 رابط</button>
+            <button class="img-tab"    id="eds-imgbtn-file" onclick="ZZ.setEditDessertsImgMode('file')">📁 رفع</button>
+          </div>
+          <div id="eds-url-row"><input id="eds-imgurl" class="admin-inp" placeholder="رابط صورة جديدة (اختياري)" type="url"></div>
+          <div id="eds-file-row" style="display:none"><input id="eds-imgfile" class="admin-inp" type="file" accept="image/*" style="padding:8px;cursor:pointer"></div>
+        </div>
+      </div>
+      <div id="eds-preview" style="display:none;width:100%;aspect-ratio:4/3;background-size:cover;background-position:center;border-radius:14px;margin:10px 0;border:1px solid rgba(255,255,255,.08)"></div>
+      <button onclick="ZZ.saveEditDesserts()" style="width:100%;margin-top:10px;padding:13px;border-radius:12px;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#000;font-weight:900;font-size:15px;border:none;cursor:pointer;font-family:'Cairo',sans-serif">💾 حفظ التعديلات</button>
+    </div>
+  </div>
+</div>
+
+
 
 
 <!-- ══ EDIT OFFER MODAL ══ -->
