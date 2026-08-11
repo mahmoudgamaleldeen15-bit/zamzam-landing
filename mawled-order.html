@@ -1194,7 +1194,7 @@ body.has-send-bar .page-wrap{padding-bottom:100px!important}
   <div id="products-section">
     <div class="sec-title">🎉 قائمة المولد</div>
     <!-- زرار شكل علبتك بنفسك — مستقل تماماً عن نظام الأقسام الحالي -->
-    <button id="box-builder-btn" onclick="ML.openBoxBuilder()" style="display:none;width:100%;margin-bottom:16px;padding:14px;border-radius:14px;border:1.5px solid rgba(200,146,10,.35);background:linear-gradient(135deg,#fff8e6,#fff3d0);color:#8a5f00;font-weight:900;font-size:14.5px;cursor:pointer;font-family:'Cairo',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:var(--shadow)">
+    <button id="box-builder-btn" onclick="ML.openBoxBuilder()" style="display:none;width:100%;margin-bottom:16px;padding:14px;border-radius:14px;border:1.5px solid rgba(200,146,10,.35);background:linear-gradient(135deg,#fff8e6,#fff3d0);color:#8a5f00;font-weight:900;font-size:14.5px;cursor:pointer;font-family:'Cairo',sans-serif;align-items:center;justify-content:center;gap:8px;box-shadow:var(--shadow)">
       🎁 <span id="box-builder-btn-label">شكل علبتك بنفسك</span>
     </button>
     <!-- Category tabs (hidden by default, shown when categories exist) -->
@@ -2558,6 +2558,18 @@ ML._boxUsage = function() {
   return { pieces: pieces, weight: weight };
 };
 
+/* ── إجمالي القطع المستخدمة من مجموعة معينة (عبر كل الأصناف التابعة لها) ── */
+ML._groupUsage = function(groupId) {
+  var cfg = ML._boxConfig;
+  if (!groupId) return 0;
+  var total = 0;
+  Object.keys(ML._currentBox).forEach(function(id) {
+    var elig = (cfg.eligibleItems || {})[id] || {};
+    if (elig.groupId === groupId) total += (ML._currentBox[id] || 0);
+  });
+  return total;
+};
+
 /* ── رسم قائمة أصناف العلبة ── */
 ML._renderBoxBuilder = function() {
   var cfg = ML._boxConfig;
@@ -2588,12 +2600,17 @@ ML._renderBoxBuilder = function() {
     var qty = ML._currentBox[p.id] || 0;
     var elig = (cfg.eligibleItems||{})[p.id] || {};
     var itemMax = elig.maxQty || null;
+    var groupInfo = '';
+    if (elig.groupId && cfg.groups && cfg.groups[elig.groupId]) {
+      var grp = cfg.groups[elig.groupId];
+      groupInfo = ' · 🏷️ ' + grp.name + ' (' + ML._groupUsage(elig.groupId) + '/' + grp.maxQty + ')';
+    }
     var imgSt = p.img ? 'style="background-image:url(\'' + p.img + '\');background-size:cover;background-position:center"' : '';
     return '<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface);border:1.5px solid ' + (qty>0?'rgba(200,146,10,.4)':'var(--border2)') + ';border-radius:14px;box-shadow:var(--shadow)">'
       + '<div style="width:52px;height:52px;border-radius:10px;background:var(--surface2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px" ' + imgSt + '>' + (p.img ? '' : '🍬') + '</div>'
       + '<div style="flex:1;min-width:0">'
       +   '<div style="font-weight:800;font-size:13.5px;color:var(--text)">' + p.name + '</div>'
-      +   '<div style="font-size:11.5px;color:var(--text3)">' + (p.price||0) + ' جنيه / قطعة' + (itemMax ? ' · حد أقصى ' + itemMax : '') + '</div>'
+      +   '<div style="font-size:11.5px;color:var(--text3)">' + (p.price||0) + ' جنيه / قطعة' + (itemMax ? ' · حد أقصى ' + itemMax : '') + groupInfo + '</div>'
       + '</div>'
       + '<div style="display:flex;align-items:center;gap:8px;flex-shrink:0">'
       +   '<button onclick="ML.boxStep(\'' + p.id + '\',-1)" style="width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border2);background:var(--surface);font-size:16px;font-weight:900;cursor:pointer;color:var(--text2)">−</button>'
@@ -2624,6 +2641,16 @@ ML.boxStep = function(itemId, delta) {
   if (elig.maxQty && curQty + 1 > elig.maxQty) {
     ML.toast('⚠️ الحد الأقصى من "' + product.name + '" هو ' + elig.maxQty + ' قطعة بس');
     return;
+  }
+
+  /* حد المجموعة (لو الصنف ده تابع لمجموعة) — بيتحسب من كل أصناف نفس المجموعة مع بعض */
+  if (elig.groupId && cfg.groups && cfg.groups[elig.groupId]) {
+    var grp = cfg.groups[elig.groupId];
+    var groupUsage = ML._groupUsage(elig.groupId);
+    if (groupUsage + 1 > grp.maxQty) {
+      ML.toast('⚠️ الحد الأقصى لمجموعة "' + grp.name + '" هو ' + grp.maxQty + ' قطعة إجمالي (من كل أصناف المجموعة)');
+      return;
+    }
   }
 
   /* حد العلبة الكلي (عدد أو وزن) */

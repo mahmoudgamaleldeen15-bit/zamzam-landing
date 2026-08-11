@@ -1255,8 +1255,20 @@ a{text-decoration:none;color:inherit}
           </div>
         </div>
 
+        <!-- ══ مجموعات الأصناف — حد أقصى مشترك بين كذا صنف ══ -->
+        <div class="admin-sec-title" style="font-size:13px">🏷️ مجموعات الأصناف <span style="opacity:.5;font-weight:600">(اختياري)</span></div>
+        <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:10px">اعمل مجموعة (مثلاً "مربات") وحدد لها حد أقصى إجمالي — أي صنف تحطه في المجموعة دي، مجموع قطعه مع باقي أصناف نفس المجموعة ميعديش الحد ده</div>
+        <div id="box-groups-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">
+          <div style="color:rgba(255,255,255,.3);font-size:12px;padding:8px">مفيش مجموعات لسه</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:20px">
+          <input id="box-new-group-name" class="admin-inp" type="text" placeholder="اسم المجموعة (مثال: مربات)" style="flex:2">
+          <input id="box-new-group-max" class="admin-inp" type="number" min="1" placeholder="الحد الأقصى" style="flex:1">
+          <button onclick="ZZ.addBoxGroup()" style="padding:0 18px;background:rgba(245,200,66,.15);border:1px solid rgba(245,200,66,.3);color:#f5c842;border-radius:10px;cursor:pointer;font-size:18px;font-weight:700">+</button>
+        </div>
+
         <div class="admin-sec-title" style="font-size:13px">الأصناف المسموح إضافتها للعلبة</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:10px">علّم بس الأصناف اللي تحب تسمح بيها، وممكن تحدد حد أقصى لكل صنف لوحده (اختياري)</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:10px">علّم بس الأصناف اللي تحب تسمح بيها، وممكن تحدد حد أقصى لكل صنف لوحده (اختياري) وتربطه بمجموعة (اختياري)</div>
         <div id="box-items-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
           <div style="color:rgba(255,255,255,.3);font-size:12.5px;padding:10px">لازم تضيف أصناف للمنيو الأول</div>
         </div>
@@ -7161,16 +7173,64 @@ ZZ.setBoxCapacityType = function(type) {
 };
 
 /* رسم قائمة الأصناف القابلة للتحديد */
-ZZ._boxEligibleState = {}; /* { itemId: { checked:bool, maxQty:num, weightPerPiece:num } } */
+ZZ._boxEligibleState = {}; /* { itemId: { checked:bool, maxQty:num, weightPerPiece:num, groupId:str|null } } */
+ZZ._boxGroups = {}; /* { groupId: { name:str, maxQty:num } } */
+
+/* ── إدارة المجموعات ── */
+ZZ._renderBoxGroupsList = function() {
+  var el = document.getElementById('box-groups-list');
+  if (!el) return;
+  var ids = Object.keys(ZZ._boxGroups);
+  if (!ids.length) { el.innerHTML = '<div style="color:rgba(255,255,255,.3);font-size:12px;padding:8px">مفيش مجموعات لسه</div>'; return; }
+  el.innerHTML = ids.map(function(gid) {
+    var g = ZZ._boxGroups[gid];
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.15);border-radius:10px">'
+      + '<span style="flex:1;color:#fff;font-weight:700;font-size:13px">🏷️ ' + g.name + '</span>'
+      + '<span style="color:#f5c842;font-size:12px;font-weight:800">حد أقصى: ' + g.maxQty + '</span>'
+      + '<button onclick="ZZ.deleteBoxGroup(\'' + gid + '\')" style="background:rgba(239,68,68,.15);border:none;color:#f87171;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:11px">حذف</button>'
+      + '</div>';
+  }).join('');
+};
+
+ZZ.addBoxGroup = function() {
+  var nameEl = document.getElementById('box-new-group-name');
+  var maxEl  = document.getElementById('box-new-group-max');
+  var name = (nameEl.value||'').trim();
+  var max  = parseInt(maxEl.value) || 0;
+  if (!name) { alert('اكتب اسم المجموعة'); return; }
+  if (max <= 0) { alert('حدد الحد الأقصى للمجموعة'); return; }
+  var gid = 'grp_' + Date.now();
+  ZZ._boxGroups[gid] = { name: name, maxQty: max };
+  nameEl.value = ''; maxEl.value = '';
+  ZZ._renderBoxGroupsList();
+  ZZ._renderBoxItemsList(); /* عشان الدروب داون يتحدث بالمجموعة الجديدة */
+};
+
+ZZ.deleteBoxGroup = function(gid) {
+  if (!confirm('حذف المجموعة دي؟ (الأصناف المرتبطة بيها هترجع "بدون مجموعة")')) return;
+  delete ZZ._boxGroups[gid];
+  /* شيل ربط أي صنف كان مرتبط بالمجموعة دي */
+  Object.keys(ZZ._boxEligibleState).forEach(function(id) {
+    if (ZZ._boxEligibleState[id].groupId === gid) ZZ._boxEligibleState[id].groupId = null;
+  });
+  ZZ._renderBoxGroupsList();
+  ZZ._renderBoxItemsList();
+};
+
 ZZ._renderBoxItemsList = function() {
   var el = document.getElementById('box-items-list');
   if (!el) return;
   var items = ZZ._mawledMenuCache || [];
   if (!items.length) { el.innerHTML = '<div style="color:rgba(255,255,255,.3);font-size:12.5px;padding:10px">لازم تضيف أصناف للمنيو الأول</div>'; return; }
   var isWeight = ZZ._boxCapacityType === 'weight';
+  var groupIds = Object.keys(ZZ._boxGroups);
   el.innerHTML = items.map(function(it) {
     var st = ZZ._boxEligibleState[it.id] || {};
     var checked = st.checked ? 'checked' : '';
+    var groupOptions = '<option value="">— بدون مجموعة —</option>' + groupIds.map(function(gid) {
+      var sel = st.groupId === gid ? 'selected' : '';
+      return '<option value="' + gid + '" ' + sel + '>' + ZZ._boxGroups[gid].name + ' (حد ' + ZZ._boxGroups[gid].maxQty + ')</option>';
+    }).join('');
     return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px">'
       + '<label style="display:flex;align-items:center;gap:8px;flex:1;min-width:140px;cursor:pointer">'
       +   '<input type="checkbox" data-box-item="' + it.id + '" ' + checked + ' onchange="ZZ._onBoxItemToggle(\'' + it.id + '\', this.checked)" style="width:16px;height:16px;accent-color:#f5c842">'
@@ -7178,6 +7238,7 @@ ZZ._renderBoxItemsList = function() {
       + '</label>'
       + '<input type="number" min="1" placeholder="حد أقصى (اختياري)" value="' + (st.maxQty||'') + '" data-box-maxqty="' + it.id + '" onchange="ZZ._onBoxMaxQtyChange(\'' + it.id + '\', this.value)" style="width:120px;padding:7px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;font-size:12px;font-family:Cairo,sans-serif">'
       + (isWeight ? '<input type="number" min="1" placeholder="وزن القطعة (جرام)" value="' + (st.weightPerPiece||'') + '" data-box-weight="' + it.id + '" onchange="ZZ._onBoxWeightChange(\'' + it.id + '\', this.value)" style="width:140px;padding:7px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;font-size:12px;font-family:Cairo,sans-serif">' : '')
+      + (groupIds.length ? '<select data-box-group="' + it.id + '" onchange="ZZ._onBoxGroupChange(\'' + it.id + '\', this.value)" style="padding:7px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;font-size:12px;font-family:Cairo,sans-serif">' + groupOptions + '</select>' : '')
       + '</div>';
   }).join('');
 };
@@ -7194,6 +7255,10 @@ ZZ._onBoxWeightChange = function(id, val) {
   if (!ZZ._boxEligibleState[id]) ZZ._boxEligibleState[id] = {};
   ZZ._boxEligibleState[id].weightPerPiece = parseInt(val) || null;
 };
+ZZ._onBoxGroupChange = function(id, val) {
+  if (!ZZ._boxEligibleState[id]) ZZ._boxEligibleState[id] = {};
+  ZZ._boxEligibleState[id].groupId = val || null;
+};
 
 /* تحميل الإعدادات المحفوظة */
 ZZ._loadBoxConfig = function() {
@@ -7205,10 +7270,12 @@ ZZ._loadBoxConfig = function() {
     ZZ.setBoxCapacityType(d.capacityType === 'weight' ? 'weight' : 'pieces');
     var mpEl = document.getElementById('box-max-pieces'); if (mpEl) mpEl.value = d.maxPieces || '';
     var mwEl = document.getElementById('box-max-weight'); if (mwEl) mwEl.value = d.maxWeightGrams || '';
+    ZZ._boxGroups = d.groups || {};
+    ZZ._renderBoxGroupsList();
     ZZ._boxEligibleState = {};
     var elig = d.eligibleItems || {};
     Object.keys(elig).forEach(function(id) {
-      ZZ._boxEligibleState[id] = { checked: true, maxQty: elig[id].maxQty || null, weightPerPiece: elig[id].weightPerPiece || null };
+      ZZ._boxEligibleState[id] = { checked: true, maxQty: elig[id].maxQty || null, weightPerPiece: elig[id].weightPerPiece || null, groupId: elig[id].groupId || null };
     });
     ZZ._renderBoxItemsList();
     ZZ._boxConfigLoaded = true;
@@ -7233,6 +7300,7 @@ ZZ.saveBoxConfig = function() {
       eligibleItems[id] = {};
       if (st.maxQty) eligibleItems[id].maxQty = st.maxQty;
       if (capacityType === 'weight' && st.weightPerPiece) eligibleItems[id].weightPerPiece = st.weightPerPiece;
+      if (st.groupId && ZZ._boxGroups[st.groupId]) eligibleItems[id].groupId = st.groupId;
     }
   });
 
@@ -7241,7 +7309,8 @@ ZZ.saveBoxConfig = function() {
   var boxConfig = {
     enabled: enabled, title: title, capacityType: capacityType,
     maxPieces: maxPieces, maxWeightGrams: maxWeightGrams,
-    eligibleItems: eligibleItems
+    eligibleItems: eligibleItems,
+    groups: ZZ._boxGroups
   };
 
   zzdb.ref('landing/mawled/settings/boxConfig').set(boxConfig)
