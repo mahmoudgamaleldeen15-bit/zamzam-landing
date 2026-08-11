@@ -1049,6 +1049,25 @@ const CA = {
       }).join('');
     }
 
+    /* العلب المخصصة — شكل علبتك بنفسك */
+    var boxesArr = o.boxes || [];
+    var boxesHTML = '';
+    if (boxesArr.length) {
+      boxesHTML = boxesArr.map(function(b, bi) {
+        var lines = (b.contents||[]).map(function(c) {
+          return '<div class="oc-item-row" style="border-color:rgba(200,146,10,.15)">'
+            + '<span class="oc-item-name">&nbsp;&nbsp;• ' + CA.esc(c.name||'') + '</span>'
+            + '<span class="oc-item-qty">×' + (c.qty||1) + '</span>'
+            + '<span class="oc-item-price">' + ((parseFloat(c.price)||0)*(parseInt(c.qty)||1)) + ' ج</span>'
+            + '</div>';
+        }).join('');
+        return '<div style="background:rgba(200,146,10,.08);border:1px solid rgba(200,146,10,.25);border-radius:10px;padding:8px 10px;margin-bottom:6px">'
+          + '<div style="font-weight:800;font-size:12px;color:#e8a820;margin-bottom:4px">🎁 ' + CA.esc(b.title||'علبة مخصصة') + ' — ' + (bi+1) + ' — إجمالي ' + (b.total||0) + ' ج</div>'
+          + lines
+          + '</div>';
+      }).join('');
+    }
+
     /* totals */
     var grandTotal = parseFloat(o.grandTotal) || parseFloat(o.total) || 0;
     var delivFee   = parseFloat(o.deliveryFee) || 0;
@@ -1092,7 +1111,7 @@ const CA = {
       +   '</div>'
       +   addressHTML
       + '</div>'
-      + (itemsHTML ? '<div class="oc-items">' + itemsHTML + '</div>' : '')
+      + (itemsHTML || boxesHTML ? '<div class="oc-items">' + boxesHTML + itemsHTML + '</div>' : '')
       + '<div class="oc-total">'
       +   '<span class="oc-total-lbl">الإجمالي' + (delivFee>0?' (شامل توصيل '+delivFee+' ج)':'') + '</span>'
       +   '<span class="oc-total-val">' + grandTotal + ' ج</span>'

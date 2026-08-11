@@ -1193,6 +1193,10 @@ body.has-send-bar .page-wrap{padding-bottom:100px!important}
   <!-- Products -->
   <div id="products-section">
     <div class="sec-title">🎉 قائمة المولد</div>
+    <!-- زرار شكل علبتك بنفسك — مستقل تماماً عن نظام الأقسام الحالي -->
+    <button id="box-builder-btn" onclick="ML.openBoxBuilder()" style="display:none;width:100%;margin-bottom:16px;padding:14px;border-radius:14px;border:1.5px solid rgba(200,146,10,.35);background:linear-gradient(135deg,#fff8e6,#fff3d0);color:#8a5f00;font-weight:900;font-size:14.5px;cursor:pointer;font-family:'Cairo',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:var(--shadow)">
+      🎁 <span id="box-builder-btn-label">شكل علبتك بنفسك</span>
+    </button>
     <!-- Category tabs (hidden by default, shown when categories exist) -->
     <div id="cat-tabs-area" style="display:none">
       <div class="cat-tabs-scroll" id="cat-tabs-row"></div>
@@ -1204,6 +1208,34 @@ body.has-send-bar .page-wrap{padding-bottom:100px!important}
       </div>
     </div>
   </div>
+
+  <!-- ══ شكل علبتك بنفسك — قسم منفصل تماماً، مخفي افتراضياً ══ -->
+  <div id="box-builder-section" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:32px 0 14px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button onclick="ML.closeBoxBuilder()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2)">→</button>
+        <div class="sec-title" style="margin:0" id="box-section-title">🎁 شكل علبتك بنفسك</div>
+      </div>
+    </div>
+
+    <div style="background:linear-gradient(135deg,#fff8e6,#fff3d0);border:1.5px solid rgba(200,146,10,.3);border-radius:16px;padding:16px;margin-bottom:18px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-weight:800;font-size:14px;color:var(--text2)" id="box-progress-label">اختار محتويات علبتك</span>
+        <span style="font-weight:900;font-size:15px;color:var(--gold)" id="box-progress-count">0 / 0</span>
+      </div>
+      <div style="height:8px;background:rgba(200,146,10,.15);border-radius:99px;overflow:hidden">
+        <div id="box-progress-bar" style="height:100%;width:0%;background:linear-gradient(135deg,#c8920a,#e8a820);border-radius:99px;transition:width .3s"></div>
+      </div>
+    </div>
+
+    <div id="box-items-wrap" style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px"></div>
+
+    <div style="display:flex;gap:10px;position:sticky;bottom:16px;z-index:5">
+      <button onclick="ML.closeBoxBuilder()" style="flex:1;padding:14px;border-radius:14px;border:1.5px solid var(--border2);background:var(--surface);color:var(--text2);font-weight:800;font-size:14px;cursor:pointer;font-family:'Cairo',sans-serif">إلغاء</button>
+      <button onclick="ML.addBoxToCart()" id="box-add-btn" style="flex:2;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#c8920a,#e8a820);color:#fff;font-weight:900;font-size:14px;cursor:pointer;font-family:'Cairo',sans-serif;box-shadow:var(--shadow-md)">➕ أضف العلبة للسلة</button>
+    </div>
+  </div>
+
 
   <!-- Cart Summary (مخفية — السلة في الـ Sheet) -->
   <div class="sec-title" id="cart-sec-title" style="display:none">🛒 سلة طلبك</div>
@@ -1449,6 +1481,7 @@ const ML = {
 ML.loadData = function() {
   var db = ML.db;
   ML._loadPageConfig();
+  ML._loadBoxConfig();
 
   /* ── إعدادات (واتساب + ترحيب + Hero) ── */
   db.ref('landing/mawled/settings').on('value', function(snap) {
@@ -1660,20 +1693,23 @@ ML.removeItem = function(id) {
 ML.updateCart = function() {
   var items      = ML.products.filter(function(p) { return (ML.cart[p.id] || 0) > 0; });
   var prodTotal  = items.reduce(function(s, p) { return s + (ML.cart[p.id] * (parseFloat(p.price) || 0)); }, 0);
+  var boxTotal   = (ML.boxCart||[]).reduce(function(s, b) { return s + b.total; }, 0);
+  prodTotal      = prodTotal + boxTotal;
   var deliveryFee= (ML.orderType === 'delivery' && ML.selectedZone) ? (ML.selectedZone.fee || 0) : 0;
   var grandTotal = prodTotal + deliveryFee;
+  var hasAnything = items.length > 0 || (ML.boxCart||[]).length > 0;
 
   /* checkout button */
-  var btnCo = document.getElementById('btn-checkout'); if (btnCo) btnCo.disabled = items.length === 0;
+  var btnCo = document.getElementById('btn-checkout'); if (btnCo) btnCo.disabled = !hasAnything;
 
   /* Topbar Cart Button */
   var tcbBtn   = document.getElementById('topbar-cart-btn');
   var tcbBadge = document.getElementById('tcb-badge');
   var tcbTotal = document.getElementById('tcb-total');
-  var totalItems = items.reduce(function(s,p){ return s + (ML.cart[p.id]||0); }, 0);
+  var totalItems = items.reduce(function(s,p){ return s + (ML.cart[p.id]||0); }, 0) + (ML.boxCart||[]).length;
 
   if (tcbBtn) {
-    if (items.length > 0) {
+    if (hasAnything) {
       var hadItems = tcbBtn.classList.contains('has-items');
       tcbBtn.classList.add('has-items');
       if (tcbBadge) tcbBadge.textContent = totalItems;
@@ -1695,7 +1731,7 @@ ML.updateCart = function() {
   var bsbCount  = document.getElementById('bsb-items-count');
   var btnSend   = document.getElementById('btn-send-order');
   if (sendBar) {
-    if (items.length > 0) {
+    if (hasAnything) {
       sendBar.classList.add('show');
       document.body.classList.add('has-send-bar');
       if (bsbTotal) bsbTotal.textContent = grandTotal + ' جنيه';
@@ -1719,7 +1755,7 @@ ML.updateCart = function() {
   var cartList = document.getElementById('cart-items-list');
   var cartTot  = document.getElementById('cart-total-row');
 
-  if (!items.length) {
+  if (!hasAnything) {
     if (cartSec) cartSec.style.display = 'none';
     if (cartBox) cartBox.style.display = 'none';
     /* إخفاء الفاتورة */
@@ -1783,7 +1819,8 @@ ML.sendOrder = function() {
   }
 
   var items = ML.products.filter(function(p) { return (ML.cart[p.id] || 0) > 0; });
-  if (!items.length) { ML.toast('اختار منتجات الأول 🛒'); return; }
+  var boxes = ML.boxCart || [];
+  if (!items.length && !boxes.length) { ML.toast('اختار منتجات الأول 🛒'); return; }
 
   var name    = document.getElementById('cust-name').value.trim();
   var phone   = document.getElementById('cust-phone').value.trim();
@@ -1807,6 +1844,8 @@ ML.sendOrder = function() {
   }
 
   var prodTotal   = items.reduce(function(s,p) { return s + (ML.cart[p.id] * (parseFloat(p.price)||0)); }, 0);
+  var boxTotal    = boxes.reduce(function(s,b) { return s + b.total; }, 0);
+  prodTotal       = prodTotal + boxTotal;
   /* فحص الحد الأدنى للطلب */
   if (ML._minOrder > 0 && prodTotal < ML._minOrder) {
     ML.toast('❌ الحد الأدنى للطلب ' + ML._minOrder + ' جنيه — إجمالي طلبك ' + prodTotal + ' جنيه');
@@ -1821,11 +1860,16 @@ ML.sendOrder = function() {
     + '🎉 *طلب حلويات المولد النبوي*\n'
     + '🆔 رقم الطلب: ' + orderId + '\n'
     + '━━━━━━━━━━━━━━━\n'
-    + '*المنتجات:*\n'
+    + (items.length ? '*المنتجات:*\n'
     + items.map(function(p) {
         var ptL = p.priceType === 'kilo' ? ' كيلو' : ' قطعة';
         return '• ' + p.name + ' × ' + ML.cart[p.id] + ptL + ' = ' + (ML.cart[p.id] * (parseFloat(p.price)||0)) + ' جنيه';
-      }).join('\n') + '\n'
+      }).join('\n') + '\n' : '')
+    + (boxes.length ? '\n🎁 *العلب المخصصة:*\n'
+    + boxes.map(function(b, bi) {
+        var lines = b.contents.map(function(c) { return '   • ' + c.name + ' × ' + c.qty + ' = ' + (c.qty*c.price) + ' جنيه'; }).join('\n');
+        return '📦 علبة ' + (bi+1) + ' (' + b.title + ') — إجمالي ' + b.total + ' جنيه:\n' + lines;
+      }).join('\n') + '\n' : '')
     + '━━━━━━━━━━━━━━━\n'
     + '🧾 *الفاتورة:*\n'
     + '• إجمالي المنتجات: ' + prodTotal + ' جنيه\n'
@@ -1870,6 +1914,9 @@ ML.sendOrder = function() {
     notes: notes,
     items: items.map(function(p) {
       return { name: p.name, qty: ML.cart[p.id], priceType: p.priceType||'piece', price: parseFloat(p.price)||0, subtotal: ML.cart[p.id]*(parseFloat(p.price)||0) };
+    }),
+    boxes: boxes.map(function(b) {
+      return { title: b.title, contents: b.contents, total: b.total, pieceCount: b.pieceCount, weightGrams: b.weightGrams };
     }),
     prodTotal: prodTotal, deliveryFee: deliveryFee, total: grandTotal,
     createdAt: Date.now()
@@ -2153,9 +2200,10 @@ ML._renderSheetBody = function() {
   if (!body) return;
 
   var items = ML.products.filter(function(p) { return (ML.cart[p.id] || 0) > 0; });
+  var boxes = ML.boxCart || [];
 
   /* empty state */
-  if (!items.length) {
+  if (!items.length && !boxes.length) {
     body.innerHTML = '<div class="sheet-empty"><div class="sheet-empty-icon">🛒</div><div class="sheet-empty-txt">السلة فاضية</div><div class="sheet-empty-sub">اضيف منتجات من القائمة</div></div>';
     if (footer) footer.style.display = 'none';
     if (cnt) cnt.textContent = '0 صنف';
@@ -2163,8 +2211,10 @@ ML._renderSheetBody = function() {
   }
 
   /* items */
-  if (cnt) cnt.textContent = items.length + (items.length === 1 ? ' صنف' : ' أصناف');
-  body.innerHTML = items.map(function(p) {
+  var totalLineCount = items.length + boxes.length;
+  if (cnt) cnt.textContent = totalLineCount + (totalLineCount === 1 ? ' صنف' : ' أصناف');
+
+  var itemsHTML = items.map(function(p) {
     var qty    = ML.cart[p.id];
     var ptL    = p.priceType === 'kilo' ? ' كيلو' : ' قطعة';
     var sub    = qty * (parseFloat(p.price) || 0);
@@ -2187,8 +2237,26 @@ ML._renderSheetBody = function() {
       + '</div>';
   }).join('');
 
+  /* عرض العلب المخصصة — بشكل مختلف بصرياً عن الأصناف العادية */
+  var boxesHTML = boxes.map(function(b) {
+    var contentsStr = b.contents.map(function(c){ return c.name + ' ×' + c.qty; }).join('، ');
+    return '<div class="sheet-cart-item" style="align-items:flex-start;background:linear-gradient(135deg,#fff8e6,#fff3d0);border:1.5px solid rgba(200,146,10,.35);border-radius:14px">'
+      + '<div class="sci-thumb" style="background:linear-gradient(135deg,#c8920a,#e8a820)">🎁</div>'
+      + '<div class="sci-info">'
+      +   '<div class="sci-name">' + b.title + '</div>'
+      +   '<div class="sci-price" style="line-height:1.6">' + contentsStr + '</div>'
+      +   '<div class="sci-subtotal">' + b.total + ' جنيه</div>'
+      + '</div>'
+      + '<button onclick="ML.removeBoxFromCart(\'' + b.id + '\')" style="background:none;border:none;color:var(--crimson2);font-size:18px;cursor:pointer;padding:4px 8px">🗑</button>'
+      + '</div>';
+  }).join('');
+
+  body.innerHTML = boxesHTML + itemsHTML;
+
   /* invoice mini */
   var prodTotal   = items.reduce(function(s,p) { return s + (ML.cart[p.id]*(parseFloat(p.price)||0)); }, 0);
+  var boxTotal    = boxes.reduce(function(s,b) { return s + b.total; }, 0);
+  prodTotal       = prodTotal + boxTotal;
   var deliveryFee = (ML.orderType === 'delivery' && ML.selectedZone) ? (ML.selectedZone.fee || 0) : 0;
   var grandTotal  = prodTotal + deliveryFee;
 
@@ -2214,9 +2282,9 @@ ML._renderSheetBody = function() {
 ML.sheetQty = function(id, delta) {
   ML.updateQty(id, delta);           /* يحدث الكارت الرئيسي */
   ML._renderSheetBody();             /* يعيد رسم السلة */
-  /* لو السلة بقت فاضية اقفلها */
+  /* لو السلة بقت فاضية تماماً (منتجات وعلب) اقفلها */
   var items = ML.products.filter(function(p){ return (ML.cart[p.id]||0) > 0; });
-  if (!items.length) setTimeout(ML.closeCartSheet, 350);
+  if (!items.length && !(ML.boxCart||[]).length) setTimeout(ML.closeCartSheet, 350);
 };
 
 ML.toast = function(msg) {
@@ -2436,7 +2504,184 @@ ML._loadPageConfig = function() {
   });
 };
 
-/* ════ تأكيد الطلب ════ */
+/* ════════════════════════════════════════════
+   شكل علبتك بنفسك — Build Your Own Box
+   نظام منفصل تماماً عن السلة والمنيو العادي
+════════════════════════════════════════════ */
+ML._boxConfig  = null;
+ML._currentBox = {};   /* { itemId: qty } — أثناء التكوين بس */
+ML.boxCart     = [];   /* [ { id, contents:[{itemId,name,qty,price,priceType}], total, pieceCount, weightGrams } ] */
+
+ML._loadBoxConfig = function() {
+  if (!ML.db) return;
+  ML.db.ref('landing/mawled/settings/boxConfig').on('value', function(snap) {
+    var d = snap.val() || null;
+    ML._boxConfig = (d && d.enabled) ? d : null;
+    var btn = document.getElementById('box-builder-btn');
+    var lbl = document.getElementById('box-builder-btn-label');
+    if (btn) btn.style.display = ML._boxConfig ? 'flex' : 'none';
+    if (lbl && ML._boxConfig) lbl.textContent = ML._boxConfig.title || 'شكل علبتك بنفسك';
+  });
+};
+
+/* ── فتح/قفل واجهة التكوين ── */
+ML.openBoxBuilder = function() {
+  if (!ML._boxConfig) return;
+  ML._currentBox = {};
+  document.getElementById('products-section').style.display = 'none';
+  var catArea = document.getElementById('cat-tabs-area'); if (catArea) catArea.style.display = 'none';
+  document.getElementById('box-builder-section').style.display = 'block';
+  var titleEl = document.getElementById('box-section-title');
+  if (titleEl) titleEl.textContent = '🎁 ' + (ML._boxConfig.title || 'شكل علبتك بنفسك');
+  ML._renderBoxBuilder();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+ML.closeBoxBuilder = function() {
+  document.getElementById('box-builder-section').style.display = 'none';
+  document.getElementById('products-section').style.display = '';
+  ML._currentBox = {};
+};
+
+/* ── حساب استهلاك العلبة الحالي ── */
+ML._boxUsage = function() {
+  var cfg = ML._boxConfig;
+  var pieces = 0, weight = 0;
+  Object.keys(ML._currentBox).forEach(function(id) {
+    var qty = ML._currentBox[id] || 0;
+    pieces += qty;
+    if (cfg.capacityType === 'weight') {
+      var elig = (cfg.eligibleItems || {})[id] || {};
+      weight += qty * (elig.weightPerPiece || 0);
+    }
+  });
+  return { pieces: pieces, weight: weight };
+};
+
+/* ── رسم قائمة أصناف العلبة ── */
+ML._renderBoxBuilder = function() {
+  var cfg = ML._boxConfig;
+  if (!cfg) return;
+  var wrap = document.getElementById('box-items-wrap');
+  var eligibleIds = Object.keys(cfg.eligibleItems || {});
+  var eligibleProducts = ML.products.filter(function(p) { return eligibleIds.indexOf(p.id) !== -1; });
+
+  var usage = ML._boxUsage();
+  var isWeight = cfg.capacityType === 'weight';
+  var maxVal   = isWeight ? (cfg.maxWeightGrams||0) : (cfg.maxPieces||0);
+  var curVal   = isWeight ? usage.weight : usage.pieces;
+  var unitLbl  = isWeight ? 'جرام' : 'قطعة';
+
+  var lblEl = document.getElementById('box-progress-label');
+  var cntEl = document.getElementById('box-progress-count');
+  var barEl = document.getElementById('box-progress-bar');
+  if (lblEl) lblEl.textContent = curVal >= maxVal ? '✅ العلبة اكتملت' : 'اختار محتويات علبتك';
+  if (cntEl) cntEl.textContent = curVal + ' / ' + maxVal + ' ' + unitLbl;
+  if (barEl) barEl.style.width = Math.min(100, (maxVal ? (curVal/maxVal*100) : 0)) + '%';
+
+  if (!eligibleProducts.length) {
+    wrap.innerHTML = '<div style="text-align:center;color:var(--text3);padding:20px;font-size:13px">مفيش أصناف متاحة للعلبة دلوقتي</div>';
+    return;
+  }
+
+  wrap.innerHTML = eligibleProducts.map(function(p) {
+    var qty = ML._currentBox[p.id] || 0;
+    var elig = (cfg.eligibleItems||{})[p.id] || {};
+    var itemMax = elig.maxQty || null;
+    var imgSt = p.img ? 'style="background-image:url(\'' + p.img + '\');background-size:cover;background-position:center"' : '';
+    return '<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface);border:1.5px solid ' + (qty>0?'rgba(200,146,10,.4)':'var(--border2)') + ';border-radius:14px;box-shadow:var(--shadow)">'
+      + '<div style="width:52px;height:52px;border-radius:10px;background:var(--surface2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px" ' + imgSt + '>' + (p.img ? '' : '🍬') + '</div>'
+      + '<div style="flex:1;min-width:0">'
+      +   '<div style="font-weight:800;font-size:13.5px;color:var(--text)">' + p.name + '</div>'
+      +   '<div style="font-size:11.5px;color:var(--text3)">' + (p.price||0) + ' جنيه / قطعة' + (itemMax ? ' · حد أقصى ' + itemMax : '') + '</div>'
+      + '</div>'
+      + '<div style="display:flex;align-items:center;gap:8px;flex-shrink:0">'
+      +   '<button onclick="ML.boxStep(\'' + p.id + '\',-1)" style="width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border2);background:var(--surface);font-size:16px;font-weight:900;cursor:pointer;color:var(--text2)">−</button>'
+      +   '<div style="min-width:22px;text-align:center;font-weight:900;font-size:14px">' + qty + '</div>'
+      +   '<button onclick="ML.boxStep(\'' + p.id + '\',1)" style="width:30px;height:30px;border-radius:50%;border:none;background:linear-gradient(135deg,#c8920a,#e8a820);font-size:16px;font-weight:900;cursor:pointer;color:#fff">+</button>'
+      + '</div>'
+      + '</div>';
+  }).join('');
+};
+
+/* ── زيادة/إنقاص قطعة داخل العلبة مع كل التحققات ── */
+ML.boxStep = function(itemId, delta) {
+  var cfg = ML._boxConfig;
+  if (!cfg) return;
+  var product = ML.products.find(function(p){ return p.id === itemId; });
+  if (!product) return;
+  var elig = (cfg.eligibleItems||{})[itemId] || {};
+  var curQty = ML._currentBox[itemId] || 0;
+
+  if (delta < 0) {
+    ML._currentBox[itemId] = Math.max(0, curQty - 1);
+    if (ML._currentBox[itemId] === 0) delete ML._currentBox[itemId];
+    ML._renderBoxBuilder();
+    return;
+  }
+
+  /* حد الصنف نفسه لوحده */
+  if (elig.maxQty && curQty + 1 > elig.maxQty) {
+    ML.toast('⚠️ الحد الأقصى من "' + product.name + '" هو ' + elig.maxQty + ' قطعة بس');
+    return;
+  }
+
+  /* حد العلبة الكلي (عدد أو وزن) */
+  var usage = ML._boxUsage();
+  if (cfg.capacityType === 'weight') {
+    var addedWeight = elig.weightPerPiece || 0;
+    if (usage.weight + addedWeight > cfg.maxWeightGrams) {
+      ML.toast('⚠️ الحد الأقصى لوزن العلبة ' + cfg.maxWeightGrams + ' جرام');
+      return;
+    }
+  } else {
+    if (usage.pieces + 1 > cfg.maxPieces) {
+      ML.toast('⚠️ الحد الأقصى لعدد قطع العلبة ' + cfg.maxPieces + ' قطعة');
+      return;
+    }
+  }
+
+  ML._currentBox[itemId] = curQty + 1;
+  ML._renderBoxBuilder();
+};
+
+/* ── إضافة العلبة المكوّنة للسلة ── */
+ML.addBoxToCart = function() {
+  var cfg = ML._boxConfig;
+  var ids = Object.keys(ML._currentBox);
+  if (!ids.length) { ML.toast('اختار صنف واحد على الأقل 🎁'); return; }
+
+  var contents = ids.map(function(id) {
+    var p = ML.products.find(function(pp){ return pp.id === id; });
+    var qty = ML._currentBox[id];
+    return { itemId: id, name: p ? p.name : '', qty: qty, price: p ? (parseFloat(p.price)||0) : 0 };
+  });
+  var total = contents.reduce(function(s,c){ return s + c.qty*c.price; }, 0);
+  var usage = ML._boxUsage();
+
+  ML.boxCart.push({
+    id: 'box_' + Date.now() + '_' + Math.floor(Math.random()*1000),
+    title: cfg.title || 'شكل علبتك بنفسك',
+    contents: contents,
+    total: total,
+    pieceCount: usage.pieces,
+    weightGrams: usage.weight
+  });
+
+  ML.closeBoxBuilder();
+  ML.updateCart();
+  ML.toast('✅ اتضافت العلبة للسلة');
+  ML.openCartSheet();
+};
+
+/* ── حذف علبة من السلة ── */
+ML.removeBoxFromCart = function(boxId) {
+  ML.boxCart = ML.boxCart.filter(function(b){ return b.id !== boxId; });
+  ML.updateCart();
+  ML._renderSheetBody();
+};
+
+
 ML._showConfirm = function(orderId) {
   var screen = document.getElementById('order-confirm-screen');
   var idEl   = document.getElementById('oc-order-id');
@@ -2452,6 +2697,7 @@ ML._closeConfirm = function() {
   if (screen) screen.classList.remove('show');
   /* reset الكارت */
   ML.cart = {};
+  ML.boxCart = [];
   ML.renderCart && ML.renderCart();
   ML._updateCartUI && ML._updateCartUI();
   window.scrollTo({top:0, behavior:'smooth'});

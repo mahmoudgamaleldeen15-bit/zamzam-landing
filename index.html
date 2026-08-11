@@ -1216,6 +1216,53 @@ a{text-decoration:none;color:inherit}
         </div>
         <button onclick="ZZ.saveMawledHero()" class="btn-admin-add" style="background:linear-gradient(135deg,#f5c842,#e8a020);color:#000">💾 حفظ إعدادات Hero المولد</button>
         <div class="admin-note" id="mawled-hero-note">✅ تم الحفظ</div>
+
+        <!-- ══ شكل علبتك بنفسك ══ -->
+        <div class="admin-sec-divider" style="margin-top:24px"></div>
+        <div class="admin-sec-title">🎁 شكل علبتك بنفسك</div>
+        <div style="font-size:11.5px;color:rgba(255,255,255,.35);margin-bottom:14px;line-height:1.7">العميل يكوّن علبة بنفسه من الأصناف اللي تحددها، بحد أقصى تحدده أنت (عدد قطع أو وزن)</div>
+
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.75);font-size:13px;cursor:pointer">
+            <input type="checkbox" id="box-enabled" style="width:17px;height:17px;accent-color:#f5c842">
+            تفعيل ميزة "شكل علبتك بنفسك"
+          </label>
+        </div>
+
+        <div class="admin-form-grid" style="margin-bottom:8px">
+          <div>
+            <label class="admin-lbl">اسم القسم اللي يظهر للعميل</label>
+            <input id="box-title" class="admin-inp" type="text" placeholder="شكل علبتك بنفسك" value="شكل علبتك بنفسك">
+          </div>
+        </div>
+
+        <div style="margin-bottom:10px">
+          <label class="admin-lbl">طريقة تحديد سعة العلبة</label>
+          <div style="display:flex;gap:8px">
+            <button type="button" id="box-cap-pieces-btn" onclick="ZZ.setBoxCapacityType('pieces')" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(245,200,66,.4);background:rgba(245,200,66,.12);color:#f5c842;font-weight:800;font-size:12.5px;cursor:pointer;font-family:'Cairo',sans-serif">🔢 عدد قطع</button>
+            <button type="button" id="box-cap-weight-btn" onclick="ZZ.setBoxCapacityType('weight')" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-weight:700;font-size:12.5px;cursor:pointer;font-family:'Cairo',sans-serif">⚖️ وزن</button>
+          </div>
+        </div>
+
+        <div class="admin-form-grid" style="margin-bottom:16px">
+          <div id="box-cap-pieces-row">
+            <label class="admin-lbl">أقصى عدد قطع في العلبة الواحدة</label>
+            <input id="box-max-pieces" class="admin-inp" type="number" min="1" placeholder="مثال: 5">
+          </div>
+          <div id="box-cap-weight-row" style="display:none">
+            <label class="admin-lbl">أقصى وزن للعلبة الواحدة (جرام)</label>
+            <input id="box-max-weight" class="admin-inp" type="number" min="1" placeholder="مثال: 1000">
+          </div>
+        </div>
+
+        <div class="admin-sec-title" style="font-size:13px">الأصناف المسموح إضافتها للعلبة</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:10px">علّم بس الأصناف اللي تحب تسمح بيها، وممكن تحدد حد أقصى لكل صنف لوحده (اختياري)</div>
+        <div id="box-items-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+          <div style="color:rgba(255,255,255,.3);font-size:12.5px;padding:10px">لازم تضيف أصناف للمنيو الأول</div>
+        </div>
+
+        <button onclick="ZZ.saveBoxConfig()" class="btn-admin-add" style="background:linear-gradient(135deg,#f5c842,#e8a020);color:#000">💾 حفظ إعدادات العلبة</button>
+        <div class="admin-note" id="box-config-note">✅ تم الحفظ</div>
       </div><!-- end tab-mawled-menu -->
 
       <div id="admin-tab-desserts-menu" class="admin-panel-sec">
@@ -4982,7 +5029,7 @@ ZZ._renderAdminJobs = function() {
     return '<div class="job-admin-card" data-jid="'+jid+'">'
       +'<div class="jac-info"><div class="jac-title">'+(j.title||'')+'</div><div class="jac-dept">'+(j.dept||'')+'</div></div>'
       +'<div class="jac-actions">'
-      +'<button class="mai-btn mai-btn-tog '+(j.active?'on':'off')+'" data-jid="'+jid+'" data-active="'+(j.active?'1':'0')+'" title="'+(j.active?'إخفاء':'إظهار')+'">'+(j.active?'✅':'🔴')+'</button>'
+      +'<button class="mai-btn mai-btn-tog '+(j.active?'on':'off')+'" data-jid="'+jid+'" data-active="'+(j.active?'1':'0')+'" title="'+(j.active?'اضغط للإخفاء من الموقع':'اضغط للإظهار في الموقع')+'">'+(j.active?'👁️':'🙈')+'</button>'
       +'<button class="mai-btn mai-btn-edit" data-jid="'+jid+'" title="تعديل">✏️</button>'
       +'<button class="mai-btn mai-btn-del"  data-jid="'+jid+'" title="حذف">🗑</button>'
       +'</div></div>';
@@ -6074,6 +6121,7 @@ ZZ.subscribeMawled = function() {
       snap.forEach(function(ch) { ZZ._mawledMenuCache.unshift(Object.assign({ id: ch.key }, ch.val())); });
       ZZ._renderAdminMawledList();
       ZZ._refreshMawledCatDropdown();
+      if (ZZ._boxConfigLoaded) ZZ._renderBoxItemsList();
     });
   }
 
@@ -6938,6 +6986,11 @@ ZZ._renderMawledOrdersTable = function() {
     var itemsList = (o.items||[]).map(function(it){
       return it.name + ' ×' + it.qty + (it.priceType==='kilo'?' ك':' ق');
     }).join('<br>');
+    var boxesList = (o.boxes||[]).map(function(b, bi){
+      var lines = (b.contents||[]).map(function(c){ return '&nbsp;&nbsp;• ' + c.name + ' ×' + c.qty; }).join('<br>');
+      return '<b style="color:#e8a820">🎁 علبة ' + (bi+1) + ' (' + (b.title||'') + ')</b><br>' + lines;
+    }).join('<br>');
+    var fullItemsList = [itemsList, boxesList].filter(Boolean).join('<br>');
     var waLink  = (o.whatsapp||o.phone||'').replace(/\D/g,'');
     /* إضافة كود مصر لو الرقم بيبدأ بـ 0 */
     if (waLink && waLink.charAt(0) === '0') waLink = '20' + waLink.slice(1);
@@ -6952,7 +7005,7 @@ ZZ._renderMawledOrdersTable = function() {
       + '<td class="mord-td">' + waBtn + '</td>'
       + '<td class="mord-td">' + typeBadge + '</td>'
       + '<td class="mord-td">' + ZZ._omEsc(o.zone||'—') + '</td>'
-      + '<td class="mord-td"><div class="mord-items-list">' + (itemsList||'—') + '</div></td>'
+      + '<td class="mord-td"><div class="mord-items-list">' + (fullItemsList||'—') + '</div></td>'
       + '<td class="mord-td" style="text-align:center">' + (o.prodTotal||o.total||0) + ' ج</td>'
       + '<td class="mord-td" style="text-align:center">' + (o.deliveryFee > 0 ? o.deliveryFee + ' ج' : 'مجاني') + '</td>'
       + '<td class="mord-td" style="font-weight:900;color:#f5c842;font-size:13px;text-align:center">' + (o.total||0) + ' ج</td>'
@@ -6978,6 +7031,11 @@ ZZ.exportMawledExcel = function() {
     var items = (o.items||[]).map(function(it){
       return it.name + ' x' + it.qty + (it.priceType==='kilo'?' كيلو':' قطعة') + ' = ' + it.subtotal + ' ج';
     }).join(' | ');
+    var boxesTxt = (o.boxes||[]).map(function(b, bi){
+      var lines = (b.contents||[]).map(function(c){ return c.name + ' x' + c.qty; }).join('، ');
+      return 'علبة ' + (bi+1) + ' (' + (b.title||'') + '): ' + lines + ' = ' + (b.total||0) + ' ج';
+    }).join(' || ');
+    var itemsAndBoxes = [items, boxesTxt].filter(Boolean).join(' || ');
     rows.push([
       o.id||o._key||'',
       dt, tm,
@@ -6986,7 +7044,7 @@ ZZ.exportMawledExcel = function() {
       o.whatsapp||o.phone||'',
       o.orderType === 'delivery' ? 'ديليفري' : 'استلام',
       o.zone||'',
-      items,
+      itemsAndBoxes,
       o.prodTotal||o.total||0,
       o.deliveryFee||0,
       o.total||0,
@@ -7029,6 +7087,11 @@ ZZ.printMawledOrders = function() {
     var items = (o.items||[]).map(function(it){
       return ZZ._omEsc(it.name) + ' ×' + it.qty + (it.priceType==='kilo'?' كيلو':' قطعة');
     }).join('، ');
+    var boxesTxt = (o.boxes||[]).map(function(b, bi){
+      var lines = (b.contents||[]).map(function(c){ return ZZ._omEsc(c.name) + ' ×' + c.qty; }).join('، ');
+      return '🎁 علبة ' + (bi+1) + ' (' + ZZ._omEsc(b.title||'') + '): ' + lines;
+    }).join('<br>');
+    var fullItemsCol = [items, boxesTxt].filter(Boolean).join('<br>');
     return '<tr style="border-bottom:1px solid #eee">'
       + '<td style="padding:6px 8px;text-align:center;color:#666">' + (i+1) + '</td>'
       + '<td style="padding:6px 8px">' + d + '</td>'
@@ -7036,7 +7099,7 @@ ZZ.printMawledOrders = function() {
       + '<td style="padding:6px 8px;direction:ltr">' + ZZ._omEsc(o.phone||'—') + '</td>'
       + '<td style="padding:6px 8px">' + (o.orderType==='delivery'?'🛵 ديليفري':'🏪 استلام') + '</td>'
       + '<td style="padding:6px 8px">' + ZZ._omEsc(o.zone||'—') + '</td>'
-      + '<td style="padding:6px 8px;font-size:11px;color:#666">' + items + '</td>'
+      + '<td style="padding:6px 8px;font-size:11px;color:#666">' + fullItemsCol + '</td>'
       + '<td style="padding:6px 8px;text-align:center">' + (o.deliveryFee>0?o.deliveryFee+' ج':'مجاني') + '</td>'
       + '<td style="padding:6px 8px;font-weight:900;color:#b45309;text-align:center">' + (o.total||0) + ' ج</td>'
       + '</tr>';
@@ -7075,6 +7138,118 @@ ZZ.saveMawledHero = function() {
     var url = (document.getElementById('mlhbg-imgurl')||{}).value||'';
     _doSave(url.trim() || null);
   }
+};
+
+/* ══════════════════════════════════════════════════
+   شكل علبتك بنفسك — إعدادات الأدمن
+   Firebase: landing/mawled/settings/boxConfig
+══════════════════════════════════════════════════ */
+ZZ._boxCapacityType = 'pieces';
+ZZ._boxConfigLoaded  = false;
+
+ZZ.setBoxCapacityType = function(type) {
+  ZZ._boxCapacityType = type;
+  var pb = document.getElementById('box-cap-pieces-btn');
+  var wb = document.getElementById('box-cap-weight-btn');
+  var pr = document.getElementById('box-cap-pieces-row');
+  var wr = document.getElementById('box-cap-weight-row');
+  if (pb) { pb.style.background = type==='pieces' ? 'rgba(245,200,66,.12)' : 'transparent'; pb.style.borderColor = type==='pieces' ? 'rgba(245,200,66,.4)' : 'rgba(255,255,255,.1)'; pb.style.color = type==='pieces' ? '#f5c842' : 'rgba(255,255,255,.5)'; }
+  if (wb) { wb.style.background = type==='weight' ? 'rgba(245,200,66,.12)' : 'transparent'; wb.style.borderColor = type==='weight' ? 'rgba(245,200,66,.4)' : 'rgba(255,255,255,.1)'; wb.style.color = type==='weight' ? '#f5c842' : 'rgba(255,255,255,.5)'; }
+  if (pr) pr.style.display = type==='pieces' ? '' : 'none';
+  if (wr) wr.style.display = type==='weight' ? '' : 'none';
+  ZZ._renderBoxItemsList(); /* عشان نظهر/نخفي حقل وزن القطعة حسب النوع */
+};
+
+/* رسم قائمة الأصناف القابلة للتحديد */
+ZZ._boxEligibleState = {}; /* { itemId: { checked:bool, maxQty:num, weightPerPiece:num } } */
+ZZ._renderBoxItemsList = function() {
+  var el = document.getElementById('box-items-list');
+  if (!el) return;
+  var items = ZZ._mawledMenuCache || [];
+  if (!items.length) { el.innerHTML = '<div style="color:rgba(255,255,255,.3);font-size:12.5px;padding:10px">لازم تضيف أصناف للمنيو الأول</div>'; return; }
+  var isWeight = ZZ._boxCapacityType === 'weight';
+  el.innerHTML = items.map(function(it) {
+    var st = ZZ._boxEligibleState[it.id] || {};
+    var checked = st.checked ? 'checked' : '';
+    return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px">'
+      + '<label style="display:flex;align-items:center;gap:8px;flex:1;min-width:140px;cursor:pointer">'
+      +   '<input type="checkbox" data-box-item="' + it.id + '" ' + checked + ' onchange="ZZ._onBoxItemToggle(\'' + it.id + '\', this.checked)" style="width:16px;height:16px;accent-color:#f5c842">'
+      +   '<span style="color:#fff;font-size:13px;font-weight:700">' + (it.name||'') + '</span>'
+      + '</label>'
+      + '<input type="number" min="1" placeholder="حد أقصى (اختياري)" value="' + (st.maxQty||'') + '" data-box-maxqty="' + it.id + '" onchange="ZZ._onBoxMaxQtyChange(\'' + it.id + '\', this.value)" style="width:120px;padding:7px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;font-size:12px;font-family:Cairo,sans-serif">'
+      + (isWeight ? '<input type="number" min="1" placeholder="وزن القطعة (جرام)" value="' + (st.weightPerPiece||'') + '" data-box-weight="' + it.id + '" onchange="ZZ._onBoxWeightChange(\'' + it.id + '\', this.value)" style="width:140px;padding:7px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;font-size:12px;font-family:Cairo,sans-serif">' : '')
+      + '</div>';
+  }).join('');
+};
+
+ZZ._onBoxItemToggle = function(id, checked) {
+  if (!ZZ._boxEligibleState[id]) ZZ._boxEligibleState[id] = {};
+  ZZ._boxEligibleState[id].checked = checked;
+};
+ZZ._onBoxMaxQtyChange = function(id, val) {
+  if (!ZZ._boxEligibleState[id]) ZZ._boxEligibleState[id] = {};
+  ZZ._boxEligibleState[id].maxQty = parseInt(val) || null;
+};
+ZZ._onBoxWeightChange = function(id, val) {
+  if (!ZZ._boxEligibleState[id]) ZZ._boxEligibleState[id] = {};
+  ZZ._boxEligibleState[id].weightPerPiece = parseInt(val) || null;
+};
+
+/* تحميل الإعدادات المحفوظة */
+ZZ._loadBoxConfig = function() {
+  if (!window.zzdb) return;
+  zzdb.ref('landing/mawled/settings/boxConfig').once('value').then(function(snap) {
+    var d = snap.val() || {};
+    var enEl = document.getElementById('box-enabled'); if (enEl) enEl.checked = !!d.enabled;
+    var tEl  = document.getElementById('box-title');   if (tEl)  tEl.value = d.title || 'شكل علبتك بنفسك';
+    ZZ.setBoxCapacityType(d.capacityType === 'weight' ? 'weight' : 'pieces');
+    var mpEl = document.getElementById('box-max-pieces'); if (mpEl) mpEl.value = d.maxPieces || '';
+    var mwEl = document.getElementById('box-max-weight'); if (mwEl) mwEl.value = d.maxWeightGrams || '';
+    ZZ._boxEligibleState = {};
+    var elig = d.eligibleItems || {};
+    Object.keys(elig).forEach(function(id) {
+      ZZ._boxEligibleState[id] = { checked: true, maxQty: elig[id].maxQty || null, weightPerPiece: elig[id].weightPerPiece || null };
+    });
+    ZZ._renderBoxItemsList();
+    ZZ._boxConfigLoaded = true;
+  });
+};
+
+ZZ.saveBoxConfig = function() {
+  if (!window.zzdb || !window.ZZ_AUTH_READY) { alert('⏳ جاري الاتصال — انتظر ثانيتين'); return; }
+  var enabled = (document.getElementById('box-enabled')||{}).checked || false;
+  var title   = ((document.getElementById('box-title')||{}).value || 'شكل علبتك بنفسك').trim();
+  var capacityType = ZZ._boxCapacityType;
+  var maxPieces = parseInt((document.getElementById('box-max-pieces')||{}).value) || 0;
+  var maxWeightGrams = parseInt((document.getElementById('box-max-weight')||{}).value) || 0;
+
+  if (enabled && capacityType === 'pieces' && maxPieces <= 0) { alert('حدد أقصى عدد قطع للعلبة'); return; }
+  if (enabled && capacityType === 'weight' && maxWeightGrams <= 0) { alert('حدد أقصى وزن للعلبة'); return; }
+
+  var eligibleItems = {};
+  Object.keys(ZZ._boxEligibleState).forEach(function(id) {
+    var st = ZZ._boxEligibleState[id];
+    if (st.checked) {
+      eligibleItems[id] = {};
+      if (st.maxQty) eligibleItems[id].maxQty = st.maxQty;
+      if (capacityType === 'weight' && st.weightPerPiece) eligibleItems[id].weightPerPiece = st.weightPerPiece;
+    }
+  });
+
+  if (enabled && !Object.keys(eligibleItems).length) { alert('حدد صنف واحد على الأقل مسموح بيه في العلبة'); return; }
+
+  var boxConfig = {
+    enabled: enabled, title: title, capacityType: capacityType,
+    maxPieces: maxPieces, maxWeightGrams: maxWeightGrams,
+    eligibleItems: eligibleItems
+  };
+
+  zzdb.ref('landing/mawled/settings/boxConfig').set(boxConfig)
+    .then(function() {
+      var n = document.getElementById('box-config-note');
+      if (n) { n.classList.add('show'); setTimeout(function(){ n.classList.remove('show'); }, 2500); }
+    })
+    .catch(function(e) { alert('❌ ' + e.message); });
 };
 
 ZZ._dessertsOrdersCache  = [];
@@ -7524,7 +7699,7 @@ ZZ._renderDessertsPublic = function() {
 var _prevAdminTab3 = ZZ.adminTab;
 ZZ.adminTab = function(tab) {
   _prevAdminTab3(tab);
-  if (tab === 'mawled-menu')  { ZZ._renderAdminMawledList(); ZZ._renderMawledCatList(); ZZ._loadMawledWa(); }
+  if (tab === 'mawled-menu')  { ZZ._renderAdminMawledList(); ZZ._renderMawledCatList(); ZZ._loadMawledWa(); ZZ._loadBoxConfig(); }
   if (tab === 'mawled-orders'){ ZZ.subscribeMawledOrders(); }
   if (tab === 'desserts-menu'){ ZZ._renderAdminDessertsList(); ZZ._renderDessertsCatList(); ZZ._loadDessertsWa(); }
   if (tab === 'desserts-orders'){ ZZ.subscribeDessertsOrders(); }
@@ -8313,6 +8488,17 @@ ZZ._omCardHTML = function(o) {
     return '<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.06)"><span style="color:rgba(255,255,255,.6)">' + ZZ._omEsc(it.name||'') + ' ×' + (it.qty||1) + '</span><span style="color:#f5c842;font-weight:700">' + total + ' ج</span></div>';
   }).join('');
 
+  var boxesArr = o.boxes || [];
+  var boxesHTML = boxesArr.map(function(b, bi) {
+    var lines = (b.contents||[]).map(function(c) {
+      return '<div style="display:flex;justify-content:space-between;font-size:11.5px;padding:2px 0"><span style="color:rgba(255,255,255,.55)">&nbsp;&nbsp;• ' + ZZ._omEsc(c.name||'') + ' ×' + (c.qty||1) + '</span><span style="color:#e8a820">' + ((parseFloat(c.price)||0)*(parseInt(c.qty)||1)) + ' ج</span></div>';
+    }).join('');
+    return '<div style="background:rgba(200,146,10,.08);border:1px solid rgba(200,146,10,.25);border-radius:8px;padding:6px 8px;margin-bottom:5px">'
+      + '<div style="font-weight:800;font-size:11.5px;color:#e8a820;margin-bottom:3px">🎁 ' + ZZ._omEsc(b.title||'علبة مخصصة') + ' — ' + (bi+1) + ' — ' + (b.total||0) + ' ج</div>'
+      + lines
+      + '</div>';
+  }).join('');
+
   var grandTotal = parseFloat(o.grandTotal) || parseFloat(o.total) || 0;
   var addrHTML = (o.orderType === 'delivery' && o.address)
     ? '<div style="font-size:11.5px;color:rgba(255,255,255,.45);margin-top:4px">📍 ' + (o.zone ? ZZ._omEsc(o.zone) + ' — ' : '') + ZZ._omEsc(o.address) + '</div>'
@@ -8342,6 +8528,7 @@ ZZ._omCardHTML = function(o) {
     + '<div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:2px">' + ZZ._omEsc(o.name||'—') + '</div>'
     + '<div style="font-size:12px;color:rgba(255,255,255,.5)">📞 ' + (waNum ? '<a href="tel:+' + waNum + '" style="color:#4ade80;text-decoration:none">' + ZZ._omEsc(o.phone||waNum) + '</a>' : ZZ._omEsc(o.phone||'—')) + '</div>'
     + addrHTML
+    + (boxesHTML ? '<div style="margin:8px 0">' + boxesHTML + '</div>' : '')
     + (itemsHTML ? '<div style="margin:8px 0">' + itemsHTML + '</div>' : '')
     + '<div style="display:flex;justify-content:space-between;align-items:center;background:rgba(245,200,66,.07);border-radius:8px;padding:7px 10px;margin:8px 0">'
     +   '<span style="font-size:11.5px;color:rgba(255,255,255,.5)">الإجمالي</span>'
