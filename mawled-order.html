@@ -2631,9 +2631,10 @@ ML._renderBoxBuilder = function() {
   var lblEl = document.getElementById('box-progress-label');
   var cntEl = document.getElementById('box-progress-count');
   var barEl = document.getElementById('box-progress-bar');
-  if (lblEl) lblEl.textContent = curVal >= maxVal ? '✅ العلبة اكتملت' : 'اختار محتويات علبتك';
-  if (cntEl) cntEl.textContent = curVal + ' / ' + maxVal + ' ' + unitLbl;
-  if (barEl) barEl.style.width = Math.min(100, (maxVal ? (curVal/maxVal*100) : 0)) + '%';
+  var hasOverallCap = maxVal > 0;
+  if (lblEl) lblEl.textContent = (hasOverallCap && curVal >= maxVal) ? '✅ العلبة اكتملت' : 'اختار محتويات علبتك';
+  if (cntEl) cntEl.textContent = hasOverallCap ? (curVal + ' / ' + maxVal + ' ' + unitLbl) : (curVal + ' ' + unitLbl + ' — بدون حد أقصى');
+  if (barEl) barEl.style.width = (hasOverallCap ? Math.min(100, (curVal/maxVal*100)) : 0) + '%';
 
   if (!eligibleProducts.length) {
     wrap.innerHTML = '<div style="text-align:center;color:var(--text3);padding:20px;font-size:13px">مفيش أصناف متاحة للفئة دي دلوقتي</div>';
@@ -2700,16 +2701,18 @@ ML.boxStep = function(itemId, delta) {
     }
   }
 
-  /* حد العلبة الكلي (عدد أو وزن) */
+  /* حد العلبة الكلي (عدد أو وزن) — لو الأدمن سابه فاضي (0) يبقى مفيش سقف عام */
   var usage = ML._boxUsage();
   if (cfg.capacityType === 'weight') {
-    var addedWeight = elig.weightPerPiece || 0;
-    if (usage.weight + addedWeight > cfg.maxWeightGrams) {
-      ML.toast('⚠️ الحد الأقصى لوزن العلبة ' + cfg.maxWeightGrams + ' جرام');
-      return;
+    if (cfg.maxWeightGrams > 0) {
+      var addedWeight = elig.weightPerPiece || 0;
+      if (usage.weight + addedWeight > cfg.maxWeightGrams) {
+        ML.toast('⚠️ الحد الأقصى لوزن العلبة ' + cfg.maxWeightGrams + ' جرام');
+        return;
+      }
     }
   } else {
-    if (usage.pieces + 1 > cfg.maxPieces) {
+    if (cfg.maxPieces > 0 && usage.pieces + 1 > cfg.maxPieces) {
       ML.toast('⚠️ الحد الأقصى لعدد قطع العلبة ' + cfg.maxPieces + ' قطعة');
       return;
     }

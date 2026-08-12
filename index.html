@@ -1262,11 +1262,11 @@ a{text-decoration:none;color:inherit}
 
           <div class="admin-form-grid" style="margin-bottom:16px">
             <div id="box-cap-pieces-row">
-              <label class="admin-lbl">أقصى عدد قطع في العلبة الواحدة</label>
+              <label class="admin-lbl">أقصى عدد قطع في العلبة الواحدة <span style="opacity:.5;font-weight:600">(اختياري — سيبه فاضي لو مش عايز سقف عام)</span></label>
               <input id="box-max-pieces" class="admin-inp" type="number" min="1" placeholder="مثال: 5">
             </div>
             <div id="box-cap-weight-row" style="display:none">
-              <label class="admin-lbl">أقصى وزن للعلبة الواحدة (جرام)</label>
+              <label class="admin-lbl">أقصى وزن للعلبة الواحدة (جرام) <span style="opacity:.5;font-weight:600">(اختياري)</span></label>
               <input id="box-max-weight" class="admin-inp" type="number" min="1" placeholder="مثال: 1000">
             </div>
           </div>
@@ -7349,7 +7349,7 @@ ZZ._renderBoxItemsList = function() {
       + '</label>'
       + '<input type="number" min="1" placeholder="حد أقصى (اختياري)" value="' + (st.maxQty||'') + '" data-box-maxqty="' + it.id + '" onchange="ZZ._onBoxMaxQtyChange(\'' + it.id + '\', this.value)" style="width:120px;padding:7px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;font-size:12px;font-family:Cairo,sans-serif">'
       + (isWeight ? '<input type="number" min="1" placeholder="وزن القطعة (جرام)" value="' + (st.weightPerPiece||'') + '" data-box-weight="' + it.id + '" onchange="ZZ._onBoxWeightChange(\'' + it.id + '\', this.value)" style="width:140px;padding:7px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;font-size:12px;font-family:Cairo,sans-serif">' : '')
-      + (groupIds.length ? '<select data-box-group="' + it.id + '" onchange="ZZ._onBoxGroupChange(\'' + it.id + '\', this.value)" style="padding:7px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;font-size:12px;font-family:Cairo,sans-serif">' + groupOptions + '</select>' : '')
+      + '<select data-box-group="' + it.id + '" onchange="ZZ._onBoxGroupChange(\'' + it.id + '\', this.value)" style="padding:7px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;font-size:12px;font-family:Cairo,sans-serif">' + groupOptions + '</select>'
       + '</div>';
   }).join('');
 };
@@ -7383,8 +7383,7 @@ ZZ.saveBoxConfig = function() {
   var maxWeightGrams = parseInt((document.getElementById('box-max-weight')||{}).value) || 0;
 
   if (!title) { alert('اكتب اسم الفئة'); return; }
-  if (enabled && capacityType === 'pieces' && maxPieces <= 0) { alert('حدد أقصى عدد قطع للعلبة'); return; }
-  if (enabled && capacityType === 'weight' && maxWeightGrams <= 0) { alert('حدد أقصى وزن للعلبة'); return; }
+  /* الحد الأقصى الكلي للعلبة اختياري — لو الأدمن سابه فاضي يبقى مفيش سقف عام، ويعتمد بس على حدود الأصناف/المجموعات لو موجودة */
 
   var eligibleItems = {};
   Object.keys(ZZ._boxEligibleState).forEach(function(id) {
