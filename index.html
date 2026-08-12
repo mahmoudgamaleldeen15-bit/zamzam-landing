@@ -1220,61 +1220,78 @@ a{text-decoration:none;color:inherit}
         <!-- ══ شكل علبتك بنفسك ══ -->
         <div class="admin-sec-divider" style="margin-top:24px"></div>
         <div class="admin-sec-title">🎁 شكل علبتك بنفسك</div>
-        <div style="font-size:11.5px;color:rgba(255,255,255,.35);margin-bottom:14px;line-height:1.7">العميل يكوّن علبة بنفسه من الأصناف اللي تحددها، بحد أقصى تحدده أنت (عدد قطع أو وزن)</div>
+        <div style="font-size:11.5px;color:rgba(255,255,255,.35);margin-bottom:14px;line-height:1.7">العميل يكوّن علبة بنفسه من الأصناف اللي تحددها — تقدر تعمل كذا فئة علبة (1 كيلو، 1.5، 2...) بإعدادات مختلفة تماماً لكل واحدة</div>
 
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-          <label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.75);font-size:13px;cursor:pointer">
-            <input type="checkbox" id="box-enabled" style="width:17px;height:17px;accent-color:#f5c842">
-            تفعيل ميزة "شكل علبتك بنفسك"
-          </label>
-        </div>
-
-        <div class="admin-form-grid" style="margin-bottom:8px">
-          <div>
-            <label class="admin-lbl">اسم القسم اللي يظهر للعميل</label>
-            <input id="box-title" class="admin-inp" type="text" placeholder="شكل علبتك بنفسك" value="شكل علبتك بنفسك">
-          </div>
-        </div>
-
-        <div style="margin-bottom:10px">
-          <label class="admin-lbl">طريقة تحديد سعة العلبة</label>
-          <div style="display:flex;gap:8px">
-            <button type="button" id="box-cap-pieces-btn" onclick="ZZ.setBoxCapacityType('pieces')" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(245,200,66,.4);background:rgba(245,200,66,.12);color:#f5c842;font-weight:800;font-size:12.5px;cursor:pointer;font-family:'Cairo',sans-serif">🔢 عدد قطع</button>
-            <button type="button" id="box-cap-weight-btn" onclick="ZZ.setBoxCapacityType('weight')" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-weight:700;font-size:12.5px;cursor:pointer;font-family:'Cairo',sans-serif">⚖️ وزن</button>
-          </div>
-        </div>
-
-        <div class="admin-form-grid" style="margin-bottom:16px">
-          <div id="box-cap-pieces-row">
-            <label class="admin-lbl">أقصى عدد قطع في العلبة الواحدة</label>
-            <input id="box-max-pieces" class="admin-inp" type="number" min="1" placeholder="مثال: 5">
-          </div>
-          <div id="box-cap-weight-row" style="display:none">
-            <label class="admin-lbl">أقصى وزن للعلبة الواحدة (جرام)</label>
-            <input id="box-max-weight" class="admin-inp" type="number" min="1" placeholder="مثال: 1000">
-          </div>
-        </div>
-
-        <!-- ══ مجموعات الأصناف — حد أقصى مشترك بين كذا صنف ══ -->
-        <div class="admin-sec-title" style="font-size:13px">🏷️ مجموعات الأصناف <span style="opacity:.5;font-weight:600">(اختياري)</span></div>
-        <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:10px">اعمل مجموعة (مثلاً "مربات") وحدد لها حد أقصى إجمالي — أي صنف تحطه في المجموعة دي، مجموع قطعه مع باقي أصناف نفس المجموعة ميعديش الحد ده</div>
-        <div id="box-groups-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">
-          <div style="color:rgba(255,255,255,.3);font-size:12px;padding:8px">مفيش مجموعات لسه</div>
+        <!-- ══ تابات فئات العلب ══ -->
+        <div id="box-profile-tabs" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+          <div style="color:rgba(255,255,255,.3);font-size:12px;padding:8px">مفيش فئات علب لسه — ضيف واحدة تحت</div>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:20px">
-          <input id="box-new-group-name" class="admin-inp" type="text" placeholder="اسم المجموعة (مثال: مربات)" style="flex:2">
-          <input id="box-new-group-max" class="admin-inp" type="number" min="1" placeholder="الحد الأقصى" style="flex:1">
-          <button onclick="ZZ.addBoxGroup()" style="padding:0 18px;background:rgba(245,200,66,.15);border:1px solid rgba(245,200,66,.3);color:#f5c842;border-radius:10px;cursor:pointer;font-size:18px;font-weight:700">+</button>
+          <input id="box-new-profile-name" class="admin-inp" type="text" placeholder="اسم الفئة الجديدة (مثال: علبة 1.5 كيلو)" style="flex:1">
+          <button onclick="ZZ.addBoxProfile()" style="padding:0 18px;background:rgba(245,200,66,.15);border:1px solid rgba(245,200,66,.3);color:#f5c842;border-radius:10px;cursor:pointer;font-size:18px;font-weight:700">+</button>
         </div>
 
-        <div class="admin-sec-title" style="font-size:13px">الأصناف المسموح إضافتها للعلبة</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:10px">علّم بس الأصناف اللي تحب تسمح بيها، وممكن تحدد حد أقصى لكل صنف لوحده (اختياري) وتربطه بمجموعة (اختياري)</div>
-        <div id="box-items-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
-          <div style="color:rgba(255,255,255,.3);font-size:12.5px;padding:10px">لازم تضيف أصناف للمنيو الأول</div>
-        </div>
+        <!-- ══ إعدادات الفئة المختارة حالياً ══ -->
+        <div id="box-profile-editor" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:10px 14px;background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.2);border-radius:10px">
+            <span style="color:#fff;font-weight:800;font-size:13.5px">⚙️ إعدادات فئة: <span id="box-editing-profile-name" style="color:#f5c842"></span></span>
+            <button onclick="ZZ.deleteBoxProfile()" style="padding:5px 12px;background:rgba(239,68,68,.15);border:none;color:#f87171;border-radius:8px;cursor:pointer;font-size:11.5px">🗑 حذف الفئة دي</button>
+          </div>
 
-        <button onclick="ZZ.saveBoxConfig()" class="btn-admin-add" style="background:linear-gradient(135deg,#f5c842,#e8a020);color:#000">💾 حفظ إعدادات العلبة</button>
-        <div class="admin-note" id="box-config-note">✅ تم الحفظ</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.75);font-size:13px;cursor:pointer">
+              <input type="checkbox" id="box-enabled" style="width:17px;height:17px;accent-color:#f5c842">
+              تفعيل الفئة دي وإظهارها للعميل
+            </label>
+          </div>
+
+          <div class="admin-form-grid" style="margin-bottom:8px">
+            <div>
+              <label class="admin-lbl">اسم الفئة اللي يظهر للعميل</label>
+              <input id="box-title" class="admin-inp" type="text" placeholder="مثال: علبة 1.5 كيلو">
+            </div>
+          </div>
+
+          <div style="margin-bottom:10px">
+            <label class="admin-lbl">طريقة تحديد سعة العلبة</label>
+            <div style="display:flex;gap:8px">
+              <button type="button" id="box-cap-pieces-btn" onclick="ZZ.setBoxCapacityType('pieces')" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(245,200,66,.4);background:rgba(245,200,66,.12);color:#f5c842;font-weight:800;font-size:12.5px;cursor:pointer;font-family:'Cairo',sans-serif">🔢 عدد قطع</button>
+              <button type="button" id="box-cap-weight-btn" onclick="ZZ.setBoxCapacityType('weight')" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);font-weight:700;font-size:12.5px;cursor:pointer;font-family:'Cairo',sans-serif">⚖️ وزن</button>
+            </div>
+          </div>
+
+          <div class="admin-form-grid" style="margin-bottom:16px">
+            <div id="box-cap-pieces-row">
+              <label class="admin-lbl">أقصى عدد قطع في العلبة الواحدة</label>
+              <input id="box-max-pieces" class="admin-inp" type="number" min="1" placeholder="مثال: 5">
+            </div>
+            <div id="box-cap-weight-row" style="display:none">
+              <label class="admin-lbl">أقصى وزن للعلبة الواحدة (جرام)</label>
+              <input id="box-max-weight" class="admin-inp" type="number" min="1" placeholder="مثال: 1000">
+            </div>
+          </div>
+
+          <!-- ══ مجموعات الأصناف — حد أقصى مشترك بين كذا صنف ══ -->
+          <div class="admin-sec-title" style="font-size:13px">🏷️ مجموعات الأصناف <span style="opacity:.5;font-weight:600">(اختياري)</span></div>
+          <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:10px">اعمل مجموعة (مثلاً "مربات") وحدد لها حد أقصى إجمالي — أي صنف تحطه في المجموعة دي، مجموع قطعه مع باقي أصناف نفس المجموعة ميعديش الحد ده. المجموعات دي خاصة بالفئة دي بس</div>
+          <div id="box-groups-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">
+            <div style="color:rgba(255,255,255,.3);font-size:12px;padding:8px">مفيش مجموعات لسه</div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:20px">
+            <input id="box-new-group-name" class="admin-inp" type="text" placeholder="اسم المجموعة (مثال: مربات)" style="flex:2">
+            <input id="box-new-group-max" class="admin-inp" type="number" min="1" placeholder="الحد الأقصى" style="flex:1">
+            <button onclick="ZZ.addBoxGroup()" style="padding:0 18px;background:rgba(245,200,66,.15);border:1px solid rgba(245,200,66,.3);color:#f5c842;border-radius:10px;cursor:pointer;font-size:18px;font-weight:700">+</button>
+          </div>
+
+          <div class="admin-sec-title" style="font-size:13px">الأصناف المسموح إضافتها للفئة دي</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:10px">علّم بس الأصناف اللي تحب تسمح بيها في الفئة دي، وممكن تحدد حد أقصى لكل صنف لوحده (اختياري) وتربطه بمجموعة (اختياري)</div>
+          <div id="box-items-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+            <div style="color:rgba(255,255,255,.3);font-size:12.5px;padding:10px">لازم تضيف أصناف للمنيو الأول</div>
+          </div>
+
+          <button onclick="ZZ.saveBoxConfig()" class="btn-admin-add" style="background:linear-gradient(135deg,#f5c842,#e8a020);color:#000">💾 حفظ إعدادات الفئة دي</button>
+          <div class="admin-note" id="box-config-note">✅ تم الحفظ</div>
+        </div>
       </div><!-- end tab-mawled-menu -->
 
       <div id="admin-tab-desserts-menu" class="admin-panel-sec">
@@ -7156,8 +7173,107 @@ ZZ.saveMawledHero = function() {
    شكل علبتك بنفسك — إعدادات الأدمن
    Firebase: landing/mawled/settings/boxConfig
 ══════════════════════════════════════════════════ */
-ZZ._boxCapacityType = 'pieces';
-ZZ._boxConfigLoaded  = false;
+/* ══════════════════════════════════════════════════
+   شكل علبتك بنفسك — نظام فئات متعددة (بروفايلات)
+   Firebase: landing/mawled/settings/boxProfiles/{profileId}
+══════════════════════════════════════════════════ */
+ZZ._boxProfiles       = {}; /* { profileId: { name, enabled, capacityType, maxPieces, maxWeightGrams, eligibleItems:{}, groups:{}, order } } */
+ZZ._activeBoxProfileId = null;
+ZZ._boxCapacityType    = 'pieces';
+ZZ._boxEligibleState   = {}; /* حالة تحرير مؤقتة للفئة المفتوحة حالياً */
+ZZ._boxGroups          = {};
+ZZ._boxConfigLoaded    = false;
+
+/* ── تحميل كل الفئات المحفوظة ── */
+ZZ._loadBoxConfig = function() {
+  if (!window.zzdb) return;
+  zzdb.ref('landing/mawled/settings/boxProfiles').once('value').then(function(snap) {
+    ZZ._boxProfiles = snap.val() || {};
+    ZZ._renderBoxProfileTabs();
+    var ids = Object.keys(ZZ._boxProfiles);
+    if (ids.length) {
+      /* افتح أول فئة تلقائياً */
+      ZZ.selectBoxProfile(ids.sort(function(a,b){ return (ZZ._boxProfiles[a].order||0) - (ZZ._boxProfiles[b].order||0); })[0]);
+    } else {
+      document.getElementById('box-profile-editor').style.display = 'none';
+    }
+    ZZ._boxConfigLoaded = true;
+  });
+};
+
+/* ── رسم تابات الفئات ── */
+ZZ._renderBoxProfileTabs = function() {
+  var el = document.getElementById('box-profile-tabs');
+  if (!el) return;
+  var ids = Object.keys(ZZ._boxProfiles).sort(function(a,b){ return (ZZ._boxProfiles[a].order||0) - (ZZ._boxProfiles[b].order||0); });
+  if (!ids.length) { el.innerHTML = '<div style="color:rgba(255,255,255,.3);font-size:12px;padding:8px">مفيش فئات علب لسه — ضيف واحدة تحت</div>'; return; }
+  el.innerHTML = ids.map(function(pid) {
+    var p = ZZ._boxProfiles[pid];
+    var active = pid === ZZ._activeBoxProfileId;
+    var statusDot = p.enabled ? '🟢' : '🔴';
+    return '<button onclick="ZZ.selectBoxProfile(\'' + pid + '\')" style="padding:9px 16px;border-radius:10px;border:1px solid ' + (active?'rgba(245,200,66,.5)':'rgba(255,255,255,.1)') + ';background:' + (active?'rgba(245,200,66,.15)':'transparent') + ';color:' + (active?'#f5c842':'rgba(255,255,255,.55)') + ';font-weight:800;font-size:12.5px;cursor:pointer;font-family:Cairo,sans-serif">' + statusDot + ' ' + p.name + '</button>';
+  }).join('');
+};
+
+/* ── إضافة فئة جديدة ── */
+ZZ.addBoxProfile = function() {
+  var nameEl = document.getElementById('box-new-profile-name');
+  var name = (nameEl.value||'').trim();
+  if (!name) { alert('اكتب اسم الفئة (مثال: علبة 1.5 كيلو)'); return; }
+  if (!window.zzdb || !window.ZZ_AUTH_READY) { alert('⏳ جاري الاتصال — انتظر ثانيتين'); return; }
+  var pid = 'boxp_' + Date.now();
+  var order = Object.keys(ZZ._boxProfiles).length;
+  var profile = { name: name, enabled: false, capacityType: 'pieces', maxPieces: 0, maxWeightGrams: 0, eligibleItems: {}, groups: {}, order: order };
+  zzdb.ref('landing/mawled/settings/boxProfiles/' + pid).set(profile).then(function() {
+    ZZ._boxProfiles[pid] = profile;
+    nameEl.value = '';
+    ZZ._renderBoxProfileTabs();
+    ZZ.selectBoxProfile(pid);
+  }).catch(function(e) { alert('❌ ' + e.message); });
+};
+
+/* ── حذف فئة ── */
+ZZ.deleteBoxProfile = function() {
+  var pid = ZZ._activeBoxProfileId;
+  if (!pid) return;
+  var pname = ZZ._boxProfiles[pid] ? ZZ._boxProfiles[pid].name : '';
+  if (!confirm('حذف فئة "' + pname + '" نهائياً؟')) return;
+  if (!window.zzdb) return;
+  zzdb.ref('landing/mawled/settings/boxProfiles/' + pid).remove().then(function() {
+    delete ZZ._boxProfiles[pid];
+    ZZ._activeBoxProfileId = null;
+    ZZ._renderBoxProfileTabs();
+    var ids = Object.keys(ZZ._boxProfiles);
+    if (ids.length) ZZ.selectBoxProfile(ids[0]);
+    else document.getElementById('box-profile-editor').style.display = 'none';
+  }).catch(function(e) { alert('❌ ' + e.message); });
+};
+
+/* ── اختيار فئة للتحرير ── */
+ZZ.selectBoxProfile = function(pid) {
+  var p = ZZ._boxProfiles[pid];
+  if (!p) return;
+  ZZ._activeBoxProfileId = pid;
+  ZZ._renderBoxProfileTabs();
+
+  document.getElementById('box-profile-editor').style.display = 'block';
+  document.getElementById('box-editing-profile-name').textContent = p.name;
+  document.getElementById('box-enabled').checked = !!p.enabled;
+  document.getElementById('box-title').value = p.name || '';
+  ZZ.setBoxCapacityType(p.capacityType === 'weight' ? 'weight' : 'pieces');
+  document.getElementById('box-max-pieces').value = p.maxPieces || '';
+  document.getElementById('box-max-weight').value = p.maxWeightGrams || '';
+
+  ZZ._boxGroups = p.groups || {};
+  ZZ._renderBoxGroupsList();
+
+  ZZ._boxEligibleState = {};
+  var elig = p.eligibleItems || {};
+  Object.keys(elig).forEach(function(id) {
+    ZZ._boxEligibleState[id] = { checked: true, maxQty: elig[id].maxQty || null, weightPerPiece: elig[id].weightPerPiece || null, groupId: elig[id].groupId || null };
+  });
+  ZZ._renderBoxItemsList();
+};
 
 ZZ.setBoxCapacityType = function(type) {
   ZZ._boxCapacityType = type;
@@ -7169,14 +7285,10 @@ ZZ.setBoxCapacityType = function(type) {
   if (wb) { wb.style.background = type==='weight' ? 'rgba(245,200,66,.12)' : 'transparent'; wb.style.borderColor = type==='weight' ? 'rgba(245,200,66,.4)' : 'rgba(255,255,255,.1)'; wb.style.color = type==='weight' ? '#f5c842' : 'rgba(255,255,255,.5)'; }
   if (pr) pr.style.display = type==='pieces' ? '' : 'none';
   if (wr) wr.style.display = type==='weight' ? '' : 'none';
-  ZZ._renderBoxItemsList(); /* عشان نظهر/نخفي حقل وزن القطعة حسب النوع */
+  ZZ._renderBoxItemsList();
 };
 
-/* رسم قائمة الأصناف القابلة للتحديد */
-ZZ._boxEligibleState = {}; /* { itemId: { checked:bool, maxQty:num, weightPerPiece:num, groupId:str|null } } */
-ZZ._boxGroups = {}; /* { groupId: { name:str, maxQty:num } } */
-
-/* ── إدارة المجموعات ── */
+/* ── إدارة المجموعات (خاصة بالفئة المفتوحة حالياً) ── */
 ZZ._renderBoxGroupsList = function() {
   var el = document.getElementById('box-groups-list');
   if (!el) return;
@@ -7203,13 +7315,12 @@ ZZ.addBoxGroup = function() {
   ZZ._boxGroups[gid] = { name: name, maxQty: max };
   nameEl.value = ''; maxEl.value = '';
   ZZ._renderBoxGroupsList();
-  ZZ._renderBoxItemsList(); /* عشان الدروب داون يتحدث بالمجموعة الجديدة */
+  ZZ._renderBoxItemsList();
 };
 
 ZZ.deleteBoxGroup = function(gid) {
   if (!confirm('حذف المجموعة دي؟ (الأصناف المرتبطة بيها هترجع "بدون مجموعة")')) return;
   delete ZZ._boxGroups[gid];
-  /* شيل ربط أي صنف كان مرتبط بالمجموعة دي */
   Object.keys(ZZ._boxEligibleState).forEach(function(id) {
     if (ZZ._boxEligibleState[id].groupId === gid) ZZ._boxEligibleState[id].groupId = null;
   });
@@ -7260,36 +7371,18 @@ ZZ._onBoxGroupChange = function(id, val) {
   ZZ._boxEligibleState[id].groupId = val || null;
 };
 
-/* تحميل الإعدادات المحفوظة */
-ZZ._loadBoxConfig = function() {
-  if (!window.zzdb) return;
-  zzdb.ref('landing/mawled/settings/boxConfig').once('value').then(function(snap) {
-    var d = snap.val() || {};
-    var enEl = document.getElementById('box-enabled'); if (enEl) enEl.checked = !!d.enabled;
-    var tEl  = document.getElementById('box-title');   if (tEl)  tEl.value = d.title || 'شكل علبتك بنفسك';
-    ZZ.setBoxCapacityType(d.capacityType === 'weight' ? 'weight' : 'pieces');
-    var mpEl = document.getElementById('box-max-pieces'); if (mpEl) mpEl.value = d.maxPieces || '';
-    var mwEl = document.getElementById('box-max-weight'); if (mwEl) mwEl.value = d.maxWeightGrams || '';
-    ZZ._boxGroups = d.groups || {};
-    ZZ._renderBoxGroupsList();
-    ZZ._boxEligibleState = {};
-    var elig = d.eligibleItems || {};
-    Object.keys(elig).forEach(function(id) {
-      ZZ._boxEligibleState[id] = { checked: true, maxQty: elig[id].maxQty || null, weightPerPiece: elig[id].weightPerPiece || null, groupId: elig[id].groupId || null };
-    });
-    ZZ._renderBoxItemsList();
-    ZZ._boxConfigLoaded = true;
-  });
-};
-
+/* ── حفظ إعدادات الفئة المفتوحة حالياً ── */
 ZZ.saveBoxConfig = function() {
+  var pid = ZZ._activeBoxProfileId;
+  if (!pid) { alert('اختار فئة الأول'); return; }
   if (!window.zzdb || !window.ZZ_AUTH_READY) { alert('⏳ جاري الاتصال — انتظر ثانيتين'); return; }
   var enabled = (document.getElementById('box-enabled')||{}).checked || false;
-  var title   = ((document.getElementById('box-title')||{}).value || 'شكل علبتك بنفسك').trim();
+  var title   = ((document.getElementById('box-title')||{}).value || '').trim();
   var capacityType = ZZ._boxCapacityType;
   var maxPieces = parseInt((document.getElementById('box-max-pieces')||{}).value) || 0;
   var maxWeightGrams = parseInt((document.getElementById('box-max-weight')||{}).value) || 0;
 
+  if (!title) { alert('اكتب اسم الفئة'); return; }
   if (enabled && capacityType === 'pieces' && maxPieces <= 0) { alert('حدد أقصى عدد قطع للعلبة'); return; }
   if (enabled && capacityType === 'weight' && maxWeightGrams <= 0) { alert('حدد أقصى وزن للعلبة'); return; }
 
@@ -7304,17 +7397,21 @@ ZZ.saveBoxConfig = function() {
     }
   });
 
-  if (enabled && !Object.keys(eligibleItems).length) { alert('حدد صنف واحد على الأقل مسموح بيه في العلبة'); return; }
+  if (enabled && !Object.keys(eligibleItems).length) { alert('حدد صنف واحد على الأقل مسموح بيه في الفئة دي'); return; }
 
-  var boxConfig = {
-    enabled: enabled, title: title, capacityType: capacityType,
+  var existing = ZZ._boxProfiles[pid] || {};
+  var profile = {
+    name: title, enabled: enabled, capacityType: capacityType,
     maxPieces: maxPieces, maxWeightGrams: maxWeightGrams,
-    eligibleItems: eligibleItems,
-    groups: ZZ._boxGroups
+    eligibleItems: eligibleItems, groups: ZZ._boxGroups,
+    order: existing.order || 0
   };
 
-  zzdb.ref('landing/mawled/settings/boxConfig').set(boxConfig)
+  zzdb.ref('landing/mawled/settings/boxProfiles/' + pid).set(profile)
     .then(function() {
+      ZZ._boxProfiles[pid] = profile;
+      ZZ._renderBoxProfileTabs();
+      document.getElementById('box-editing-profile-name').textContent = profile.name;
       var n = document.getElementById('box-config-note');
       if (n) { n.classList.add('show'); setTimeout(function(){ n.classList.remove('show'); }, 2500); }
     })

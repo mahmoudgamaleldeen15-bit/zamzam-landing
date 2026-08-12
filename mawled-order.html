@@ -1218,7 +1218,10 @@ body.has-send-bar .page-wrap{padding-bottom:100px!important}
       </div>
     </div>
 
-    <div style="background:linear-gradient(135deg,#fff8e6,#fff3d0);border:1.5px solid rgba(200,146,10,.3);border-radius:16px;padding:16px;margin-bottom:18px">
+    <!-- تابات اختيار فئة العلبة -->
+    <div id="box-profile-tabs-customer" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px"></div>
+
+    <div id="box-progress-area" style="background:linear-gradient(135deg,#fff8e6,#fff3d0);border:1.5px solid rgba(200,146,10,.3);border-radius:16px;padding:16px;margin-bottom:18px;display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <span style="font-weight:800;font-size:14px;color:var(--text2)" id="box-progress-label">اختار محتويات علبتك</span>
         <span style="font-weight:900;font-size:15px;color:var(--gold)" id="box-progress-count">0 / 0</span>
@@ -2508,32 +2511,43 @@ ML._loadPageConfig = function() {
    شكل علبتك بنفسك — Build Your Own Box
    نظام منفصل تماماً عن السلة والمنيو العادي
 ════════════════════════════════════════════ */
-ML._boxConfig  = null;
+ML._boxProfiles        = {};   /* { profileId: {...} } كل فئات العلب */
+ML._activeBoxProfileId = null; /* الفئة المختارة حالياً */
 ML._currentBox = {};   /* { itemId: qty } — أثناء التكوين بس */
-ML.boxCart     = [];   /* [ { id, contents:[{itemId,name,qty,price,priceType}], total, pieceCount, weightGrams } ] */
+ML.boxCart     = [];   /* [ { id, profileName, contents:[{itemId,name,qty,price}], total, pieceCount, weightGrams } ] */
 
 ML._loadBoxConfig = function() {
   if (!ML.db) return;
-  ML.db.ref('landing/mawled/settings/boxConfig').on('value', function(snap) {
-    var d = snap.val() || null;
-    ML._boxConfig = (d && d.enabled) ? d : null;
+  ML.db.ref('landing/mawled/settings/boxProfiles').on('value', function(snap) {
+    ML._boxProfiles = snap.val() || {};
+    var anyEnabled = Object.keys(ML._boxProfiles).some(function(pid) { return ML._boxProfiles[pid].enabled; });
     var btn = document.getElementById('box-builder-btn');
-    var lbl = document.getElementById('box-builder-btn-label');
-    if (btn) btn.style.display = ML._boxConfig ? 'flex' : 'none';
-    if (lbl && ML._boxConfig) lbl.textContent = ML._boxConfig.title || 'شكل علبتك بنفسك';
+    if (btn) btn.style.display = anyEnabled ? 'flex' : 'none';
+    /* لو قسم العلبة مفتوح دلوقتي، حدّث التابات والمحتوى مباشرة */
+    var section = document.getElementById('box-builder-section');
+    if (section && section.style.display !== 'none') {
+      ML._renderBoxProfileTabsCustomer();
+      if (ML._activeBoxProfileId) ML._renderBoxBuilder();
+    }
   });
 };
 
 /* ── فتح/قفل واجهة التكوين ── */
 ML.openBoxBuilder = function() {
-  if (!ML._boxConfig) return;
+  var enabledProfiles = Object.keys(ML._boxProfiles).filter(function(pid) { return ML._boxProfiles[pid].enabled; });
+  if (!enabledProfiles.length) return;
   ML._currentBox = {};
+  ML._activeBoxProfileId = null;
   document.getElementById('products-section').style.display = 'none';
   var catArea = document.getElementById('cat-tabs-area'); if (catArea) catArea.style.display = 'none';
   document.getElementById('box-builder-section').style.display = 'block';
+  document.getElementById('box-progress-area').style.display = 'none';
+  document.getElementById('box-items-wrap').innerHTML = '';
   var titleEl = document.getElementById('box-section-title');
-  if (titleEl) titleEl.textContent = '🎁 ' + (ML._boxConfig.title || 'شكل علبتك بنفسك');
-  ML._renderBoxBuilder();
+  if (titleEl) titleEl.textContent = '🎁 شكل علبتك بنفسك';
+  ML._renderBoxProfileTabsCustomer();
+  /* لو فيه فئة واحدة بس مفعّلة، افتحها تلقائياً */
+  if (enabledProfiles.length === 1) ML.selectBoxProfile(enabledProfiles[0]);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
@@ -2541,12 +2555,42 @@ ML.closeBoxBuilder = function() {
   document.getElementById('box-builder-section').style.display = 'none';
   document.getElementById('products-section').style.display = '';
   ML._currentBox = {};
+  ML._activeBoxProfileId = null;
 };
 
-/* ── حساب استهلاك العلبة الحالي ── */
+/* ── رسم تابات اختيار فئة العلبة للعميل ── */
+ML._renderBoxProfileTabsCustomer = function() {
+  var wrap = document.getElementById('box-profile-tabs-customer');
+  if (!wrap) return;
+  var ids = Object.keys(ML._boxProfiles)
+    .filter(function(pid) { return ML._boxProfiles[pid].enabled; })
+    .sort(function(a,b){ return (ML._boxProfiles[a].order||0) - (ML._boxProfiles[b].order||0); });
+
+  wrap.innerHTML = ids.map(function(pid) {
+    var p = ML._boxProfiles[pid];
+    var active = pid === ML._activeBoxProfileId;
+    return '<button onclick="ML.selectBoxProfile(\'' + pid + '\')" style="padding:10px 18px;border-radius:12px;border:1.5px solid ' + (active?'rgba(200,146,10,.5)':'var(--border2)') + ';background:' + (active?'linear-gradient(135deg,#c8920a,#e8a820)':'var(--surface)') + ';color:' + (active?'#fff':'var(--text2)') + ';font-weight:800;font-size:13px;cursor:pointer;font-family:\'Cairo\',sans-serif;box-shadow:' + (active?'var(--shadow-md)':'none') + '">' + p.name + '</button>';
+  }).join('');
+};
+
+/* ── اختيار فئة معينة والبدء في بنائها ── */
+ML.selectBoxProfile = function(pid) {
+  var p = ML._boxProfiles[pid];
+  if (!p || !p.enabled) return;
+  ML._activeBoxProfileId = pid;
+  ML._currentBox = {}; /* نصفّر الاختيار لما نغيّر فئة — كل فئة أصنافها وحدودها مختلفة */
+  ML._renderBoxProfileTabsCustomer();
+  var titleEl = document.getElementById('box-section-title');
+  if (titleEl) titleEl.textContent = '🎁 ' + p.name;
+  document.getElementById('box-progress-area').style.display = 'block';
+  ML._renderBoxBuilder();
+};
+
+/* ── حساب استهلاك العلبة الحالي (للفئة المفعّلة حالياً) ── */
 ML._boxUsage = function() {
-  var cfg = ML._boxConfig;
+  var cfg = ML._boxProfiles[ML._activeBoxProfileId];
   var pieces = 0, weight = 0;
+  if (!cfg) return { pieces: 0, weight: 0 };
   Object.keys(ML._currentBox).forEach(function(id) {
     var qty = ML._currentBox[id] || 0;
     pieces += qty;
@@ -2560,8 +2604,8 @@ ML._boxUsage = function() {
 
 /* ── إجمالي القطع المستخدمة من مجموعة معينة (عبر كل الأصناف التابعة لها) ── */
 ML._groupUsage = function(groupId) {
-  var cfg = ML._boxConfig;
-  if (!groupId) return 0;
+  var cfg = ML._boxProfiles[ML._activeBoxProfileId];
+  if (!groupId || !cfg) return 0;
   var total = 0;
   Object.keys(ML._currentBox).forEach(function(id) {
     var elig = (cfg.eligibleItems || {})[id] || {};
@@ -2570,9 +2614,9 @@ ML._groupUsage = function(groupId) {
   return total;
 };
 
-/* ── رسم قائمة أصناف العلبة ── */
+/* ── رسم قائمة أصناف الفئة المختارة ── */
 ML._renderBoxBuilder = function() {
-  var cfg = ML._boxConfig;
+  var cfg = ML._boxProfiles[ML._activeBoxProfileId];
   if (!cfg) return;
   var wrap = document.getElementById('box-items-wrap');
   var eligibleIds = Object.keys(cfg.eligibleItems || {});
@@ -2592,7 +2636,7 @@ ML._renderBoxBuilder = function() {
   if (barEl) barEl.style.width = Math.min(100, (maxVal ? (curVal/maxVal*100) : 0)) + '%';
 
   if (!eligibleProducts.length) {
-    wrap.innerHTML = '<div style="text-align:center;color:var(--text3);padding:20px;font-size:13px">مفيش أصناف متاحة للعلبة دلوقتي</div>';
+    wrap.innerHTML = '<div style="text-align:center;color:var(--text3);padding:20px;font-size:13px">مفيش أصناف متاحة للفئة دي دلوقتي</div>';
     return;
   }
 
@@ -2605,9 +2649,9 @@ ML._renderBoxBuilder = function() {
       var grp = cfg.groups[elig.groupId];
       groupInfo = ' · 🏷️ ' + grp.name + ' (' + ML._groupUsage(elig.groupId) + '/' + grp.maxQty + ')';
     }
-    var imgSt = p.img ? 'style="background-image:url(\'' + p.img + '\');background-size:cover;background-position:center"' : '';
+    var imgSt = p.img ? 'background-image:url(\'' + p.img + '\');background-size:cover;background-position:center' : '';
     return '<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface);border:1.5px solid ' + (qty>0?'rgba(200,146,10,.4)':'var(--border2)') + ';border-radius:14px;box-shadow:var(--shadow)">'
-      + '<div style="width:52px;height:52px;border-radius:10px;background:var(--surface2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px" ' + imgSt + '>' + (p.img ? '' : '🍬') + '</div>'
+      + '<div style="width:52px;height:52px;border-radius:10px;background:var(--surface2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;' + imgSt + '">' + (p.img ? '' : '🍬') + '</div>'
       + '<div style="flex:1;min-width:0">'
       +   '<div style="font-weight:800;font-size:13.5px;color:var(--text)">' + p.name + '</div>'
       +   '<div style="font-size:11.5px;color:var(--text3)">' + (p.price||0) + ' جنيه / قطعة' + (itemMax ? ' · حد أقصى ' + itemMax : '') + groupInfo + '</div>'
@@ -2623,11 +2667,14 @@ ML._renderBoxBuilder = function() {
 
 /* ── زيادة/إنقاص قطعة داخل العلبة مع كل التحققات ── */
 ML.boxStep = function(itemId, delta) {
-  var cfg = ML._boxConfig;
+  var cfg = ML._boxProfiles[ML._activeBoxProfileId];
   if (!cfg) return;
   var product = ML.products.find(function(p){ return p.id === itemId; });
   if (!product) return;
-  var elig = (cfg.eligibleItems||{})[itemId] || {};
+  var eligibleItems = cfg.eligibleItems || {};
+  /* تحقق صارم: الصنف لازم يكون فعلاً من ضمن أصناف الفئة دي المسموحة */
+  if (!eligibleItems.hasOwnProperty(itemId)) return;
+  var elig = eligibleItems[itemId] || {};
   var curQty = ML._currentBox[itemId] || 0;
 
   if (delta < 0) {
@@ -2674,7 +2721,8 @@ ML.boxStep = function(itemId, delta) {
 
 /* ── إضافة العلبة المكوّنة للسلة ── */
 ML.addBoxToCart = function() {
-  var cfg = ML._boxConfig;
+  var cfg = ML._boxProfiles[ML._activeBoxProfileId];
+  if (!cfg) { ML.toast('اختار فئة العلبة الأول 🎁'); return; }
   var ids = Object.keys(ML._currentBox);
   if (!ids.length) { ML.toast('اختار صنف واحد على الأقل 🎁'); return; }
 
@@ -2688,7 +2736,7 @@ ML.addBoxToCart = function() {
 
   ML.boxCart.push({
     id: 'box_' + Date.now() + '_' + Math.floor(Math.random()*1000),
-    title: cfg.title || 'شكل علبتك بنفسك',
+    title: cfg.name || 'شكل علبتك بنفسك',
     contents: contents,
     total: total,
     pieceCount: usage.pieces,
